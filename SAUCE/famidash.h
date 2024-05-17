@@ -290,6 +290,12 @@ unsigned char player_old_posy[8];
 unsigned char asdftemp;
 unsigned char discorefreshrate;
 unsigned char whichpcm;
+
+#define UP_WALK 0x01
+#define LEFT_WALK 0x02
+#define DOWN_WALK 0x04
+
+unsigned char spiderwalk;
 /*
 unsigned char gnd_palette_transition_timer;
 unsigned char original_gnd_palette_idx_0;

@@ -11,26 +11,36 @@ void x_movement(){
     // handle x
 
 	old_x = currplayer_x;
-	
-	if (!(options & platformer)) {
-		currplayer_vel_x = speed_table[speed & 0x7F];
-		currplayer_x += currplayer_vel_x;
-	} else {
-		currplayer_vel_x = speed_table[speed & 0x7F];
-		// leave the col calls first so it executes and checks against spike collision
-		if (!bg_coll_R() && (pad[currplayer] & PAD_RIGHT)) currplayer_x += currplayer_vel_x;
-		if (!bg_coll_L() && pad[currplayer] & PAD_LEFT && currplayer_x > 0x1000) currplayer_x -= currplayer_vel_x;
+	if (!spiderwalk) {
+		if (!(options & platformer)) {
+			currplayer_vel_x = speed_table[speed & 0x7F];
+			currplayer_x += currplayer_vel_x;
+		} else {
+			currplayer_vel_x = speed_table[speed & 0x7F];
+			// leave the col calls first so it executes and checks against spike collision
+			if (!bg_coll_R() && (pad[currplayer] & PAD_RIGHT)) currplayer_x += currplayer_vel_x;
+			if (!bg_coll_L() && pad[currplayer] & PAD_LEFT && currplayer_x > 0x1000) currplayer_x -= currplayer_vel_x;
+		}
+
+		if(currplayer_x > 0xf000) { // too far, don't wrap around
+		if(old_x >= 0xf000){
+		    currplayer_x = 0xf000; // max right
+		} else{
+		    currplayer_x = 0x0000; // max left
+		}
+			currplayer_vel_x = 0;
+		} 
 	}
 
-	if(currplayer_x > 0xf000) { // too far, don't wrap around
-        if(old_x >= 0xf000){
-            currplayer_x = 0xf000; // max right
-        } else{
-            currplayer_x = 0x0000; // max left
-        }
-		currplayer_vel_x = 0;
-	} 
-	
+	else if (spiderwalk & UP_WALK || spiderwalk & DOWN_WALK) {
+			currplayer_vel_x = 0;
+	}
+	else if (spiderwalk & LEFT_WALK) {
+			currplayer_vel_x = speed_table[speed & 0x7F];
+			currplayer_x -= currplayer_vel_x;
+	}
+
+
 	Generic.x = high_byte(currplayer_x); // this is much faster than passing a pointer to player
 	Generic.y = high_byte(currplayer_y);
 
