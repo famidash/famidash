@@ -11,7 +11,7 @@ void x_movement(){
     // handle x
 
 	old_x = currplayer_x;
-	if (!spiderwalk) {
+	if (!(spiderwalk & LEFT_WALK)) {
 		if (!(options & platformer)) {
 			currplayer_vel_x = speed_table[speed & 0x7F];
 			currplayer_x += currplayer_vel_x;
@@ -32,9 +32,6 @@ void x_movement(){
 		} 
 	}
 
-	else if (spiderwalk & UP_WALK || spiderwalk & DOWN_WALK) {
-			currplayer_vel_x = 0;
-	}
 	else if (spiderwalk & LEFT_WALK) {
 			currplayer_vel_x = speed_table[speed & 0x7F];
 			currplayer_x -= currplayer_vel_x;

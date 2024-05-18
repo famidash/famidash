@@ -322,13 +322,20 @@ void state_game(){
 
 		mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
 		if (((twoplayer) && !(kandoframecnt & 0x01)) || !twoplayer) sprite_collide();
-		{	// always store it back for practice mode
+			// always store it back for practice mode
+		if (spiderwalk & UP_WALK || spiderwalk & DOWN_WALK) {
+			player_vel_x[0] = currplayer_vel_y;
+			player_vel_y[0] = currplayer_vel_x;
+			player_x[0] = currplayer_y;
+			player_y[0] = currplayer_x;
+		} else {
 			player_x[0] = currplayer_x;
 			player_y[0] = currplayer_y;
 			player_vel_x[0] = currplayer_vel_x;
 			player_vel_y[0] = currplayer_vel_y;
-			player_gravity[0] = currplayer_gravity;
 		}
+			player_gravity[0] = currplayer_gravity;
+		
 
 
 		if (dual) { 
@@ -339,10 +346,10 @@ void state_game(){
 			else if (dual && !(options & platformer)) { player_x[1] = player_x[0]; player_vel_x[1] = player_vel_x[0]; }
 
 			{	
-				currplayer_x = player_x[1];
-				currplayer_y = player_y[1];
-				currplayer_vel_x = player_vel_x[1];
-				currplayer_vel_y = player_vel_y[1];
+		//		currplayer_x = player_x[1];
+		//		currplayer_y = player_y[1];
+		//		currplayer_vel_x = player_vel_x[1];
+		//		currplayer_vel_y = player_vel_y[1];
 				currplayer_gravity = player_gravity[1];
 			}
 
