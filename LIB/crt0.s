@@ -22,6 +22,10 @@
 VRAM_BUF=__VRAM_BUF_START__
 OAM_BUF=__OAM_BUF_START__
 PAL_BUF=__PAL_BUF_START__
+collMap0=__COLL0_START__
+collMap1=__COLL1_START__
+collMap2=__COLL2_START__
+collMap3=__COLL3_START__
 
 	.importzp _PAD_STATE, _PAD_STATET ;added
     .include "zeropage.inc"

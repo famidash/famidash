@@ -313,13 +313,13 @@ _unrle_next_column:
     ; roughly twice the size for much more perf. We'll want this function to be fast when we
     ; do practice mode so we can quickly reload to the middle of levels
     ldx _rld_column
-    .repeat 16, I
+    .repeat 15, I
     lda columnBuffer + I
-    sta _collisionMap0 + I * 16, x
+    sta collMap0 + I * 16, x
     .endrepeat
-    .repeat 11, I
-    lda columnBuffer+16 + I
-    sta _collisionMap0+$100 + I * 16, x
+    .repeat 12, I
+    lda columnBuffer+15 + I
+    sta collMap1 + I * 16, x
     .endrepeat
 
     inx
@@ -535,15 +535,15 @@ NametableAddrHi = tmp1
         STA ptr3
 
         ; Get the ptr (I am not bothering with 2 separate loops)
-        LDA #>_collisionMap0
+        LDA #>collMap0
         STA ptr1+1
         LDA ptr3
         AND #$0E
-        ADC #(<_collisionMap0-1)    ; The carry is set by the CMP used to jump into this routine
+        ; ADC #(<collMap0-1)    ; The carry is set by the CMP used to jump into this routine
         STA ptr1
-        BCC :+
-            INC ptr1+1
-        :
+        ; BCC :+
+        ;     INC ptr1+1
+        ; :
 
         LDA #8 - 1
         STA LoopCount
@@ -561,6 +561,7 @@ NametableAddrHi = tmp1
         STA LoopCount
 
         ; Update pointer (collisionMap0 is 240 bytes, not 256)
+        ; ???????
         LDA ptr1
         SEC
         SBC #$10
@@ -677,9 +678,9 @@ NametableAddrHi = tmp1
             ; is valid
             ADC #$20
             STA ptr1
-            BCC :+
-                INC ptr1+1
-            :
+            ; BCC :+            ;
+            ;     INC ptr1+1    ;   coll map starts at 0
+            ; :                 ;
 
             INX
             DEC LoopCount
@@ -2060,9 +2061,11 @@ drawplayer_common := _drawplayerone::common
         ; else
         ;     collision = collisionMap1[coordinates];
         ; return is_solid[collision];
+    LDA #(<collMap0)
+    STA ptr1
     LDA _temp_y     ;
     CMP #$F0        ;   if(temp_y >= 0xf0) return 0;
-    BCS Return0	;__
+    BCS Return0	    ;__
     AND #$F0        ;	temp_y & 0xF0
     STA tmp1        ;__
 	LDA _temp_x		;
@@ -2071,23 +2074,22 @@ drawplayer_common := _drawplayerone::common
 	LSR				;
 	LSR				;__
 	ORA tmp1		;	coordinates = (temp_x >> 4) + ((temp_y) & 0xf0);
-	TAX				;__
+	TAY				;__
 
 	LDA _temp_room	;	tmp3 = temp_room&1;
 	AND #$01		;__
-	BNE Room1		;__
-	LDA _collisionMap0,X	; collision = collisionMap0[coordinates];
-	JMP BothRooms
-
-	Room1:
-	; "tmp3" is 1, check for coordinates >= $C0
-	CPX #$C0			;	if (tmp3 && coordinates >= 0xc0) return COL_ALL;
-	BCS ReturnColAll	;__
-	LDA _collisionMap1,X	; collision = collisionMap0[coordinates];
-	BothRooms:
-	STA _collision	;
-	TAX				;__
-	LDA _is_solid,X	;	return is_solid[collision];
+	ORA #(>collMap0);
+    STA ptr1+1      ;
+    CMP #$61
+	BNE DoIt
+        ; "tmp3" is 1, check for coordinates >= $C0 (i.e. ground)
+        CPY #$C0			;	if (tmp3 && coordinates >= 0xc0) return COL_ALL;
+        BCS ReturnColAll	;__
+	DoIt:
+	LDA (ptr1),Y	; collision = collisionMap0[coordinates];
+	STA _collision	;__
+    TAY             ;
+	LDA _is_solid,Y	;	return is_solid[collision];
 	RTS				;__
 
 	Return0:
