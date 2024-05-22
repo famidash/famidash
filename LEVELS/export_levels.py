@@ -49,6 +49,7 @@ def export_bg(folder: str, levels: Iterable[str]):
             f"{level}_speed",
             f"{level}_bg_color",
             f"{level}_grnd_color",
+            f"{level}_extceil_flg",
         ]
         all_data += header
         all_data += rle_data
@@ -82,8 +83,9 @@ def export_bg(folder: str, levels: Iterable[str]):
                 out_str += f"  .byte {bank[filled_bytes + 2]}\n"
                 out_str += f"  .byte {bank[filled_bytes + 3]}\n"
                 out_str += f"  .byte {bank[filled_bytes + 4]}\n"
-                filled_bytes += 5
-                next_level_offset = filled_bytes + level_lengths[current_level] - 5
+                out_str += f"  .byte {bank[filled_bytes + 5]}\n"
+                filled_bytes += 6
+                next_level_offset = filled_bytes + level_lengths[current_level] - 6
                 current_level += 1
             else:
                 tmp = remaining_bytes
