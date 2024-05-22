@@ -41,6 +41,7 @@
 #define GREEN_ORB				0X27
 #define RED_ORB					0X28
 #define YELLOW_JUMP_ORB_SMALLER			0x29
+#define DECO_START              0x2A
 #define LONG_LIGHT				0x2A
 #define MEDIUM_LIGHT				0x2B
 #define SHORT_LIGHT				0x2C
@@ -67,6 +68,7 @@
 #define LONG_LIGHT_LEFT				0x41
 #define SHORT_LIGHT_U_8_PIXELS			0x42
 #define CHAIN_U_8_PIXELS			0x43
+#define DECO_END                0x43
 #define BLACK_ORB				0x44
 #define DASH_ORB				0x45
 #define DASH_GRAVITY_ORB			0x46
@@ -135,62 +137,10 @@ void init_sprites(void){
     } while (spr_index != 0);
 }
 
-__fastcall__ char sprite_height_lookup(){
+char sprite_height_lookup(){
 
     #define type tmp4
 
-    switch(type) {
-        case YELLOW_ORB:
-        case YELLOW_ORB_BIGGER:
-        case BLUE_ORB:
-        case PINK_ORB:
-        case GREEN_ORB:
-        case BLACK_ORB:
-        case DASH_ORB:
-        case DASH_GRAVITY_ORB:
-        case RED_ORB:
-        case D_BLOCK:
-        case S_BLOCK:
-	case BIG_SPIKE_BOTTOM:
-	case BIG_SPIKE_TOP:
-            return 0x0f;
-	case SMALL_SPIKE_BOTTOM:
-	case SMALL_SPIKE_TOP:
-	    return 0x07;
-	case 0x2A:
-	case 0x2B:
-	case 0x2C:
-	case 0x2D:
-	case 0x2E:
-	case 0x2F:
-	case 0x30:
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-	case 0x38:
-	case 0x39:
-	case 0x3A:
-	case 0x3B:
-	case 0x3C:
-	case 0x3D:
-	case 0x3E:
-	case 0x3F:
-	case 0x40:
-	case 0x41:
-	case 0x42:
-	case 0x43:
-	case 0x47:
-	case 0x48:
-	case 0x49:
-	case 0x4A:
-		if (twoplayer || !decorations) activesprites_type[index] = 0xFF; 
-		return 0;
-            
-    }
 /*			color fading code
     if ((type >= 0x80) && (type < 0xF0)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
         if (!discomode) tmp2 = (type & 0x3F);                        
@@ -238,48 +188,66 @@ __fastcall__ char sprite_height_lookup(){
 
     else if ((type >= 0x80) && (type < 0xF0)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
 		if (!discomode) tmp2 = (type & 0x3F);                        
-		else { 
-			return 0x00;
-		}
+		else return 0x00;
 			
 		if (type >= 0xC0){
 		    pal_col(6, tmp2);
 		    if (tmp2-0x10 & 0xC0) { 
-			pal_col(5, 0x0f); 
+			    pal_col(5, 0x0f); 
 		    } else { 
-			pal_col(5, (tmp2-0x10)); 
+			    pal_col(5, (tmp2-0x10)); 
 		    }
 			lastgcolortype = type;
 		} else {
 		    pal_col(0, tmp2);
 		    if (tmp2-0x10 & 0xC0) { 
-			pal_col(1, 0x0f); 
-			pal_col(9, 0x0f); 
+			    pal_col(1, 0x0f); 
+			    pal_col(9, 0x0f); 
 		    } else { 
-			pal_col(1, (tmp2-0x10)); 
-			pal_col(9, (tmp2-0x10)); 
+			    pal_col(1, (tmp2-0x10)); 
+			    pal_col(9, (tmp2-0x10)); 
 		    }
 			lastbgcolortype = type;
 		}
-		activesprites_type[index] = 0xFF; 
-		return 0x00;
+		activesprites_type[low_byte(index)] = 0xFF; 
+		return 0;
     }
 
     else if (type >= COINGOTTEN1 && type <= COINGOTTEN3) return 0x17;	// Coin
-    else if (
-        (type >= SPEED_05_PORTAL && type <= SPEED_20_PORTAL) || // Speed portals
-        (type == GRAVITY_DOWN_DOWNWARDS_PORTAL || type == GRAVITY_UP_DOWNWARDS_PORTAL))	// Gravity portals
+    else if (type >= SPEED_05_PORTAL && type <= SPEED_20_PORTAL) // Speed portals
         return 0x1F;	
-    else if ((type == GRAVITY_DOWN_UPWARDS_PORTAL || type == GRAVITY_UP_UPWARDS_PORTAL))	// Gravity portals
-	return 0x01;
+    else if ((type >= 0x2A && type <= 0x43) || (type >= 0x47 && type <= 0x4A)) {    // Decorations
+        if (twoplayer || !decorations) activesprites_type[low_byte(index)] = 0xFF; 
+		return 0;
+    }
+
     switch(type) {
         case NOSPRITE:
             return 0;
+		case SMALL_SPIKE_BOTTOM:
+		case SMALL_SPIKE_TOP:
+	    	return 0x07;
         case GRAVITY_PAD_DOWN_INVISIBLE:
         case GRAVITY_PAD_UP_INVISIBLE:
             return 0x07;
+		case YELLOW_ORB:
+        case YELLOW_ORB_BIGGER:
+        case BLUE_ORB:
+        case PINK_ORB:
+        case GREEN_ORB:
+        case BLACK_ORB:
+        case DASH_ORB:
+        case DASH_GRAVITY_ORB:
+        case RED_ORB:
+        case D_BLOCK:
+        case S_BLOCK:
+		case BIG_SPIKE_BOTTOM:
+		case BIG_SPIKE_TOP:
+            return 0x0f;
         case GRAVITY_UP_INVISIBLE_PORTAL:
         case GRAVITY_DOWN_INVISIBLE_PORTAL:
+		case GRAVITY_DOWN_UPWARDS_PORTAL:
+		case GRAVITY_UP_UPWARDS_PORTAL:
             return 0x01;
 //            return 0x0F;
         case CUBE_MODE:
@@ -298,21 +266,23 @@ __fastcall__ char sprite_height_lookup(){
             return 0x2f;
         case COIN1:
             if (coin1_obtained[level]) {
-                activesprites_type[index] = COINGOTTEN1;
+                activesprites_type[low_byte(index)] = COINGOTTEN1;
             }
             return 0x17; 
         case COIN2:
             if (coin2_obtained[level]) {
-                activesprites_type[index] = COINGOTTEN2;
+                activesprites_type[low_byte(index)] = COINGOTTEN2;
             }
             return 0x17; 
         case COIN3:
             if (coin3_obtained[level]) {
-                activesprites_type[index] = COINGOTTEN3;
+                activesprites_type[low_byte(index)] = COINGOTTEN3;
             }
             return 0x17; 
         case SPEED_30_PORTAL:
         case SPEED_40_PORTAL:
+		case GRAVITY_DOWN_DOWNWARDS_PORTAL:
+		case GRAVITY_UP_DOWNWARDS_PORTAL:
             return 0x1F;
         case YELLOW_PAD_DOWN:
         case YELLOW_PAD_UP:
