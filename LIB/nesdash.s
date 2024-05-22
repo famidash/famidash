@@ -39,14 +39,16 @@ sprite_data = _sprite_data
 
 .segment "BSS"
     ; column buffer, to be pushed to the collision map
-    ; 16 metatiles in the top screen 
-    ; 11 metatiles in the bot screen
-    columnBuffer:   .res 16 + 11
+    ; 15 metatiles in the top screen 
+    ; 12 metatiles in the bot screen
+    columnBuffer:   .res 15 + 15 + 15 + 12
 
     current_song_bank: .res 1
     scroll_count:   .res 1
+    extceil:        .res 1
 
 .export _scroll_count := scroll_count
+.export _extceil := extceil
 
 .export _parallax_scroll_column := parallax_scroll_column
 .export _parallax_scroll_column_start := parallax_scroll_column_start
@@ -225,9 +227,14 @@ _init_rld:
 		LDA #$0F		;	if (faded color invalid) color = $0F (canonical black)
 	:					;__
 	STA PAL_BUF+5		;__	Store faded color (pal_col(5, tmp2-0x10 or 0x0F))
+	INC <PAL_UPDATE		;__ Yes, we do need to update the palette
+    
     incw_check level_data
 
-	INC <PAL_UPDATE		;__ Yes, we do need to update the palette
+    LDA (level_data),y  ;   Extended ceiling flag
+    STA extceil         ;__
+
+    incw_check level_data
 
 SetupNextRLEByte:
     LDA (level_data),y  ;
