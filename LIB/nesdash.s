@@ -1,7 +1,7 @@
 ; Custom routines implemented specifically for famidash (some are totally not stolen from famitower)
 
 .global _level_list_lo, _level_list_hi, _level_list_bank, _sprite_list_lo, _sprite_list_hi, _sprite_list_bank
-.import _rld_column, _collisionMap0, _collisionMap1 ; used by C code
+.import _rld_column ; used by C code
 .import _scroll_x, _level_data_bank, _sprite_data_bank
 .import _song, _level, _gravity, _speed
 .import _cube_movement, _ship_movement, _ball_movement, _ufo_movement, _robot_movement, _spider_movement, _wave_movement
