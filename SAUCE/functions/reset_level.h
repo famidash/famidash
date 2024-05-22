@@ -7,34 +7,32 @@ void reset_level(void) {
     coins = 0;
 
     if (!DEBUG_MODE && cube_data[0] & 1) {
-	robotjumpframe[0] = 0;
-
+	    robotjumpframe[0] = 0;
         sfx_play(sfx_death, 0);
         tmp1 = 0;
-	attempts++;
+	    attempts++;
         while (tmp1 < 30){
             ppu_wait_nmi();
             music_update();
-    oam_clear();	
-	oam_meta_spr(high_byte(currplayer_x)-2, high_byte(currplayer_y)-2, Explode_Sprites[robotjumpframe[0]]);
+            oam_clear();	
+	        oam_meta_spr(high_byte(currplayer_x)-2, high_byte(currplayer_y)-2, Explode_Sprites[robotjumpframe[0]]);
             ++tmp1;
-	    if (robotjumpframe[0] < 20) ++robotjumpframe[0];
+	        if (robotjumpframe[0] < 20) ++robotjumpframe[0];
             //gray_line();
         }
-    }
-    else if (!DEBUG_MODE && cube_data[1] & 1) {
-	robotjumpframe[1] = 0;
+    } else if (!DEBUG_MODE && cube_data[1] & 1) {
+	    robotjumpframe[1] = 0;
 
         sfx_play(sfx_death, 0);
         tmp1 = 0;
-	attempts++;
+	    attempts++;
         while (tmp1 < 30){
-		ppu_wait_nmi();
-		music_update();
-		oam_clear();	
-	oam_meta_spr(high_byte(currplayer_x), high_byte(currplayer_y)-1, Explode_Sprites[robotjumpframe[1]]);
-		++tmp1;
-		if (robotjumpframe[1] < 20) ++robotjumpframe[1];
+            ppu_wait_nmi();
+            music_update();
+            oam_clear();	
+            oam_meta_spr(high_byte(currplayer_x), high_byte(currplayer_y)-1, Explode_Sprites[robotjumpframe[1]]);
+            ++tmp1;
+            if (robotjumpframe[1] < 20) ++robotjumpframe[1];
             //gray_line();
         }
     }
@@ -49,22 +47,27 @@ void reset_level(void) {
     set_scroll_y(scroll_y);
     init_rld(level);
 
-    if (!(options & platformer)) {player_x[0] = 0x0000;    player_x[1] = 0x0000; currplayer_x = 0x0000;}
-    else {player_x[0] = 0x1110;    player_x[1] = 0x1110; currplayer_x = 0x1110;}
+    if (!(options & platformer)) {
+        player_x[0] = 0x0000;
+        player_x[1] = 0x0000;
+        currplayer_x = 0x0000;
+    } else {
+        player_x[0] = 0x1110;
+        player_x[1] = 0x1110;
+        currplayer_x = 0x1110;
+    }
     
     player_y[0] = 0xb000;
     player_y[1] = 0xb000;
     currplayer_y = 0xb000;
 
     player_gravity[0] = 0x00;
-    if (twoplayer) player_gravity[1] = 0x00;
-    else player_gravity[1] = 0x01;
+    player_gravity[1] = twoplayer ? 0x00 : 0x01;
 
     currplayer_gravity = player_gravity[currplayer];
 
+    dual = twoplayer ? 1 : 0x00;
     mini = 0x00;
-    dual = 0x00;
-    if (twoplayer) dual = 1;
     player_vel_x[0] = 0;
     player_vel_y[0] = 0;
     player_vel_x[1] = 0;
@@ -89,18 +92,18 @@ void reset_level(void) {
 			if (tmp3 >= 0xC0){
 			    pal_col(6, tmp2);
 			    if (tmp2-0x10 & 0xC0) { 
-				pal_col(5, 0x0f); 
+				    pal_col(5, 0x0f); 
 			    } else { 
-				pal_col(5, (tmp2-0x10)); 
+				    pal_col(5, (tmp2-0x10)); 
 			    }
 			} else {
 			    pal_col(0, tmp2);
 			    if (tmp2-0x10 & 0xC0) { 
-				pal_col(1, 0x0f); 
-				pal_col(9, 0x0f); 
+				    pal_col(1, 0x0f); 
+				    pal_col(9, 0x0f); 
 			    } else { 
-				pal_col(1, (tmp2-0x10)); 
-				pal_col(9, (tmp2-0x10)); 
+				    pal_col(1, (tmp2-0x10)); 
+				    pal_col(9, (tmp2-0x10)); 
 			    }
 			}    
 
@@ -110,18 +113,18 @@ void reset_level(void) {
 			if (tmp3 >= 0xC0){
 			    pal_col(6, tmp2);
 			    if (tmp2-0x10 & 0xC0) { 
-				pal_col(5, 0x0f); 
+				    pal_col(5, 0x0f); 
 			    } else { 
-				pal_col(5, (tmp2-0x10)); 
+				    pal_col(5, (tmp2-0x10)); 
 			    }
 			} else {
 			    pal_col(0, tmp2);
 			    if (tmp2-0x10 & 0xC0) { 
-				pal_col(1, 0x0f); 
-				pal_col(9, 0x0f); 
+				    pal_col(1, 0x0f); 
+				    pal_col(9, 0x0f); 
 			    } else { 
-				pal_col(1, (tmp2-0x10)); 
-				pal_col(9, (tmp2-0x10)); 
+				    pal_col(1, (tmp2-0x10)); 
+				    pal_col(9, (tmp2-0x10)); 
 			    }
 			}    
     }
