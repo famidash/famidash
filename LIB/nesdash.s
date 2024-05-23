@@ -10,8 +10,6 @@
 level_data = _level_data
 sprite_data = _sprite_data
 
-;void __fastcall__ oam_meta_spr_flipped(uint8_t x,uint8_t y,const void *data);
-
 .segment "ZEROPAGE"
     rld_value:      .res 1
     rld_run:        .res 1
@@ -38,6 +36,7 @@ sprite_data = _sprite_data
 
 .segment "XCD_BANK_00"
 
+;void __fastcall__ oam_meta_spr_flipped(uint8_t x,uint8_t y,const void *data);
 .export __oam_meta_spr_flipped
 .proc __oam_meta_spr_flipped
 	; AX = data
@@ -544,17 +543,18 @@ NametableAddrHi = tmp1
         AND #$0F
         STA columnBuffer+7
 
-        ; Update new maximum
-        ; Update pointer (collisionMap0 is 240 bytes, not 256)
-        ; ???????
-        LDA ptr1
-        SEC
-        SBC #$10
-        STA ptr1
-        BCS :+
-            DEC ptr1+1
-        :
+        ; Update pointer
+		INC ptr1+1
 
+		; TODO: More logic:
+		; Y ≥	| Y <	| A		| B		|
+		; 	0	|  $78	|	0	|	1	|
+		;  $78	| $178	|  0/2	|	1	|
+		; $178	| $278	|	2	|  1/3	|
+		; $278	| $2F0	|	2	|	3	|
+		; $10 is added to Y at all F0 boundaries but the edge
+
+        ; Update new maximum
         LDA #8+6 - 1
         JSR attributeSetup
 
