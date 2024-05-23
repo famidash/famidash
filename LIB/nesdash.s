@@ -808,6 +808,61 @@ ParallaxBufferCol5:
 
 .endproc
 
+.import _ground
+.export _load_ground
+.proc _load_ground
+	;A = ground num
+	ASL						;
+	TAX						;
+	LDA	#$00				;
+	TAY						;	ptr1 = ground[id]
+	JSR	mmc3_set_prg_bank_1	;	mmc3_set_prg_bank_1(0)
+	LDA _ground, X			;	Y = 0
+	STA ptr1				;
+	LDA _ground+1, X		;
+	STA ptr1+1				;__
+	LDX #<-48				;__	X = idx @ collmap data, count up to 0
+
+	ground_ptr = ground-($100-48)
+
+	; there's a max of 48 bytes of data to fill, 
+	; the rle worst case is 96 bytes long,
+	; therefore not needing to check for an overflow
+
+	loop:
+		LDA (ptr1),y		;
+		bmi single_rle_byte	;	Run
+		STA tmp1			;
+		iny					;__
+
+		LDA (ptr1),y		;	Value
+		iny					;__
+
+		STY tmp2
+		LDY tmp1
+	mult_loop:
+		STA ground_ptr, X
+		INX
+		BEQ fin
+		DEY
+		BPL mult_loop
+		LDY tmp2
+		BNE loop	; Physically cannot be not 0
+
+	single_rle_byte:
+		AND #$7F
+		STA ground_ptr, X
+		INY
+		INX
+		BNE loop
+
+	fin:
+		RTS
+
+.endproc
+
+.segment "CODE"
+
 .export __draw_padded_text
 ; void __fastcall__ draw_padded_text(const void * data, uint8_t len, uint8_t total_len, uintptr_t ppu_address)
 .proc __draw_padded_text

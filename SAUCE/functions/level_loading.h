@@ -29,14 +29,11 @@ void __fastcall__ draw_screen_R_frame0(void);
 void __fastcall__ draw_screen_R_frame1(void);
 void __fastcall__ draw_screen_R_frame2(void);
 
-void load_ground(unsigned char id){
-	mmc3_set_prg_bank_1(0);
-	// render to both nametable c and d
-    vram_adr(NAMETABLE_C);
-    vram_unrle(ground[id & 0x7F]);
-    vram_adr(NAMETABLE_D);
-    vram_unrle(ground[id & 0x7F]);
-}
+/*
+	Load ground tiles into collision map
+	Implemented in asm
+*/
+void __fastcall__ load_ground(unsigned char id);
 
 void increase_parallax_scroll_column() {
 	// The parallax is a 6 x 9 tile background, and when it repeats
