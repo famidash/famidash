@@ -157,17 +157,7 @@ __oam_meta_spr_flipped:
 .endproc
 
 _init_rld:
-    ; The C code being ported:
-        ;
-        ; void init_rld(uint8_t level){ // reset run-length decoder back to zero
-        ;     rld_column = 0;
-        ; 	level_data = (uint8_t *) level_list[level];
-        ;     rld_value = level_data[0]; // set the value and run to the first tile type and length
-        ;     rld_run = level_data[1];
-        ; 	++level_data; ++level_data; 
-        ; }
-
-    ; A has the level ID
+    ; A = level ID
 
     ; Get pointers:
     TAY		                ;__ Load pointer to tables
@@ -2087,12 +2077,6 @@ drawplayer_common := _drawplayerone::common
 	AND #$01		;__
 	ORA #(>collMap0);
     STA ptr1+1      ;
-    CMP #$61
-	BNE DoIt
-        ; "tmp3" is 1, check for coordinates >= $C0 (i.e. ground)
-        CPY #$C0			;	if (tmp3 && coordinates >= 0xc0) return COL_ALL;
-        BCS ReturnColAll	;__
-	DoIt:
 	LDA (ptr1),Y	; collision = collisionMap0[coordinates];
 	STA _collision	;__
     TAY             ;
@@ -2101,10 +2085,6 @@ drawplayer_common := _drawplayerone::common
 
 	Return0:
 	LDA #$00
-	RTS
-
-	ReturnColAll:
-	LDA #$09       ; return COL_FLOOR_CEIL
 	RTS
 
 .endproc
