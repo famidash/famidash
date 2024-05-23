@@ -1,35 +1,14 @@
 ; Custom routines implemented specifically for famidash (some are totally not stolen from famitower)
-
-.global _level_list_lo, _level_list_hi, _level_list_bank, _sprite_list_lo, _sprite_list_hi, _sprite_list_bank
-.import _rld_column ; used by C code
-.import _scroll_x, _level_data_bank, _sprite_data_bank
-.import _song, _level, _gravity, _speed
-.import _cube_movement, _ship_movement, _ball_movement, _ufo_movement, _robot_movement, _spider_movement, _wave_movement
 .importzp _gamemode
 .importzp _tmp1, _tmp2, _tmp3, _tmp4, _tmp5, _tmp6, _tmp7, _tmp8  ; C-safe temp storage
-.import _DATA_PTR
-.import pusha, pushax, _lastgcolortype, _lastbgcolortype, _player_vel_x, _retro_mode, _ROBOT_ALT, _MINI_ROBOT_ALT
-.import _level1text, _level2text, _level3text, _level4text, _level5text, _level6text, _level7text, _level8text, _level9text, _levelAtext
-.import _increase_parallax_scroll_column, _icon
-.import FIRST_MUSIC_BANK
-.import _auto_fs_updates, _no_parallax
-.import callptr4
-
-.global metatiles_top_left, metatiles_top_right, metatiles_bot_left, metatiles_bot_right, metatiles_attr
+.import pusha, pushax, callptr4
+.import _scroll_x
 
 .macpack longbranch
-
-.export __oam_meta_spr_flipped
-.export _init_rld, _unrle_next_column, _draw_screen_R
-.export _movement
-.export _music_play, __sfx_play, _music_update
 
 .importzp _level_data, _sprite_data
 level_data = _level_data
 sprite_data = _sprite_data
-
-.define CUBE_GRAVITY $6B
-.define MINI_CUBE_GRAVITY $6F
 
 ;void __fastcall__ oam_meta_spr_flipped(uint8_t x,uint8_t y,const void *data);
 
@@ -43,12 +22,14 @@ sprite_data = _sprite_data
     ; 12 metatiles in the bot screen
     columnBuffer:   .res 15 + 15 + 15 + 12
 
-    current_song_bank: .res 1
-    scroll_count:   .res 1
-    extceil:        .res 1
+    current_song_bank:	.res 1
+    scroll_count:		.res 1
+    extceil:			.res 1
+    auto_fs_updates:	.res 1
 
 .export _scroll_count := scroll_count
 .export _extceil := extceil
+.export _auto_fs_updates := auto_fs_updates
 
 .export _parallax_scroll_column := parallax_scroll_column
 .export _parallax_scroll_column_start := parallax_scroll_column_start
@@ -57,7 +38,8 @@ sprite_data = _sprite_data
 
 .segment "XCD_BANK_00"
 
-__oam_meta_spr_flipped:
+.export __oam_meta_spr_flipped
+.proc __oam_meta_spr_flipped
 	; AX = data
 	; sreg[0] = x
 	; sreg[1] = y
@@ -68,11 +50,11 @@ __oam_meta_spr_flipped:
     ldx SPRID
 	ldy #0
 
-@1:
+loop:
 
     lda (PTR),y     ;x offset
     cmp #$80
-    beq @2
+    beq end
     iny
     clc
     BIT xargs+0 ;   Check for bit 6 (HFLIP)
@@ -105,12 +87,13 @@ __oam_meta_spr_flipped:
     inx
     inx
     inx
-    jmp @1
+    jmp loop
 
-@2:
+end:
 
     stx SPRID
     rts
+.endproc
 
 .macro INCW addr
     INC addr
@@ -156,6 +139,11 @@ __oam_meta_spr_flipped:
 	rts
 .endproc
 
+.global _level_list_lo, _level_list_hi, _level_list_bank, _sprite_list_lo, _sprite_list_hi, _sprite_list_bank
+.import _song, _speed, _lastgcolortype, _lastbgcolortype
+.import _rld_column
+.import _level_data_bank, _sprite_data_bank
+.export _init_rld
 _init_rld:
     ; A = level ID
 
@@ -261,7 +249,7 @@ single_rle_byte:
     incw_check level_data
     rts
 
-
+.export _unrle_next_column
 _unrle_next_column:
 
     ; Count up to zero to remove a cmp instruction
@@ -331,29 +319,33 @@ shiftBy4table:
 .byte $80, $90, $A0, $B0
 .byte $C0, $D0, $E0, $F0
 
-TileSizeHi  = (15*2)+2+1
-TileSizeLo  = (12*2)+2+1
 
-TileOff0    = 0
-TileOff1    = 0+TileSizeHi
-TileEnd     = 0+TileSizeHi+TileSizeLo
-
-
-AttrSizeHi  = 8*3
-AttrSizeLo  = 6*3
-
-AttrOff0    = 0
-AttrOff1    = 0+AttrSizeHi
-AttrEnd     = 0+AttrSizeHi+AttrSizeLo
-
+.global metatiles_top_left, metatiles_top_right, metatiles_bot_left, metatiles_bot_right, metatiles_attr
+.import _increase_parallax_scroll_column
+.import _no_parallax
+.export _draw_screen_R
 .proc _draw_screen_R
 
-CurrentRow = tmp1
-LoopCount = tmp2
+    TileSizeHi  = (15*2)+2+1
+    TileSizeLo  = (12*2)+2+1
 
-.export _draw_screen_R_frame0 := frame0
-.export _draw_screen_R_frame1 := frame1
-.export _draw_screen_R_frame2 := frame2
+    TileOff0    = 0
+    TileOff1    = 0+TileSizeHi
+    TileEnd     = 0+TileSizeHi+TileSizeLo
+
+    AttrSizeHi  = 8*3
+    AttrSizeLo  = 6*3
+
+    AttrOff0    = 0
+    AttrOff1    = 0+AttrSizeHi
+    AttrEnd     = 0+AttrSizeHi+AttrSizeLo
+
+    CurrentRow = tmp1
+    LoopCount = tmp2
+
+    .export _draw_screen_R_frame0 := frame0
+    .export _draw_screen_R_frame1 := frame1
+    .export _draw_screen_R_frame2 := frame2
     ; Write architecture:
 
     ; Frame 0:
@@ -937,10 +929,14 @@ ParallaxBufferCol5:
 
 .endproc
 
+
 ;void __fastcall__ movement(void);
 .pushseg
 .segment "XCD_BANK_01"
 
+.import _cube_movement, _ship_movement, _ball_movement, _ufo_movement, _robot_movement, _spider_movement, _wave_movement
+.import _retro_mode
+.export _movement
 .proc _movement
     ; The C code being "ported":
         ; switch (gamemode) {
@@ -985,7 +981,8 @@ ParallaxBufferCol5:
 .popseg
 
 ;void __fastcall__ music_play(uint8_t song);
-.import _options
+.import _options, FIRST_MUSIC_BANK
+.export _music_play
 .proc _music_play  
     bit _options ; sets N flag to bit 7 of _options without affecting a  
     bpl musicon
@@ -1031,6 +1028,7 @@ music_counts:
 
 ; void __fastcall__ sfx_play(uint8_t sfx_index, uint8_t channel);
 .import _options
+.export __sfx_play
 .proc __sfx_play  
     ; x = sfx
 	; a = channel
@@ -1043,6 +1041,7 @@ play:
 .endproc
 
 ; void __fastcall__ music_update (void);
+.export _music_update
 .proc _music_update
     LDA current_song_bank
     JSR mmc3_tmp_prg_bank_1
@@ -1243,12 +1242,16 @@ write_active:
 .pushseg
 .segment "XCD_BANK_00"
 
-.import _player_x, _player_y, _player_gravity, _player_vel_y
-.import _ballframe, _robotframe, _robotjumpframe, _spiderframe
+.define CUBE_GRAVITY $6B
+.define MINI_CUBE_GRAVITY $6F
+
+.import _player_x, _player_y, _player_gravity, _player_vel_x, _player_vel_y
+.import _ballframe, _robotframe, _robotjumpframe, _spiderframe, _mario_mode, _icon
 .importzp _cube_rotate, _mini
-.import _CUBE, _SHIP, _BALL, _ROBOT, _UFO, _SPIDER, _WAVE, _SWING
-.import _MINI_CUBE, _MINI_SHIP, _MINI_BALL, _MINI_ROBOT, _MINI_UFO, _MINI_SPIDER, _MINI_WAVE, _MINI_SWING
+.import _CUBE, _SHIP, _BALL, _ROBOT, _ROBOT_ALT, _UFO, _SPIDER, _WAVE, _SWING
+.import _MINI_CUBE, _MINI_SHIP, _MINI_BALL, _MINI_ROBOT, _MINI_ROBOT_ALT, _MINI_UFO, _MINI_SPIDER, _MINI_WAVE, _MINI_SWING
 .importzp _cube_data, _slope_frames
+
 drawcube_rounding_table:
 	.byte 0, <-1, <-2, 3, 2, 1
 	.byte 0, <-1, <-2, 3, 2, 1	; doubling it simplifies the routine
