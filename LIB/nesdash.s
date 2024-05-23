@@ -542,10 +542,9 @@ NametableAddrHi = tmp1
         ; :
 
         LDA #8 - 1
-        STA LoopCount
-
-        ldx #0
-        JSR attributeLoop1
+		LDX #0
+		STX ptr2+1
+        JSR attributeSetup
 
         ; Last byte has no bottom tiles
         LDA columnBuffer+7
@@ -553,9 +552,6 @@ NametableAddrHi = tmp1
         STA columnBuffer+7
 
         ; Update new maximum
-        LDA #8+6 - 1
-        STA LoopCount
-
         ; Update pointer (collisionMap0 is 240 bytes, not 256)
         ; ???????
         LDA ptr1
@@ -566,7 +562,8 @@ NametableAddrHi = tmp1
             DEC ptr1+1
         :
 
-        JSR attributeLoop1
+        LDA #8+6 - 1
+        JSR attributeSetup
 
         ; Get address hi byte (either left or right side)
         lda _scroll_x + 1 ; high byte
@@ -629,43 +626,44 @@ NametableAddrHi = tmp1
         STA scroll_count
         RTS
 
-    attributeLoop1:
-            ; Read upper left metatile
-            LDY #$00
-            LDA (ptr1),Y
-            tay
-            lda metatiles_attr,y
-            STA ptr2
+	attributeSetup:
+		STA LoopCount
 
-            ; Read lower left metatile (higher chance of being the same, due to RLE)
-            LDY #$10
+    	attributeLoop1:
+            ; Read lower right metatile
+            LDY #$11
             LDA (ptr1),Y
-            tay
-            lda metatiles_attr,y
-            STA ptr2+1
+            tax
+            ; Read lower left metatile
+			dey
+			LDA (ptr1), Y
+			tay
+			; Get their attributes
+            lda metatiles_attr,x	; Lower right
+			ASL
+			ASL
+			ora metatiles_attr,y	; Lower left
+            STA ptr2
 
             ; Read upper right metatile
             LDY #$01
             LDA (ptr1),Y
-            tay
-            lda metatiles_attr,y
-            ASL
-            ASL
-            ORA ptr2
-            STA ptr2
+            tax
+			; Read upper left metatile
+			dey
+			LDA (ptr1), Y
+			tay
+			; Get their attributes
+            lda metatiles_attr,x	; Upper right
+			ASL
+			ASL
+			ora metatiles_attr,y	; Upper left
 
-            ; Read lower right metatile
-            LDY #$11
-            LDA (ptr1),Y
-            tay
-            lda metatiles_attr,y
-            ASL
-            ASL
-            ORA ptr2+1
-            TAY
-            LDA ptr2
-            ORA shiftBy4table,Y
-            STA columnBuffer,X
+			; Combine
+			LDY ptr2	; Y has the lower metatile attrs, will shift by 4
+			ORA shiftBy4table,Y
+			LDX ptr2+1
+			STA columnBuffer,X
 
             ; Increment pointer
             LDA ptr1
@@ -678,7 +676,7 @@ NametableAddrHi = tmp1
             ;     INC ptr1+1    ;   coll map starts at 0
             ; :                 ;
 
-            INX
+            INC ptr2+1
             DEC LoopCount
             BPL attributeLoop1
         RTS
