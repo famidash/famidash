@@ -5,12 +5,7 @@
 //
 // ============================================================
 //
-// You can generate ground data by opening GRAPHICS/cube.nss
-// in NEXXT and making a ground in the nametable space. The
-// ground design should use Palette 1 and take the lowest six
-// tiles of the nametable builder. To export, go to
-// File > Canvas > Save as Screen (32x30), and select
-// "RLE C header (.h)."
+// You can generate ground data [INSTRUCTIONS REMOVED, DO IT MANUALLY MOTHERFCERS]
 //
 // Put the contents of the file in grounddata.h, and then put
 // the name of the ground in the pointer list below.
