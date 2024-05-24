@@ -141,3 +141,6 @@ extern char PAL_BUF[32];
   __asm__("pla"); \
   (b) = __A__; \
 } while(0);
+
+#define sec_sbc(a, b) (__A__ = (a), __asm__("sec \nadc %v", b), __A__)
+#define clc_sbc(a, b) (__A__ = (a), __asm__("clc \nsbc %v", b), __A__)

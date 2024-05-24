@@ -6,7 +6,7 @@
 
 void do_the_scroll_thing(){
     
-	if (currplayer_x > 0x5000){ // change x scroll
+	if (high_byte(currplayer_x) >= MSB(0x5000)){ // change x scroll
 		tmp1 = MSB(currplayer_x - 0x5000);
 		scroll_x += tmp1;
 		parallax_scroll_x += tmp1 ? tmp1 - 1 : 0;
@@ -30,12 +30,12 @@ void do_the_scroll_thing(){
 			}
 
 			
-			if (currplayer_y > 0xA000){ // change y scroll (upward)
+			if (high_byte(currplayer_y) >= MSB(0xA000)){ // change y scroll (upward)
 				tmp1 = MSB(currplayer_y - 0xA000);
 				scroll_y = add_scroll_y(tmp1, scroll_y);
-				if (scroll_y <= 0x2EF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+				if (high_byte(scroll_y) < MSB(0x300)) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
 			}
-			if (scroll_y > 0x2EF) scroll_y = 0x2EF;
+			if (high_byte(scroll_y) >= MSB(0x300)) scroll_y = 0x2EF; // 2F0 overflows into 300 (add_scroll_y)
 		}
 		else {
 			// TODO: boundary according to extceil flag
@@ -51,12 +51,12 @@ void do_the_scroll_thing(){
 			}
 
 			
-			if (currplayer_y > 0xF000){ // change y scroll (upward)
+			if (high_byte(currplayer_y) >= MSB(0xF000)){ // change y scroll (upward)
 				tmp1 = MSB(currplayer_y - 0xF000);
 				scroll_y = add_scroll_y(tmp1, scroll_y);
-				if (scroll_y <= 0x2EF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+				if (high_byte(scroll_y) < MSB(0x300)) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
 			}
-			if (scroll_y > 0x2EF) scroll_y = 0x2EF;
+			if (high_byte(scroll_y) >= MSB(0x300)) scroll_y = 0x2EF; // 2F0 overflows into 300 (add_scroll_y)
 		}
 	}
 
@@ -65,24 +65,24 @@ void do_the_scroll_thing(){
 			if (target_scroll_y > 0x0120) {
 				target_scroll_y--;
 				target_scroll_y--;
-				// TODO
-				++scroll_y; --high_byte(currplayer_y);
-				++scroll_y; --high_byte(currplayer_y);
+				--high_byte(currplayer_y); --high_byte(currplayer_y);
+				scroll_y = sub_scroll_y(2, scroll_y);
 			}
 			if (target_scroll_y < 0x110) {
 				target_scroll_y++;
 				target_scroll_y++;
-				--scroll_y; ++high_byte(currplayer_y);
-				--scroll_y; ++high_byte(currplayer_y);
+				++high_byte(currplayer_y); ++high_byte(currplayer_y);
+				scroll_y = add_scroll_y(2, scroll_y);
 			}
 			// TODO: boundary according to extceil flag
 			while (scroll_y < 0x08) {
 				++scroll_y;
 				--high_byte(currplayer_y);
 			}
-			while (scroll_y > 0x2EF) {
-				--scroll_y;
-				++high_byte(currplayer_y);
+			// 2F0 immediately overflows into 300
+			if (high_byte(scroll_y) >= MSB(0x300)) {
+				high_byte(currplayer_y) = clc_sbc(high_byte(currplayer_y), scroll_y);
+				scroll_y = 0x2EF;
 			}
 
 
@@ -94,7 +94,7 @@ void do_the_scroll_thing(){
 void do_the_scroll_thing2(){
 
     
-	if (currplayer_x > 0x5000){ // change x scroll
+	if (high_byte(currplayer_x) >= MSB(0x5000)){ // change x scroll
 		tmp1 = MSB(currplayer_x - 0x5000);
 		scroll_x += tmp1;
 		parallax_scroll_x += tmp1 ? tmp1 - 1 : 0;
@@ -119,12 +119,12 @@ void do_the_scroll_thing2(){
 		}
 
 		
-		if (currplayer_y > 0xA000){ // change y scroll (upward)
+		if (high_byte(currplayer_y) >= MSB(0xA000)){ // change y scroll (upward)
 			tmp1 = MSB(currplayer_y - 0xA000);
 			scroll_y = add_scroll_y(tmp1, scroll_y);
-			if (scroll_y <= 0x2EF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+			if (high_byte(scroll_y) < MSB(0x300)) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
 		}
-		if (scroll_y > 0x2EF) scroll_y = 0x2EF;
+		if (high_byte(scroll_y) >= MSB(0x300)) scroll_y = 0x2EF; // 2F0 overflows into 300 (add_scroll_y)
 	}
 	else {
 		// TODO: boundary according to extceil flag
@@ -140,12 +140,12 @@ void do_the_scroll_thing2(){
 		}
 
 		
-		if (currplayer_y > 0xF000){ // change y scroll (upward)
+		if (high_byte(currplayer_y) >= MSB(0xF000)){ // change y scroll (upward)
 			tmp1 = MSB(currplayer_y - 0xF000);
 			scroll_y = add_scroll_y(tmp1, scroll_y);
-			if (scroll_y <= 0x2EF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+			if (high_byte(scroll_y) < MSB(0x300)) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
 		}
-		if (scroll_y > 0x2EF) scroll_y = 0x2EF;
+		if (high_byte(scroll_y) >= MSB(0x300)) scroll_y = 0x2EF; // 2F0 overflows into 300 (add_scroll_y)
 	}
 
 
