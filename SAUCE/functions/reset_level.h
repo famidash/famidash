@@ -41,7 +41,7 @@ void reset_level(void) {
     scroll_x = 0;
     scroll_count = 0;
     set_scroll_x(scroll_x);
-    scroll_y = 0xEF;
+    scroll_y = 0x2EF;
     set_scroll_y(scroll_y);
     init_rld(level);
 
