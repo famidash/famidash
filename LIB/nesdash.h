@@ -155,3 +155,6 @@ extern uint8_t PAL_BUF[32];
 #define crossPRGBankJump0_16(sym) (crossPRGBankJump0_0(sym), __asm__("lda ptr3 \n ldx ptr3+1"), __AX__)
 #define crossPRGBankJump8_16(sym, args) (crossPRGBankJump8_0(sym, args), __asm__("lda ptr3 \n ldx ptr3+1"), __AX__)
 #define crossPRGBankJump16_16(sym, args) (crossPRGBankJump16_0(sym, args), __asm__("lda ptr3 \n ldx ptr3+1"), __AX__)
+
+#define sec_sbc(a, b) (__A__ = (a), __asm__("sec \nadc %v", b), __A__)
+#define clc_sbc(a, b) (__A__ = (a), __asm__("clc \nsbc %v", b), __A__)
