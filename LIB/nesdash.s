@@ -20,11 +20,12 @@ sprite_data = _sprite_data
 	; column buffer, to be pushed to the collision map
 	; 15 metatiles in the top screen 
 	; 12 metatiles in the bot screen
-	columnBuffer:   .res 15 + 15 + 15 + 12
+	columnBuffer:   .res 15 + 15 + 15 + 15
 
 	current_song_bank:	.res 1
 	scroll_count:		.res 1
 	auto_fs_updates:	.res 1
+	extceil:			.res 1
 	rld_load_value:		.res 1
 	min_scroll_y:		.res 2
 
@@ -42,66 +43,66 @@ sprite_data = _sprite_data
 ;void __fastcall__ oam_meta_spr_flipped(uint8_t x,uint8_t y,const void *data);
 .export __oam_meta_spr_flipped
 .proc __oam_meta_spr_flipped
-	; AX = data
-	; sreg[0] = x
-	; sreg[1] = y
-	; xargs[0] = flip
-	sta <PTR
-	stx <PTR+1
+		; AX = data
+		; sreg[0] = x
+		; sreg[1] = y
+		; xargs[0] = flip
+		sta <PTR
+		stx <PTR+1
 
-	ldx SPRID
-	ldy #0
+		ldx SPRID
+		ldy #0
 
-loop:
+	loop:
 
-	lda (PTR),y     ;x offset
-	cmp #$80
-	beq end
-	iny
-	clc
-	BIT xargs+0 ;	Check for bit 6 (HFLIP)
-	BVC :+      ;__
-	EOR #$FF    ;	If HLIPd, then two's complement
-	ADC #($100 - 8)	; Carry is clear
-	SEC         ;__
-	:           ;
-	adc sreg+0
-	sta OAM_BUF+3,x
-	lda (PTR),y     ;y offset
-	INY
-	clc
-	BIT xargs+0 ;	Check for bit 7 (VFLIP)
-	BPL :+      ;__
-	EOR #$FF    ;	If VLIPd, then two's complement
-	; ADC #($100 - 16)	; Carry is clear, Y is -16'd because of us using 8x16 mode
-	SEC         ;__
-	:           ;
-	adc sreg+1
-	sta OAM_BUF+0,x
-	lda (PTR),y     ;tile
-	iny
-	sta OAM_BUF+1,x
-	lda (PTR),y     ;attribute
-	iny
-	EOR xargs+0
-	sta OAM_BUF+2,x
-	inx
-	inx
-	inx
-	inx
-	jmp loop
+		lda (PTR),y     ;x offset
+		cmp #$80
+		beq end
+		iny
+		clc
+		BIT xargs+0 ;	Check for bit 6 (HFLIP)
+		BVC :+      ;__
+		EOR #$FF    ;	If HLIPd, then two's complement
+		ADC #($100 - 8)	; Carry is clear
+		SEC         ;__
+		:           ;
+		adc sreg+0
+		sta OAM_BUF+3,x
+		lda (PTR),y     ;y offset
+		INY
+		clc
+		BIT xargs+0 ;	Check for bit 7 (VFLIP)
+		BPL :+      ;__
+		EOR #$FF    ;	If VLIPd, then two's complement
+		; ADC #($100 - 16)	; Carry is clear, Y is -16'd because of us using 8x16 mode
+		SEC         ;__
+		:           ;
+		adc sreg+1
+		sta OAM_BUF+0,x
+		lda (PTR),y     ;tile
+		iny
+		sta OAM_BUF+1,x
+		lda (PTR),y     ;attribute
+		iny
+		EOR xargs+0
+		sta OAM_BUF+2,x
+		inx
+		inx
+		inx
+		inx
+		jmp loop
 
-end:
+	end:
 
-	stx SPRID
-	rts
+		stx SPRID
+		rts
 .endproc
 
 .macro INCW addr
 	INC addr
 	BNE :+
 		INC addr+1
-:
+	:
 .endmacro
 
 .macro incw addr
@@ -112,10 +113,8 @@ end:
 	INC addr
 	BNE :+
 		jsr incwlvl_checkC000
-:
+	:
 .endmacro
-
-.segment "CODE_2"
 
 .export __one_vram_buffer_repeat
 .proc __one_vram_buffer_repeat
@@ -211,8 +210,34 @@ _init_rld:
 
 	incw_check level_data
 
-	LDA	(level_data),y	;	Extended ceiling flag
+	LDA	(level_data),y	;
+	TAX					;
+	EOR #$FF			;	Level height
+	CLC					;
+	ADC #$01			;
+	STA rld_load_value	;__
+
+	LDA	#$80			;- (to automatically shift out 1)
+	CPX	#27+1			;	Extceil flag
+	ROL					;
 	STA	extceil			;__
+
+	@min_scroll_y_calc:
+		LDA	#$00			;
+		STA	min_scroll_y+1	;__
+		
+		TXA					;
+	@min_scroll_y_loop:
+		; SEC done by LDA #$80, and looping
+		SBC	#15				;__
+		BCC	@min_scroll_y_fin
+		INC	min_scroll_y+1
+		TAX
+		BCS	@min_scroll_y_loop	; = BRA
+	@min_scroll_y_fin:
+		LDA	shiftBy4table, X
+		ORA #$08
+		STA min_scroll_y
 
 	incw_check level_data
 
@@ -251,16 +276,18 @@ single_rle_byte:
     incw_check level_data
     rts
 
+.segment "CODE_2"
+
 .export _unrle_next_column
 _unrle_next_column:
 
     ; Count up to zero to remove a cmp instruction
-    ldx #<-27
+    ldx rld_load_value
     ldy #$00
     lda rld_value
 
     @FirstLoop:
-        sta columnBuffer - ($100 - 27), x
+        sta columnBuffer - ($100 - (15 + 15 + 15 + 12)), x
         dec rld_run
         bmi @UpdateValueRun
         inx 
@@ -300,15 +327,37 @@ _unrle_next_column:
     ; roughly twice the size for much more perf. We'll want this function to be fast when we
     ; do practice mode so we can quickly reload to the middle of levels
     ldx _rld_column
-    .repeat 15, I
-    lda columnBuffer + I
-    sta collMap0 + I * 16, x
-    .endrepeat
-    .repeat 12, I
-    lda columnBuffer+15 + I
-    sta collMap1 + I * 16, x
-    .endrepeat
+	ldy rld_load_value
+	cpy #<-(15+15+12)
+	bcs @write_collmap1
+		.repeat 15, I
+			lda columnBuffer + I
+			sta collMap0 + I * 16, x
+		.endrepeat
+	@write_collmap1:
+	cpy #<-(15+12)
+	bcs @write_collmap2
+		.repeat 15, I
+			lda columnBuffer+(15*1) + I
+			sta collMap1 + I * 16, x
+		.endrepeat
+	@write_collmap2:
+	cpy #<-(12)
+	bcs @write_collmap3
+		.repeat 15, I
+			lda columnBuffer+(15*2) + I
+			sta collMap2 + I * 16, x
+		.endrepeat
+	@write_collmap3:
+		.repeat 12, I
+			lda columnBuffer+(15*3) + I
+			sta collMap3 + I * 16, x
+		.endrepeat
 
+		.repeat 3, I
+			lda ground + I * 16, x
+			sta columnBuffer+(15*3)+12+I
+		.endrepeat
     inx
     txa
     and #$0F
@@ -329,14 +378,14 @@ shiftBy4table:
 .proc _draw_screen_R
 
     TileSizeHi  = (15*2)+2+1
-    TileSizeLo  = (12*2)+2+1
+    TileSizeLo  = (15*2)+2+1
 
     TileOff0    = 0
     TileOff1    = 0+TileSizeHi
     TileEnd     = 0+TileSizeHi+TileSizeLo
 
     AttrSizeHi  = 8*3
-    AttrSizeLo  = 6*3
+    AttrSizeLo  = 8*3
 
     AttrOff0    = 0
     AttrOff1    = 0+AttrSizeHi
@@ -420,14 +469,15 @@ frame1:
         ; Amount of data in the sequence - 27*2 tiles (8x8 tiles, left sides of the metatiles)
         LDA	#(15*2)
         STA	VRAM_BUF+TileOff0+2,X
-        LDA	#(12*2)
         STA	VRAM_BUF+TileOff1+2,X
 
         ; The sequence itself:
         
         ; Load Y value
-        LDY #$00
-        sty CurrentRow
+        LDA rld_load_value
+		SEC
+		SBC #$03
+        sta CurrentRow
         ; Load max value
         LDA	#15 - 1
         STA	LoopCount
@@ -439,11 +489,11 @@ frame1:
             ; Call for upper tiles
             JSR right_tilewriteloop
             jmp @WriteBottomHalf
-@LeftWrite:
+		@LeftWrite:
             JSR left_tilewriteloop
-@WriteBottomHalf:
+	@WriteBottomHalf:
         ; Load new max
-        LDA	#12 - 1
+        LDA	#15 - 1
         STA	LoopCount
         ; Add offset to X
         TXA
@@ -456,13 +506,13 @@ frame1:
         beq @LeftWrite2
             JSR right_tilewriteloop
             jmp @RenderParallax
-@LeftWrite2:
+		@LeftWrite2:
             ; Call for lower tiles
             JSR left_tilewriteloop
-@RenderParallax:
+	@RenderParallax:
 
-ParallaxBufferStart = tmp1
-ParallaxExtent = tmp3
+		ParallaxBufferStart = tmp1
+		ParallaxExtent = tmp3
         ; Loop through the vram writes and find any $00 tiles and replace them with parallax
         ; Calculate the end of the parallax column offset
         ldy parallax_scroll_column
@@ -526,7 +576,7 @@ NametableAddrHi = tmp1
         STA	ptr3
 
         ; Get the ptr (I am not bothering with 2 separate loops)
-        LDA	#>collMap0
+        LDA	#>collMap2
         STA	ptr1+1
         LDA	ptr3
         AND	#$0E
@@ -558,8 +608,13 @@ NametableAddrHi = tmp1
 		; $10 is added to Y at all F0 boundaries but the edge
 
         ; Update new maximum
-        LDA	#8+6 - 1
+        LDA	#8+8 - 1
         JSR attributeSetup
+
+		; Last byte has no bottom tiles
+        LDA	columnBuffer+15
+        AND	#$0F
+        STA	columnBuffer+15
 
         ; Get address hi byte (either left or right side)
         lda _scroll_x + 1 ; high byte
@@ -596,7 +651,7 @@ NametableAddrHi = tmp1
             ADC #$08
             BCC addressLoop
         
-        LDY #14
+        LDY #16
 
         LDA	VRAM_INDEX
         ADC #AttrEnd-1  ; Carry is set by the ADC : BCC
@@ -679,7 +734,7 @@ NametableAddrHi = tmp1
 
     right_tilewriteloop:
             ldy CurrentRow
-            LDA	columnBuffer,Y
+            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
             tay
             ; y is the metatile id
             lda metatiles_top_right, y
@@ -695,7 +750,7 @@ NametableAddrHi = tmp1
         rts
     left_tilewriteloop:
             ldy CurrentRow
-            LDA	columnBuffer,Y
+            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
             tay
             ; y is the metatile id
             lda metatiles_top_left, y
@@ -2118,7 +2173,7 @@ drawplayer_common := _drawplayerone::common
 
 	LDA	_temp_room	;	tmp3 = temp_room&1;
 	AND	#$01		;__
-	ORA	#(>collMap0);
+	ORA	#(>collMap2);
     STA	ptr1+1      ;
 	LDA	(ptr1),Y	; collision = collisionMap0[coordinates];
 	STA	_collision	;__
