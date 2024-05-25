@@ -52,7 +52,7 @@ def export_bg(folder: str, levels: Iterable[str]):
             f"{level}_speed",
             f"{level}_bg_color",
             f"{level}_grnd_color",
-            f"{1 if len(lines) > 27 else 0}\t; extended ceiling flag",
+            f"{len(lines)}\t; {level} height",
         ]
         all_data += header
         all_data += rle_data
