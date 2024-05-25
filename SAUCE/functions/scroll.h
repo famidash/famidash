@@ -62,6 +62,7 @@ void do_the_scroll_thing(){
 
 
 	else {			//ship stuff
+			// TODO: Adjust
 			if (target_scroll_y > 0x0120) {
 				target_scroll_y--;
 				target_scroll_y--;

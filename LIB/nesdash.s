@@ -10,21 +10,23 @@
 level_data = _level_data
 sprite_data = _sprite_data
 
+.define gamemode_count 7
 
 .segment "ZEROPAGE"
-    rld_value:      .res 1
-    rld_run:        .res 1
+	rld_value:		.res 1
+	rld_run:		.res 1
 
 .segment "BSS"
-    ; column buffer, to be pushed to the collision map
-    ; 15 metatiles in the top screen 
-    ; 12 metatiles in the bot screen
-    columnBuffer:   .res 15 + 15 + 15 + 12
+	; column buffer, to be pushed to the collision map
+	; 15 metatiles in the top screen 
+	; 12 metatiles in the bot screen
+	columnBuffer:   .res 15 + 15 + 15 + 12
 
-    current_song_bank:	.res 1
-    scroll_count:		.res 1
-    extceil:			.res 1
-    auto_fs_updates:	.res 1
+	current_song_bank:	.res 1
+	scroll_count:		.res 1
+	auto_fs_updates:	.res 1
+	rld_load_value:		.res 1
+	min_scroll_y:		.res 2
 
 .export _scroll_count := scroll_count
 .export _extceil := extceil
@@ -32,8 +34,8 @@ sprite_data = _sprite_data
 
 .export _parallax_scroll_column := parallax_scroll_column
 .export _parallax_scroll_column_start := parallax_scroll_column_start
-    parallax_scroll_column: .res 1
-    parallax_scroll_column_start: .res 1
+	parallax_scroll_column: .res 1
+	parallax_scroll_column_start: .res 1
 
 .segment "CODE"
 
@@ -43,73 +45,73 @@ sprite_data = _sprite_data
 	; AX = data
 	; sreg[0] = x
 	; sreg[1] = y
-    ; xargs[0] = flip
+	; xargs[0] = flip
 	sta <PTR
 	stx <PTR+1
 
-    ldx SPRID
+	ldx SPRID
 	ldy #0
 
 loop:
 
-    lda (PTR),y     ;x offset
-    cmp #$80
-    beq end
-    iny
-    clc
-    BIT xargs+0 ;   Check for bit 6 (HFLIP)
-    BVC :+      ;__
-    EOR #$FF    ;   If HLIPd, then two's complement
+	lda (PTR),y     ;x offset
+	cmp #$80
+	beq end
+	iny
+	clc
+	BIT xargs+0 ;	Check for bit 6 (HFLIP)
+	BVC :+      ;__
+	EOR #$FF    ;	If HLIPd, then two's complement
 	ADC #($100 - 8)	; Carry is clear
-    SEC         ;__
-    :           ;
-    adc sreg+0
-    sta OAM_BUF+3,x
-    lda (PTR),y     ;y offset
-    INY
-    clc
-    BIT xargs+0 ;   Check for bit 7 (VFLIP)
-    BPL :+      ;__
-    EOR #$FF    ;   If VLIPd, then two's complement
+	SEC         ;__
+	:           ;
+	adc sreg+0
+	sta OAM_BUF+3,x
+	lda (PTR),y     ;y offset
+	INY
+	clc
+	BIT xargs+0 ;	Check for bit 7 (VFLIP)
+	BPL :+      ;__
+	EOR #$FF    ;	If VLIPd, then two's complement
 	; ADC #($100 - 16)	; Carry is clear, Y is -16'd because of us using 8x16 mode
-    SEC         ;__
-    :           ;
-    adc sreg+1
-    sta OAM_BUF+0,x
-    lda (PTR),y     ;tile
-    iny
-    sta OAM_BUF+1,x
-    lda (PTR),y     ;attribute
-    iny
-    EOR xargs+0
-    sta OAM_BUF+2,x
-    inx
-    inx
-    inx
-    inx
-    jmp loop
+	SEC         ;__
+	:           ;
+	adc sreg+1
+	sta OAM_BUF+0,x
+	lda (PTR),y     ;tile
+	iny
+	sta OAM_BUF+1,x
+	lda (PTR),y     ;attribute
+	iny
+	EOR xargs+0
+	sta OAM_BUF+2,x
+	inx
+	inx
+	inx
+	inx
+	jmp loop
 
 end:
 
-    stx SPRID
-    rts
+	stx SPRID
+	rts
 .endproc
 
 .macro INCW addr
-    INC addr
-    BNE :+
-        INC addr+1
+	INC addr
+	BNE :+
+		INC addr+1
 :
 .endmacro
 
 .macro incw addr
-    INCW addr
+	INCW addr
 .endmacro
 
 .macro incw_check addr
-    INC addr
-    BNE :+
-        jsr incwlvl_checkC000
+	INC addr
+	BNE :+
+		jsr incwlvl_checkC000
 :
 .endmacro
 
@@ -124,18 +126,18 @@ end:
 	sta VRAM_BUF, y
 	txa
 	sta VRAM_BUF+1, y
-    ; ptr1 lo byte is len, hi byte is character to repeat
-    lda sreg+1
-    ora #$80 ; set length + repeat byte
+	; ptr1 lo byte is len, hi byte is character to repeat
+	lda sreg+1
+	ora #$80 ; set length + repeat byte
 	sta VRAM_BUF+2, y
-    lda sreg+0
+	lda sreg+0
 	sta VRAM_BUF+3, y
 	lda #$ff ;=NT_UPD_EOF
 	sta VRAM_BUF+4, y
-    tya
-    clc
-    adc #4
-    sta VRAM_INDEX
+	tya
+	clc
+	adc #4
+	sta VRAM_INDEX
 	rts
 .endproc
 
@@ -145,83 +147,83 @@ end:
 .import _level_data_bank, _sprite_data_bank
 .export _init_rld
 _init_rld:
-    ; A = level ID
+	; A = level ID
 
-    ; Get pointers:
-    TAY		                ;__ Load pointer to tables
-	LDA _sprite_list_lo,y	;
-	STA _sprite_data+0		;__	Get low pointer to sprite data 
-	LDA _sprite_list_hi,y	;
-	STA _sprite_data+1		;__	Get high pointer to sprite data 
-    LDA _sprite_list_bank,y ;   Get sprite data bank
-    ; CLC                     ;
-    ; ADC #<FIRST_SPRITE_BANK ;
-    STA _sprite_data_bank   ;__
-	LDA _level_list_lo,y	;
-	STA _level_data+0		;__	Get low pointer to level data 
-	LDA _level_list_hi,y	;
-	STA _level_data+1		;__	Get high pointer to level data 
-    LDA _level_list_bank,y  ;   Get level data bank
-    STA _level_data_bank    ;__
-    
-    JSR mmc3_set_prg_bank_1
+	; Get pointers:
+	TAY						;__ Load pointer to tables
+	LDA	_sprite_list_lo,y	;
+	STA	_sprite_data+0		;__	Get low pointer to sprite data 
+	LDA	_sprite_list_hi,y	;
+	STA	_sprite_data+1		;__	Get high pointer to sprite data 
+	LDA	_sprite_list_bank,y ;	Get sprite data bank
+	; CLC						;
+	; ADC #<FIRST_SPRITE_BANK	;
+	STA	_sprite_data_bank	;__
+	LDA	_level_list_lo,y	;
+	STA	_level_data+0		;__	Get low pointer to level data 
+	LDA	_level_list_hi,y	;
+	STA	_level_data+1		;__	Get high pointer to level data 
+	LDA	_level_list_bank,y	;	Get level data bank
+	STA	_level_data_bank	;__
 
-    LDY #$00            ;-  For both (zp),y addressing and rld_column
-    STY _rld_column     ;__ Reset scrolling
+	JSR mmc3_set_prg_bank_1
 
-    ; Read header
-    LDA (level_data),y  ;
-    STA _song           ;   Song number
-    incw_check level_data
+	LDY #$00			;-	For both (zp),y addressing and rld_column
+	STY _rld_column		;__	Reset scrolling
 
-    LDA (level_data),y  ;
-    STA _gamemode       ;   Starting level number
-    incw_check level_data
+	; Read header
+	LDA	(level_data),y	;
+	STA	_song			;	Song number
+	incw_check level_data
 
-    LDA (level_data),y  ;
-    STA _speed          ;   Starting speed
-    incw_check level_data
+	LDA	(level_data),y	;
+	STA	_gamemode		;	Starting level number
+	incw_check level_data
 
-    LDA (level_data),y  ;	Starting BG color
-	AND #$3F			;	Store normal color (pal_col(0, tmp2))
-    STA PAL_BUF+0       ;__ 
-    STA _lastbgcolortype
-    SEC                 ;	A = faded OG color (A - 10)
-    SBC #$10            ;__
+	LDA	(level_data),y	;
+	STA	_speed			;	Starting speed
+	incw_check level_data
+
+	LDA	(level_data),y	;	Starting BG color
+	AND	#$3F			;	Store normal color (pal_col(0, tmp2))
+	STA	PAL_BUF+0		;__
+	STA	_lastbgcolortype
+	SEC					;	A = faded OG color (A - 10)
+	SBC #$10			;__
 	BPL :+				;
-		LDA #$0F		;	if (faded color invalid) color = $0F (canonical black)
+		LDA	#$0F		;	if (faded color invalid) color = $0F (canonical black)
 	:					;__
-	STA PAL_BUF+1		;__	Store faded color (pal_col(1, tmp2-0x10 or 0x0F))
-	STA PAL_BUF+9		;__	Store faded color (pal_col(1, tmp2-0x10 or 0x0F))
-    incw_check level_data
+	STA	PAL_BUF+1		;__	Store faded color (pal_col(1, tmp2-0x10 or 0x0F))
+	STA	PAL_BUF+9		;__	Store faded color (pal_col(1, tmp2-0x10 or 0x0F))
+	incw_check level_data
 
-	LDA (level_data),y  ;	Starting ground color
-	AND #$3F			;	Store normal color (pal_col(6, tmp2))
-    STA PAL_BUF+6       ;__ 
-	STA	_lastgcolortype
-    SEC                 ;	A = faded OG color (A - 10)
-    SBC #$10            ;__
+	LDA	(level_data),y  ;	Starting ground color
+	AND	#$3F			;	Store normal color (pal_col(6, tmp2))
+	STA	PAL_BUF+6		;__
+	STA	_lastgcolortype	;
+	SEC					;	A = faded OG color (A - 10)
+	SBC #$10			;__
 	BPL :+				;
-		LDA #$0F		;	if (faded color invalid) color = $0F (canonical black)
+		LDA	#$0F		;	if (faded color invalid) color = $0F (canonical black)
 	:					;__
-	STA PAL_BUF+5		;__	Store faded color (pal_col(5, tmp2-0x10 or 0x0F))
-	INC <PAL_UPDATE		;__ Yes, we do need to update the palette
-    
-    incw_check level_data
+	STA	PAL_BUF+5		;__	Store faded color (pal_col(5, tmp2-0x10 or 0x0F))
+	INC <PAL_UPDATE		;__	Yes, we do need to update the palette
 
-    LDA (level_data),y  ;   Extended ceiling flag
-    STA extceil         ;__
+	incw_check level_data
 
-    incw_check level_data
+	LDA	(level_data),y	;	Extended ceiling flag
+	STA	extceil			;__
+
+	incw_check level_data
 
 SetupNextRLEByte:
-    LDA (level_data),y  ;
+    LDA	(level_data),y  ;
     bmi single_rle_byte
-    STA rld_run         ;__ Load rld_run, ++level_data
+    STA	rld_run         ;__ Load rld_run, ++level_data
     incw_check level_data     ;__
 
-    LDA (level_data),y  ;
-    STA rld_value       ;   Load rld_value, ++level_data
+    LDA	(level_data),y  ;
+    STA	rld_value       ;	Load rld_value, ++level_data
     ; JMP incwlvl_checkC000
 
     INC level_data
@@ -233,10 +235,10 @@ incwlvl_checkC000:  ; clobbers A
         bvc :+
         pha 
             ; switch banks
-            LDA #$A0            ;   Reset memory-mapped ptr
-            STA level_data+1    ;__
+            LDA	#$A0            ;	Reset memory-mapped ptr
+            STA	level_data+1    ;__
             INC _level_data_bank ;_ Increment bank
-            LDA _level_data_bank
+            LDA	_level_data_bank
             jsr mmc3_set_prg_bank_1 ;__ Switch the bank
         pla
     :   
@@ -274,7 +276,7 @@ _unrle_next_column:
         incw_check level_data     ;__
 
         lda (level_data), y       ;
-        sta rld_value             ;   Load rld_value, ++level_data
+        sta rld_value             ;	Load rld_value, ++level_data
         incw_check level_data
 
         lda rld_value
@@ -348,26 +350,26 @@ shiftBy4table:
     ; Write architecture:
 
     ; Frame 0:
-    ;   Write 0 updates the upper nametable's left tiles
-    ;   Write 1 updates the lower nametable's left tiles
+    ;	Write 0 updates the upper nametable's left tiles
+    ;	Write 1 updates the lower nametable's left tiles
     ; Frame 1:
-    ;   Write 0 updates the upper nametable's right tiles
-    ;   Write 1 updates the lower nametable's right tiles
+    ;	Write 0 updates the upper nametable's right tiles
+    ;	Write 1 updates the lower nametable's right tiles
     ; Frame 2:
-    ;   Attributes 
+    ;	Attributes 
     
-    LDA _scroll_x           ;__ Highbyte of scroll_x
+    LDA	_scroll_x           ;__ Highbyte of scroll_x
     LSR                     ;
-    LSR                     ;   >> 4
+    LSR                     ;	>> 4
     LSR                     ;
     LSR                     ;__
-    STA tmp4
+    STA	tmp4
 
     LDX scroll_count
     BNE frame2
 
-    LDA tmp4
-    CMP _rld_column         ;   If X == rld column, decompress shit
+    LDA	tmp4
+    CMP _rld_column         ;	If X == rld column, decompress shit
     BEQ frame0
     RTS
     
@@ -378,7 +380,7 @@ frame2:
 
 frame0:
         ; Switch banks
-        LDA _level_data_bank
+        LDA	_level_data_bank
         JSR mmc3_set_prg_bank_1
 
         JSR _unrle_next_column
@@ -390,17 +392,17 @@ frame1:
 
         ; In-house replacement of get_ppu_addr, only counts X
         ; Address is big-endian
-        LDY _rld_column ;   000xxxx0 - the left tiles of the metatiles
+        LDY _rld_column ;	000xxxx0 - the left tiles of the metatiles
         DEY
         TYA
-        AND #$0F
+        AND	#$0F
         ASL         ;__
         LDY scroll_count
         BEQ :+
-            ORA #$01    ;   000xxxx1 - the right tiles of the metatiles
+            ORA	#$01    ;	000xxxx1 - the right tiles of the metatiles
         :
-        STA VRAM_BUF+TileOff0+1,X
-        STA VRAM_BUF+TileOff1+1,X
+        STA	VRAM_BUF+TileOff0+1,X
+        STA	VRAM_BUF+TileOff1+1,X
 
         lda _scroll_x + 1 ; high byte
         and #%00000001
@@ -408,17 +410,17 @@ frame1:
         asl
         asl
         ora #($20+$80)  ; 0th nametable + NT_UPDATE_VERT
-        STA VRAM_BUF+TileOff0,X
-        ORA #$08        ; 2nd nametable
-        STA VRAM_BUF+TileOff1,X
+        STA	VRAM_BUF+TileOff0,X
+        ORA	#$08        ; 2nd nametable
+        STA	VRAM_BUF+TileOff1,X
 
 
         ; First part of the update: the tiles
         ; Amount of data in the sequence - 27*2 tiles (8x8 tiles, left sides of the metatiles)
-        LDA #(15*2)
-        STA VRAM_BUF+TileOff0+2,X
-        LDA #(12*2)
-        STA VRAM_BUF+TileOff1+2,X
+        LDA	#(15*2)
+        STA	VRAM_BUF+TileOff0+2,X
+        LDA	#(12*2)
+        STA	VRAM_BUF+TileOff1+2,X
 
         ; The sequence itself:
         
@@ -426,11 +428,11 @@ frame1:
         LDY #$00
         sty CurrentRow
         ; Load max value
-        LDA #15 - 1
-        STA LoopCount
+        LDA	#15 - 1
+        STA	LoopCount
         ; Check if doing a left or right hand write
-        LDA scroll_count
-        AND #1
+        LDA	scroll_count
+        AND	#1
         beq @LeftWrite
             ; Right side write
             ; Call for upper tiles
@@ -440,16 +442,16 @@ frame1:
             JSR left_tilewriteloop
 @WriteBottomHalf:
         ; Load new max
-        LDA #12 - 1
-        STA LoopCount
+        LDA	#12 - 1
+        STA	LoopCount
         ; Add offset to X
         TXA
         CLC
         ADC #(TileSizeHi-(15*2))
         TAX
         
-        LDA scroll_count
-        AND #1
+        LDA	scroll_count
+        AND	#1
         beq @LeftWrite2
             JSR right_tilewriteloop
             jmp @RenderParallax
@@ -489,14 +491,14 @@ ParallaxExtent = tmp3
 
         ; Demarkate end of write
         LDX VRAM_INDEX
-        LDA #$FF
-        STA VRAM_BUF+TileEnd,X
+        LDA	#$FF
+        STA	VRAM_BUF+TileEnd,X
 
         ; Declare this section as taken
         TXA
         CLC
         ADC #TileEnd
-        STA VRAM_INDEX
+        STA	VRAM_INDEX
 
         INC scroll_count
 
@@ -507,7 +509,7 @@ NametableAddrHi = tmp1
         ; Attribute write architecture:
 
         ; | Ad|dr |dat|
-        ;   0   1   2
+        ;	0   1   2
         ; Addr = VRAM address
 
         ; 1 byte can theoretically be saved by using a vertical
@@ -519,29 +521,29 @@ NametableAddrHi = tmp1
         LDX _rld_column
         DEX
         TXA
-        AND #$0F
-        STA ptr3
+        AND	#$0F
+        STA	ptr3
 
         ; Get the ptr (I am not bothering with 2 separate loops)
-        LDA #>collMap0
-        STA ptr1+1
-        LDA ptr3
-        AND #$0E
+        LDA	#>collMap0
+        STA	ptr1+1
+        LDA	ptr3
+        AND	#$0E
         ; ADC #(<collMap0-1)    ; The carry is set by the CMP used to jump into this routine
-        STA ptr1
-        ; BCC :+
-        ;     INC ptr1+1
-        ; :
+        STA	ptr1
+		; BCC :+
+		; 	INC ptr1+1
+		; :
 
-        LDA #8 - 1
+        LDA	#8 - 1
 		LDX #0
 		STX ptr2+1
         JSR attributeSetup
 
         ; Last byte has no bottom tiles
-        LDA columnBuffer+7
-        AND #$0F
-        STA columnBuffer+7
+        LDA	columnBuffer+7
+        AND	#$0F
+        STA	columnBuffer+7
 
         ; Update pointer
 		INC ptr1+1
@@ -555,7 +557,7 @@ NametableAddrHi = tmp1
 		; $10 is added to Y at all F0 boundaries but the edge
 
         ; Update new maximum
-        LDA #8+6 - 1
+        LDA	#8+6 - 1
         JSR attributeSetup
 
         ; Get address hi byte (either left or right side)
@@ -567,22 +569,22 @@ NametableAddrHi = tmp1
         ora #$23
         sta NametableAddrHi
         
-        LDA ptr3
+        LDA	ptr3
         LSR
-        ORA #$C0
+        ORA	#$C0
         
         ; Store address
         LDX VRAM_INDEX
         addressLoop:
             ; Low byte
-            STA VRAM_BUF+AttrOff0+1,X
-            STA VRAM_BUF+AttrOff1+1,X
+            STA	VRAM_BUF+AttrOff0+1,X
+            STA	VRAM_BUF+AttrOff1+1,X
             TAY
             ; High byte
             lda NametableAddrHi
-            STA VRAM_BUF+AttrOff0,X
-            ORA #$08
-            STA VRAM_BUF+AttrOff1,X
+            STA	VRAM_BUF+AttrOff0,X
+            ORA	#$08
+            STA	VRAM_BUF+AttrOff1,X
             TYA
 
             INX 
@@ -595,14 +597,14 @@ NametableAddrHi = tmp1
         
         LDY #14
 
-        LDA VRAM_INDEX
+        LDA	VRAM_INDEX
         ADC #AttrEnd-1  ; Carry is set by the ADC : BCC
-        STA VRAM_INDEX  ; State that the block is now occupied
+        STA	VRAM_INDEX  ; State that the block is now occupied
         TAX
 
         dataLoop:
-            LDA columnBuffer-1,Y
-            STA VRAM_BUF-3+2,X
+            LDA	columnBuffer-1,Y
+            STA	VRAM_BUF-3+2,X
 
             DEX
             DEX
@@ -612,39 +614,39 @@ NametableAddrHi = tmp1
         
         ; Finish off the routine
         ; X has VRAM_INDEX, mark this block as taken
-        LDA #$FF
-        STA VRAM_BUF+AttrEnd,X
+        LDA	#$FF
+        STA	VRAM_BUF+AttrEnd,X
         ; Reset frame counter
-        LDA #$00
-        STA scroll_count
+        LDA	#$00
+        STA	scroll_count
         RTS
 
 	attributeSetup:
-		STA LoopCount
+		STA	LoopCount
 
     	attributeLoop1:
             ; Read lower right metatile
             LDY #$11
-            LDA (ptr1),Y
+            LDA	(ptr1),Y
             tax
             ; Read lower left metatile
 			dey
-			LDA (ptr1), Y
+			LDA	(ptr1), Y
 			tay
 			; Get their attributes
             lda metatiles_attr,x	; Lower right
 			ASL
 			ASL
 			ora metatiles_attr,y	; Lower left
-            STA ptr2
+            STA	ptr2
 
             ; Read upper right metatile
             LDY #$01
-            LDA (ptr1),Y
+            LDA	(ptr1),Y
             tax
 			; Read upper left metatile
 			dey
-			LDA (ptr1), Y
+			LDA	(ptr1), Y
 			tay
 			; Get their attributes
             lda metatiles_attr,x	; Upper right
@@ -654,20 +656,20 @@ NametableAddrHi = tmp1
 
 			; Combine
 			LDY ptr2	; Y has the lower metatile attrs, will shift by 4
-			ORA shiftBy4table,Y
+			ORA	shiftBy4table,Y
 			LDX ptr2+1
-			STA columnBuffer,X
+			STA	columnBuffer,X
 
             ; Increment pointer
-            LDA ptr1
+            LDA	ptr1
             ; Last thing affecting carry is the ASL, which
             ; always shifts 0 into it if the metatile data
             ; is valid
             ADC #$20
-            STA ptr1
-            ; BCC :+            ;
-            ;     INC ptr1+1    ;   coll map starts at 0
-            ; :                 ;
+            STA	ptr1
+			; BCC :+            ;
+			; 	INC ptr1+1    ;   coll map starts at 0
+			; :                 ;
 
             INC ptr2+1
             DEC LoopCount
@@ -676,13 +678,13 @@ NametableAddrHi = tmp1
 
     right_tilewriteloop:
             ldy CurrentRow
-            LDA columnBuffer,Y
+            LDA	columnBuffer,Y
             tay
             ; y is the metatile id
             lda metatiles_top_right, y
-            STA VRAM_BUF+TileOff0+3,X
+            STA	VRAM_BUF+TileOff0+3,X
             lda metatiles_bot_right, y
-            STA VRAM_BUF+TileOff0+4,X
+            STA	VRAM_BUF+TileOff0+4,X
             
             INX
             INX
@@ -692,13 +694,13 @@ NametableAddrHi = tmp1
         rts
     left_tilewriteloop:
             ldy CurrentRow
-            LDA columnBuffer,Y
+            LDA	columnBuffer,Y
             tay
             ; y is the metatile id
             lda metatiles_top_left, y
-            STA VRAM_BUF+TileOff0+3,X
+            STA	VRAM_BUF+TileOff0+3,X
             lda metatiles_bot_left, y
-            STA VRAM_BUF+TileOff0+4,X
+            STA	VRAM_BUF+TileOff0+4,X
             
             INX
             INX
@@ -804,10 +806,10 @@ ParallaxBufferCol5:
 	LDA	#$00				;
 	TAY						;	ptr1 = ground[id]
 	JSR	mmc3_set_prg_bank_1	;	mmc3_set_prg_bank_1(0)
-	LDA _ground, X			;	Y = 0
-	STA ptr1				;
-	LDA _ground+1, X		;
-	STA ptr1+1				;__
+	LDA	_ground, X			;	Y = 0
+	STA	ptr1				;
+	LDA	_ground+1, X		;
+	STA	ptr1+1				;__
 	LDX #<-48				;__	X = idx @ collmap data, count up to 0
 
 	ground_ptr = ground-($100-48)
@@ -817,18 +819,18 @@ ParallaxBufferCol5:
 	; therefore not needing to check for an overflow
 
 	loop:
-		LDA (ptr1),y		;
+		LDA	(ptr1),y		;
 		bmi single_rle_byte	;	Run
-		STA tmp1			;
+		STA	tmp1			;
 		iny					;__
 
-		LDA (ptr1),y		;	Value
+		LDA	(ptr1),y		;	Value
 		iny					;__
 
 		STY tmp2
 		LDY tmp1
 	mult_loop:
-		STA ground_ptr, X
+		STA	ground_ptr, X
 		INX
 		BEQ fin
 		DEY
@@ -837,8 +839,8 @@ ParallaxBufferCol5:
 		BNE loop	; Physically cannot be not 0
 
 	single_rle_byte:
-		AND #$7F
-		STA ground_ptr, X
+		AND	#$7F
+		STA	ground_ptr, X
 		INY
 		INX
 		BNE loop
@@ -862,37 +864,37 @@ ParallaxBufferCol5:
 	.define len sreg+1
 
 	LDY VRAM_INDEX
-	STA VRAM_BUF, Y	;
+	STA	VRAM_BUF, Y	;
 	TXA					;	vram pointer
-	STA VRAM_BUF+1, Y	;__
-	LDA total_len		;	total length
-	STA VRAM_BUF+2, Y	;__
+	STA	VRAM_BUF+1, Y	;__
+	LDA	total_len		;	total length
+	STA	VRAM_BUF+2, Y	;__
 
 	SEC					;   Total padding
 	SBC len				;__
 	LSR					;	Get left offset
-	STA tmp1			;__
+	STA	tmp1			;__
 	ADC #$00			;	Get right offset
 	TAY					;__
 
-	LDA total_len
+	LDA	total_len
 	ADC	VRAM_INDEX		;	Carry is guaranteed to be clear by LSR : ADC #$00
 	; If carry is still set, we have big problems
 	; BCS some shit to do
 	TAX
     ADC #$03
-    STA VRAM_INDEX
+    STA	VRAM_INDEX
 
-	LDA #$FF			;	Finish off the write
-	STA VRAM_BUF+3, X	;__
+	LDA	#$FF			;	Finish off the write
+	STA	VRAM_BUF+3, X	;__
 
 	CPY #$00	; Had to do this, very sorry
 	BEQ main_data
 
-	LDA #spaceChr
+	LDA	#spaceChr
 
 	pad_loop_right:
-		STA VRAM_BUF+2, X
+		STA	VRAM_BUF+2, X
 		DEX
 		DEY
 		BNE pad_loop_right
@@ -902,8 +904,8 @@ ParallaxBufferCol5:
 		DEY
 
 	main_data_loop:
-		LDA (<data), Y
-		STA VRAM_BUF+2, X
+		LDA	(<data), Y
+		STA	VRAM_BUF+2, X
 		DEX
 		DEY
 		BPL main_data_loop
@@ -911,10 +913,10 @@ ParallaxBufferCol5:
 	LDY tmp1	;	Pad left amount
 	BEQ fin		;__
 
-	LDA #spaceChr
+	LDA	#spaceChr
 
 	pad_loop_left:
-		STA VRAM_BUF+2, X
+		STA	VRAM_BUF+2, X
 		DEX
 		DEY
 		BNE pad_loop_left
@@ -932,32 +934,22 @@ ParallaxBufferCol5:
 .import _cube_movement, _ship_movement, _ball_movement, _ufo_movement, _robot_movement, _spider_movement, _wave_movement
 .export _movement
 .proc _movement
-    ; The C code being "ported":
-        ; switch (gamemode) {
-        ;     case 0x00: cube_movement(); break;
-        ;     case 0x01: ship_movement(); break;
-        ;     case 0x02: ball_movement(); break;
-        ;     case 0x03: break;
-        ;     default: break;
-        ; } 
+	LDX _gamemode
+	CPX #gamemode_count
+	BPL end
+	LDA	jump_table_lo, X
+	STA	<PTR
+	LDA	jump_table_hi, X
+	STA	<PTR+1
+	JMP (PTR)
 
-        LDX _gamemode
-        CPX #$07
-        BPL end    
-        LDA jump_table_lo, X
-        STA <PTR
-        LDA jump_table_hi, X
-        STA <PTR+1
-        JMP (PTR)
+	end:
+		RTS
 
-        end:
-            RTS     ; break;
-
-        jump_table_lo:
-            .byte <_cube_movement, <_ship_movement, <_ball_movement, <_ufo_movement, <_cube_movement, <_spider_movement, <_wave_movement
-        jump_table_hi:
-            .byte >_cube_movement, >_ship_movement, >_ball_movement, >_ufo_movement, >_cube_movement, >_spider_movement, >_wave_movement
-
+	jump_table_lo:
+		.byte <_cube_movement, <_ship_movement, <_ball_movement, <_ufo_movement, <_cube_movement, <_spider_movement, <_wave_movement
+	jump_table_hi:
+		.byte >_cube_movement, >_ship_movement, >_ball_movement, >_ufo_movement, >_cube_movement, >_spider_movement, >_wave_movement
 .endproc
 .popseg
 
@@ -989,12 +981,12 @@ found_bank:
     CMP current_song_bank
     BEQ :+
     ;If different bank than before reinitalize FS
-        STA current_song_bank
+        STA	current_song_bank
         TAY
         LDX music_data_locations_lo, Y
-        LDA music_data_locations_hi, Y
+        LDA	music_data_locations_hi, Y
         TAY
-        LDA #$01
+        LDA	#$01
         JSR famistudio_init
     :
     PLA
@@ -1029,7 +1021,7 @@ play:
 ; void __fastcall__ music_update (void);
 .export _music_update
 .proc _music_update
-    LDA current_song_bank
+    LDA	current_song_bank
     CLC
     ADC #<FIRST_MUSIC_BANK
     JSR mmc3_tmp_prg_bank_1
@@ -1115,10 +1107,10 @@ SpriteOffset = ptr2
 
     ; Increment to the next sprite index - 
     ; Add the 5 back to the pointer
-    LDA #$05
+    LDA	#$05
     CLC
     ADC _sprite_data
-    STA _sprite_data
+    STA	_sprite_data
     BCC :+
         INC _sprite_data+1
     :
@@ -1136,8 +1128,8 @@ SpriteOffset = ptr2
     ; Increment the _spr_index and and it with #$0F
     INX
     TXA
-    AND #$0F
-    STA _spr_index
+    AND	#$0F
+    STA	_spr_index
 
 @Exit:
     pla
@@ -1287,79 +1279,73 @@ drawplayer_center_offsets:
 
 .proc _drawplayerone
 
-    LDA _player_gravity+0
-    BEQ :+
-        LDA #$80
-    : STA xargs+0
+	LDA	_player_gravity+0
+	BEQ :+
+		LDA	#$80
+	: STA	xargs+0
 
 	LDX _player_y+1		;
 	DEX					;	The Y of oam_meta_spr is high_byte(player_y[0])-1
 	STX sreg+1			;__
 
-    ; Set up base pointer for jump tables
-    LDA _mini       ;
-    BEQ :+          ;   Add 7 if mini mode 
-        LDA #$07    ;   ! Increment this value when new gamemodes added
-    :               ;__
-    CLC             ;   Actual gamemode itself
-    ADC _gamemode   ;__
-    TAX             ;   Get low byte of table ptr
-
-    LDA _mario_mode
-    beq @regulartable
-    LDA sprite_table_table_lo2, X
-    STA ptr1        ;__
-    LDA sprite_table_table_hi2, X
-    STA ptr1+1      ;__ Get high byte of table ptr
-    jmp @donetable    
-    
-   @regulartable:
+	; Set up base pointer for jump tables
+	LDA	_mini		;
+	BEQ :+			;	Add 7 if mini mode 
+		LDA	#gamemode_count
+	:				;__
+	CLC				;	Actual gamemode itself
+	ADC _gamemode	;__
+	LDX	_mario_mode	;
+	beq :+			;	Other table if mario mode
+		; There is no way this overflowed
+		ADC #gamemode_count*2
+	:				;__
+	TAX				;	Set up base pointer for jump tables
     LDA sprite_table_table_lo, X
     STA ptr1        ;__
     LDA sprite_table_table_hi, X
     STA ptr1+1      ;__ Get high byte of table ptr
-   @donetable:
 
     LDY _player_x+1     ;__ temp_x = high_byte(player_x[0]);
 	; The condition if is temp_x == 0 or is > 0xfc,
 	; this can be expressed as (temp_x - 1) > 0xfb
 	DEY					;
-	CPY #$FC            ;
-	BCC :+              ;	if(temp_x-1 > 0xfb) temp_x = 1;
-		LDY #$00        ;
-	:                   ;__
+	CPY #$FC			;
+	BCC :+				;	if(temp_x-1 > 0xfb) temp_x = 1;
+		LDY #$00		;
+	:					;__
 	TYA
 	SEC		; I decremented the Y, this is getting back at it
 	ADC drawplayer_center_offsets, X
-    STA sreg+0			;__ The X of oam_meta_spr is temp_x
+	STA	sreg+0			;__ The X of oam_meta_spr is temp_x
 
-    ; The switch 
-    LDX _gamemode
-    DEX         ;   case 0x01: ship shit
-    jeq ship   ;__
-    DEX         ;   case 0x02: ball shit
-    jeq ball   ;__
-    DEX         ;   case 0x03: ufo shit
-    jeq ufo    ;__
-    DEX         ;   case 0x04: robot shit
-    jeq robot  ;__
-    DEX         ;   case 0x05: spider shit
-    jeq spider ;__
-    dex
-    jeq	wave
-    
-    ; default: cube
-    cube:
+	; The switch 
+	LDX _gamemode
+	DEX			;	case 0x01: ship shit
+	jeq ship	;__
+	DEX			;	case 0x02: ball shit
+	jeq ball	;__
+	DEX			;	case 0x03: ufo shit
+	jeq ufo		;__
+	DEX			;	case 0x04: robot shit
+	jeq robot	;__
+	DEX			;	case 0x05: spider shit
+	jeq spider	;__
+	dex
+	jeq	wave
+
+	; default: cube
+	cube:
 		; C code:
 			; 		if (player_vel_y[0] == 0) cube_rotate[0] = round to the nearest 90°;
 			; 		else cube_rotate[0] += player_gravity[0] ? -CUBE_GRAVITY : CUBE_GRAVITY;
 			; 		cap the mf at 0..23
 		@rounding_table = drawcube_rounding_table
 
-		LDA _player_vel_y+1		;	if player_vel_y == 0
-		ORA _player_vel_y+0		;
+		LDA	_player_vel_y+1		;	if player_vel_y == 0
+		ORA	_player_vel_y+0		;
 		BNE @no_round			;__
-			STA _cube_rotate+0	;__ low_byte = 0
+			STA	_cube_rotate+0	;__ low_byte = 0
 			LAX _cube_rotate+1	;	LAX abs is apparently stable
 			SEC					;
 			SBC #12				;
@@ -1367,21 +1353,21 @@ drawplayer_center_offsets:
 				TAX				;	
 				CLC				;
 			:					;__
-			LDA _cube_rotate+1	;	Round the cube rotation
+			LDA	_cube_rotate+1	;	Round the cube rotation
 			ADC @rounding_table, X
-			STA _cube_rotate+1	;
-            TAX                 ;__
-            JMP @fin_nold
+			STA	_cube_rotate+1	;
+			TAX                 ;__
+			JMP @fin_nold
 
 		@no_round:
-		LDA _cube_rotate
+		LDA	_cube_rotate
 		CLC
 
 		LDX _player_gravity+0
 		BNE @subtract
 
 			ADC #<CUBE_GRAVITY      ;
-			STA _cube_rotate        ;
+			STA	_cube_rotate        ;
 			BCC @fin				;   cube_rotate[0] += CUBE_GRAVITY;
 				LDX _cube_rotate+1	;
 				INX					;__
@@ -1393,29 +1379,29 @@ drawplayer_center_offsets:
 
 		@subtract:
 			SBC #<CUBE_GRAVITY-1	; 	
-			STA _cube_rotate		;
+			STA	_cube_rotate		;
 			BCS @fin				;	cube_rotate[0] -= CUBE_GRAVITY;
 				DEC _cube_rotate+1	;
 				BPL @fin			;__
-				LDA #23				;	Cap at 0
-				STA _cube_rotate+1	;__
+				LDA	#23				;	Cap at 0
+				STA	_cube_rotate+1	;__
 
 		@fin:
 			LDX _cube_rotate+1
-        @fin_nold:
-			LDA _icon
+		@fin_nold:
+			LDA	_icon
 			cmp #2
 			bne	@norm
-			LDA drawcube_sprite_way, X
+			LDA	drawcube_sprite_way, X
 			jmp @don
 		@norm:
-			LDA drawcube_sprite_table, X
+			LDA	drawcube_sprite_table, X
 		@don:
 			TAX
-			AND #$C0
-			STA xargs+0	; flip setting
+			AND	#$C0
+			STA	xargs+0	; flip setting
 			TXA
-			AND #$07
+			AND	#$07
 			TAY
 			JMP fin
 
@@ -1466,7 +1452,7 @@ drawplayer_center_offsets:
 			; 			ballframe++;
 			; 			if (ballframe > 7) { ballframe = 0; }
 			;	}
-		LDA _options
+		LDA	_options
 		and #$04  ;platformer
 		beq	@ball2
 		lda _player_vel_x
@@ -1475,12 +1461,12 @@ drawplayer_center_offsets:
 		ldy #0
 		beq @donball
 	@ball2:
-		LDA _ballframe	;	Load index
+		LDA	_ballframe	;	Load index
 		TAY				;__
 		CLC				;	ballframe++;
 		ADC #$01		;__
-		AND #$07		;__	if (ballframe > 7) { ballframe = 0; }
-		STA _ballframe	;__
+		AND	#$07		;__	if (ballframe > 7) { ballframe = 0; }
+		STA	_ballframe	;__
 	@donball:
 		JMP fin
 
@@ -1506,13 +1492,13 @@ drawplayer_center_offsets:
 			;		if (lowbyte == 0) kandotemp3[0] = 0;
 			; 	}
 		LDY #$1				;__	kandotemp3[0] = 1;
-		LDA _player_vel_y+1	;__
+		LDA	_player_vel_y+1	;__
 		BEQ :+				;__	else if (highbyte == $00) { // later }
 		BPL @go	    		;__	if (0 < highbyte < $80) {}	// do nothing with it
 			INY				;__	else if ($80 ≤ highbyte ≤ $FF) { kandotemp3[0] = 2; }
 			JMP fin			;__
 		:
-		ORA _player_vel_y	;	if (player_vel_y == 0)
+		ORA	_player_vel_y	;	if (player_vel_y == 0)
 		BNE @go				;__
 		DEY					;	kandotemp3[0] = 0;
 	@go:
@@ -1526,13 +1512,13 @@ drawplayer_center_offsets:
 			;	} else {
 			;		[index from ROBOT_JUMP/MINI_ROBOT_JUMP using robotjumpframe[0]]
 			; 	}
-			LDA _player_vel_y+1	;
-			ORA _player_vel_y	;	if (player_vel_y[0] == 0) {
+			LDA	_player_vel_y+1	;
+			ORA	_player_vel_y	;	if (player_vel_y[0] == 0) {
 			BNE @jump			;__
-			LDA _options
+			LDA	_options
 			and #$04
 			beq	@cont1
-			LDA _player_vel_x
+			LDA	_player_vel_x
 			bne @cont1
 			lda #0
 			sta _robotframe
@@ -1540,19 +1526,19 @@ drawplayer_center_offsets:
 			jmp @fini
 			
 		@cont1:
-			LDA #0
+			LDA	#0
 			LDY _robotframe	;	[load robotframe[0] into Y]
 			SEC				;	robotframe[0]++; (A is 0, so set the carry and bam)
 			ADC _robotframe	;__
 			CMP #20			;
 			BCC @hur			;	if (robotframe[0] > 19) { robotframe[0] = 0; }	
-				LDA #$00	;__
+				LDA	#$00	;__
 			@hur:				;
-			STA _robotframe	;__
+			STA	_robotframe	;__
 		@fini:
 			JMP fin
 		@jump:				;	} else {
-			LDA #20			; ! This is the sizeof ROBOT / MINI_ROBOT, change it as needed
+			LDA	#20			; ! This is the sizeof ROBOT / MINI_ROBOT, change it as needed
 			CLC				;	ROBOT_JUMP[X] = ROBOT[X+20]
 			ADC _robotjumpframe
 			TAY				;__
@@ -1566,13 +1552,13 @@ drawplayer_center_offsets:
 			;	} else {
 			;		[use SPIDER_JUMP/MINI_SPIDER_JUMP[0]]
 			; 	}
-		LDA _player_vel_y+1	;
-		ORA _player_vel_y	;	if (player_vel_y[0] == 0) {
+		LDA	_player_vel_y+1	;
+		ORA	_player_vel_y	;	if (player_vel_y[0] == 0) {
 		BNE @jump			;
-			LDA _options
+			LDA	_options
 			and #$04
 			beq	@cont1
-			LDA _player_vel_x
+			LDA	_player_vel_x
 			bne @cont1
 			lda #0
 			sta _spiderframe
@@ -1580,12 +1566,12 @@ drawplayer_center_offsets:
 			jmp fin
 			
 		@cont1:
-			LDA #0
+			LDA	#0
 			LDY _spiderframe	;	[load spiderframe[0] into Y]
 			SEC				;	spiderframe[0]++; (A is 0, so set the carry and bam)
 			ADC _spiderframe ;__
-			AND #$0F        ;   if (spiderframe[0] > 15) spiderframe[0] = 0;
-			STA _spiderframe;__
+			AND	#$0F        ;   if (spiderframe[0] > 15) spiderframe[0] = 0;
+			STA	_spiderframe;__
 			JMP fin
 		@jump:				;	} else { SPIDER_JUMP[0] = SPIDER[8]
 			LDY #8			; ! This is the sizeof SPIDER / MINI_SPIDER, change it as needed
@@ -1634,7 +1620,7 @@ drawplayer_center_offsets:
 
 
 	fin:
-    common:
+	common:
 		TYA					;
 		ASL					;	Double da index cuz it's a table of shorts
 		TAY					;__
@@ -1648,26 +1634,26 @@ drawplayer_center_offsets:
 		; sta xargs+0
 
 
-		LDA (ptr1), Y		;	Load low byte
+		LDA	(ptr1), Y		;	Load low byte
 		PHA					;__
 		INY					;
-		LDA (ptr1), Y		;	Load high byte
+		LDA	(ptr1), Y		;	Load high byte
 		TAX					;__
 		PLA
 		JMP __oam_meta_spr_flipped ;__	oam_meta_spr(temp_x, high_byte(player_y[0])-1, [whatever the fuck we set here]);
 
-    sprite_table_table_lo:
-        .byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT, <_SPIDER, <_WAVE
-        .byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
-    sprite_table_table_hi:
-        .byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT, >_SPIDER, >_WAVE
-        .byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
-    sprite_table_table_lo2:
-        .byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT_ALT, <_SPIDER, <_WAVE
-        .byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
-    sprite_table_table_hi2:
-        .byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT_ALT, >_SPIDER, >_WAVE
-        .byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
+	sprite_table_table_lo:
+		.byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT, <_SPIDER, <_WAVE
+		.byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
+	sprite_table_table_hi:
+		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT, >_SPIDER, >_WAVE
+		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
+	sprite_table_table_lo2:
+		.byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT_ALT, <_SPIDER, <_WAVE
+		.byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
+	sprite_table_table_hi2:
+		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT_ALT, >_SPIDER, >_WAVE
+		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
 .endproc
 drawplayer_common := _drawplayerone::common
 
@@ -1677,68 +1663,68 @@ drawplayer_common := _drawplayerone::common
 
 .proc _drawplayertwo
 
-    LDA _player_gravity+1
-    BEQ :+
-        LDA #$80
-    : STA xargs+0	; flip
+	LDA	_player_gravity+1
+	BEQ :+
+		LDA	#$80
+	: STA	xargs+0	; flip
 
-    LDX _player_y+3		;
+	LDX _player_y+3		;
 	DEX					;	The Y of oam_meta_spr is high_byte(player_y[1])-1
 	STX sreg+1			;__
 
-    ; Set up base pointer for jump tables
-    LDA _mini       ;
-    BEQ :+          ;   Add 7 if mini mode 
-        LDA #$07    ;   ! Increment this value when new gamemodes added
-    :               ;__
-    CLC             ;   Actual gamemode itself
-    ADC _gamemode   ;__
-    TAX             ;   Get low byte of table ptr
-    LDA sprite_table_table_lo, X
-    STA ptr1        ;__
-    LDA sprite_table_table_hi, X
-    STA ptr1+1      ;__ Get high byte of table ptr
+	; Set up base pointer for jump tables
+	LDA	_mini		;
+	BEQ :+			;	Add 7 if mini mode 
+		LDA	#gamemode_count
+	:				;__
+	CLC				;	Actual gamemode itself
+	ADC _gamemode	;__
+	TAX				;	Get low byte of table ptr
+	LDA	sprite_table_table_lo, X
+	STA	ptr1		;__
+	LDA	sprite_table_table_hi, X
+	STA	ptr1+1		;__	Get high byte of table ptr
 
 	LDY _player_x+3     ;__ temp_x = high_byte(player_x[1]);
 	; The condition if is temp_x == 0 or is > 0xfc,
 	; this can be expressed as (temp_x - 1) > 0xfb
 	DEY					;
-	CPY #$FC            ;
-	BCC :+              ;	if(temp_x-1 > 0xfb) temp_x = 1;
-		LDY #$00        ;
-	:                   ;__
+	CPY #$FC			;
+	BCC :+				;	if(temp_x-1 > 0xfb) temp_x = 1;
+		LDY #$00		;
+	:					;__
 	TYA
 	SEC		; I decremented the Y, this is getting back at it
 	ADC drawplayer_center_offsets, X
-    STA sreg+0			;__ The X of oam_meta_spr is temp_x
+	STA	sreg+0			;__ The X of oam_meta_spr is temp_x
 
-    ; The switch 
-    LDX _gamemode
-    DEX         ;   case 0x01: ship shit
-    jeq ship   ;__
-    DEX         ;   case 0x02: ball shit
-    jeq ball   ;__
-    DEX         ;   case 0x03: ufo shit
-    jeq ufo    ;__
-    DEX         ;   case 0x04: robot shit
-    jeq robot  ;__
-    DEX         ;   case 0x05: spider shit
-    jeq spider ;__
-    DEX         ;   case 0x05: spider shit
-    jeq wave ;__
-    
-    ; default: cube
-    cube:
-        ; C code:
+	; The switch 
+	LDX _gamemode
+	DEX			;	case 0x01: ship shit
+	jeq ship	;__
+	DEX			;	case 0x02: ball shit
+	jeq ball	;__
+	DEX			;	case 0x03: ufo shit
+	jeq ufo		;__
+	DEX			;	case 0x04: robot shit
+	jeq robot	;__
+	DEX			;	case 0x05: spider shit
+	jeq spider	;__
+	DEX			;	case 0x05: spider shit
+	jeq wave	;__
+
+	; default: cube
+	cube:
+		; C code:
 			; 		if (player_vel_y[1] == 0) cube_rotate[1] = round to the nearest 90°;
 			; 		else cube_rotate[1] += player_gravity[1] ? -CUBE_GRAVITY : CUBE_GRAVITY;
 			; 		cap the mf at 0..23
 		@rounding_table = drawcube_rounding_table
 
-		LDA _player_vel_y+3		;	if player_vel_y == 0
-		ORA _player_vel_y+2		;
+		LDA	_player_vel_y+3		;	if player_vel_y == 0
+		ORA	_player_vel_y+2		;
 		BNE @no_round			;__
-			STA _cube_rotate+2	;__ low_byte = 0
+			STA	_cube_rotate+2	;__ low_byte = 0
 			LAX _cube_rotate+3	;	LAX abs is apparently stable
 			SEC					;
 			SBC #12				;
@@ -1746,21 +1732,21 @@ drawplayer_common := _drawplayerone::common
 				TAX				;	
 				CLC				;
 			:					;__
-			LDA _cube_rotate+3	;	Round the cube rotation
+			LDA	_cube_rotate+3	;	Round the cube rotation
 			ADC @rounding_table, X
-			STA _cube_rotate+3	;
-            TAX                 ;__
-            JMP @fin_nold
+			STA	_cube_rotate+3	;
+			TAX					;__
+			JMP @fin_nold
 
 		@no_round:
-		LDA _cube_rotate+2
+		LDA	_cube_rotate+2
 		CLC
 
 		LDX _player_gravity+1
 		BNE @subtract
 
 			ADC #<CUBE_GRAVITY      ;
-			STA _cube_rotate+2		;
+			STA	_cube_rotate+2		;
 			BCC @fin				;   cube_rotate[0] += CUBE_GRAVITY;
 				LDX _cube_rotate+3	;
 				INX					;__
@@ -1772,29 +1758,29 @@ drawplayer_common := _drawplayerone::common
 
 		@subtract:
 			SBC #<CUBE_GRAVITY-1	; 	
-			STA _cube_rotate+2		;
+			STA	_cube_rotate+2		;
 			BCS @fin				;	cube_rotate[0] -= CUBE_GRAVITY;
 				DEC _cube_rotate+3	;
 				BPL @fin			;__
-				LDA #23				;	Cap at 0
-				STA _cube_rotate+3	;__
+				LDA	#23				;	Cap at 0
+				STA	_cube_rotate+3	;__
 
 		@fin:
 			LDX _cube_rotate+3
-        @fin_nold:
-			LDA _icon
+		@fin_nold:
+			LDA	_icon
 			cmp #2
 			bne	@norm
-			LDA drawcube_sprite_way, X
+			LDA	drawcube_sprite_way, X
 			jmp @don
 		@norm:
-			LDA drawcube_sprite_table, X
+			LDA	drawcube_sprite_table, X
 		@don:
 			TAX
-			AND #$C0
-			STA xargs+0
+			AND	#$C0
+			STA	xargs+0
 			TXA
-			AND #$07
+			AND	#$07
 			TAY
 			JMP drawplayer_common
 
@@ -1844,12 +1830,12 @@ drawplayer_common := _drawplayerone::common
 			; 			ballframe++;
 			; 			if (ballframe > 7) { ballframe = 0; }
 			;	}
-		; LDA _ballframe	;	Load index
+		; LDA	_ballframe	;	Load index
 		; TAY				;__
 		; CLC				;	ballframe++;
 		; ADC #$01			;__
-		; AND #$07			;__	if (ballframe > 7) { ballframe = 0; }
-		; STA _ballframe	;__
+		; AND	#$07			;__	if (ballframe > 7) { ballframe = 0; }
+		; STA	_ballframe	;__
 		lda _options
 		and #$04
 		beq	@continue
@@ -1884,13 +1870,13 @@ drawplayer_common := _drawplayerone::common
 			; 	}
 
 		LDY #$1				;__	kandotemp3[1] = 1;
-		LDA _player_vel_y+3	;__
+		LDA	_player_vel_y+3	;__
 		BEQ :+				;__	else if (highbyte == $00) { // later }
 		BPL @fin		    ;__	if (0 < highbyte < $80) {}	// do nothing with it
 			INY				;__	else if ($80 ≤ highbyte ≤ $FF) { kandotemp3[1] = 2; }
 			JMP drawplayer_common	    ;__
 		:
-		ORA _player_vel_y+2	;	if (lowbyte == 0) kandotemp3[1] = 0;
+		ORA	_player_vel_y+2	;	if (lowbyte == 0) kandotemp3[1] = 0;
 		BNE @fin			;
 			DEY				;	kandotemp3[1] = 0;
 		@fin:
@@ -1904,12 +1890,12 @@ drawplayer_common := _drawplayerone::common
 			;	} else {
 			;		[index from ROBOT_JUMP/MINI_ROBOT_JUMP using robotjumpframe[1]]
 			; 	}
-		LDA _player_vel_y+3	;
-		ORA _player_vel_y+2	;	if (player_vel_y[1] == 0 || player_vel_y[1] == CUBE_GRAVITY) {
-			LDA _options
+		LDA	_player_vel_y+3	;
+		ORA	_player_vel_y+2	;	if (player_vel_y[1] == 0 || player_vel_y[1] == CUBE_GRAVITY) {
+			LDA	_options
 			and #$04
 			beq	@cont1
-			LDA _player_vel_x+2
+			LDA	_player_vel_x+2
 			bne @cont1
 			lda #0
 			sta _robotframe
@@ -1917,19 +1903,19 @@ drawplayer_common := _drawplayerone::common
 			jmp @fini
 			
 		@cont1:
-			LDA #0
+			LDA	#0
 			LDY _robotframe	;	[load robotframe[0] into Y]
 			SEC				;	robotframe[0]++; (A is 0, so set the carry and bam)
 			ADC _robotframe	;__
 			CMP #20			;
 			BCC @hur			;	if (robotframe[0] > 19) { robotframe[0] = 0; }	
-				LDA #$00	;__
+				LDA	#$00	;__
 			@hur:				;
-			STA _robotframe	;__
+			STA	_robotframe	;__
 		@fini:
 			JMP drawplayer_common
 		@jump:				;	} else {
-			LDA #20			; ! This is the sizeof ROBOT / MINI_ROBOT, change it as needed
+			LDA	#20			; ! This is the sizeof ROBOT / MINI_ROBOT, change it as needed
 			CLC				;	ROBOT_JUMP[X] = ROBOT[X+20]
 			ADC _robotjumpframe+1
 			TAY				;__
@@ -1943,13 +1929,13 @@ drawplayer_common := _drawplayerone::common
 			;	} else {
 			;		[use SPIDER_JUMP/MINI_SPIDER_JUMP[0]]
 			; 	}
-		LDA _player_vel_y+3	;
-		ORA _player_vel_y+2	;	if (player_vel_y[1] == 0 || player_vel_y[1] == CUBE_GRAVITY) {
+		LDA	_player_vel_y+3	;
+		ORA	_player_vel_y+2	;	if (player_vel_y[1] == 0 || player_vel_y[1] == CUBE_GRAVITY) {
 		BNE @jump	    	;__
-			LDA _options
+			LDA	_options
 			and #$04
 			beq	@cont1
-			LDA _player_vel_x
+			LDA	_player_vel_x
 			bne @cont1
 			lda #0
 			sta _spiderframe
@@ -1957,12 +1943,12 @@ drawplayer_common := _drawplayerone::common
 			jmp drawplayer_common
 			
 		@cont1:
-			LDA #0
+			LDA	#0
 			LDY _spiderframe+1;	[load spiderframe[1] into Y] 
 			SEC				;	spiderframe[1]++; (A is 0, so set the carry and bam)
 			ADC _spiderframe+1;__
-			AND #$0F        ;   if (spiderframe[1] > 15) spiderframe[1] = 0;
-			STA _spiderframe+1;__
+			AND	#$0F        ;	if (spiderframe[1] > 15) spiderframe[1] = 0;
+			STA	_spiderframe+1;__
 			JMP drawplayer_common
 		@jump:				;	} else { SPIDER_JUMP[0] = SPIDER[8]
 			LDY #8			; ! This is the sizeof SPIDER / MINI_SPIDER, change it as needed
@@ -2012,12 +1998,12 @@ drawplayer_common := _drawplayerone::common
 	sprite_table_table_hi:
 		.byte >_CUBE2, >_SHIP2, >_BALL2, >_UFO2, >_ROBOT2, >_SPIDER2, >_WAVE2
 		.byte >_MINI_CUBE2, >_MINI_SHIP2, >_MINI_BALL2, >_MINI_UFO2, >_MINI_ROBOT2, >_MINI_SPIDER2, >_MINI_WAVE2
-    sprite_table_table_lo2:
-        .byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT_ALT, <_SPIDER, <_WAVE
-        .byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
-    sprite_table_table_hi2:
-        .byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT_ALT, >_SPIDER, >_WAVE
-        .byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
+	sprite_table_table_lo2:
+		.byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT_ALT, <_SPIDER, <_WAVE
+		.byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE
+	sprite_table_table_hi2:
+		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT_ALT, >_SPIDER, >_WAVE
+		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE
 .endproc
 .popseg
 
@@ -2038,33 +2024,33 @@ drawplayer_common := _drawplayerone::common
         ; else
         ;     collision = collisionMap1[coordinates];
         ; return is_solid[collision];
-    LDA #(<collMap0)
-    STA ptr1
-    LDA _temp_y     ;
-    CMP #$F0        ;   if(temp_y >= 0xf0) return 0;
+    LDA	#(<collMap0)
+    STA	ptr1
+    LDA	_temp_y     ;
+    CMP #$F0        ;	if(temp_y >= 0xf0) return 0;
     BCS Return0	    ;__
-    AND #$F0        ;	temp_y & 0xF0
-    STA tmp1        ;__
-	LDA _temp_x		;
+    AND	#$F0        ;	temp_y & 0xF0
+    STA	tmp1        ;__
+	LDA	_temp_x		;
 	LSR				;
 	LSR				;	temp_x >> 4
 	LSR				;
 	LSR				;__
-	ORA tmp1		;	coordinates = (temp_x >> 4) + ((temp_y) & 0xf0);
+	ORA	tmp1		;	coordinates = (temp_x >> 4) + ((temp_y) & 0xf0);
 	TAY				;__
 
-	LDA _temp_room	;	tmp3 = temp_room&1;
-	AND #$01		;__
-	ORA #(>collMap0);
-    STA ptr1+1      ;
-	LDA (ptr1),Y	; collision = collisionMap0[coordinates];
-	STA _collision	;__
+	LDA	_temp_room	;	tmp3 = temp_room&1;
+	AND	#$01		;__
+	ORA	#(>collMap0);
+    STA	ptr1+1      ;
+	LDA	(ptr1),Y	; collision = collisionMap0[coordinates];
+	STA	_collision	;__
     TAY             ;
-	LDA _is_solid,Y	;	return is_solid[collision];
+	LDA	_is_solid,Y	;	return is_solid[collision];
 	RTS				;__
 
 	Return0:
-	LDA #$00
+	LDA	#$00
 	RTS
 
 .endproc
@@ -2093,9 +2079,9 @@ PCM_ptr = _tmp6
     sta $4000
     sta $4004
     ;init pcm
-;    lda #<GeometryDashPCM
- ;   sta PCM_ptr
- ;   ldx #<.bank(GeometryDashPCM)
+	; lda #<GeometryDashPCM
+	; sta PCM_ptr
+	; ldx #<.bank(GeometryDashPCM)
  	ldy #0
 
     ;play pcm
