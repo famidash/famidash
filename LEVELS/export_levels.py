@@ -52,7 +52,7 @@ def export_bg(folder: str, levels: Iterable[str]):
             f"{level}_speed",
             f"{level}_bg_color",
             f"{level}_grnd_color",
-            f"{level}_extceil_flg",
+            f"{1 if len(lines) > 27 else 0}\t; extended ceiling flag",
         ]
         all_data += header
         all_data += rle_data
@@ -119,6 +119,7 @@ def export_spr(folder: str, levels: Iterable[str]):
         lines = []
         with open(f"{folder}/{level}_SP.csv") as f:
             lines = list(csv.reader(f))
+        extceil = len(lines) == 59
         level_data = []
         rows = len(lines)
         columns = len(lines[0])
@@ -147,6 +148,8 @@ def export_spr(folder: str, levels: Iterable[str]):
              
                     k = (j % 32) // 16
                     y_hi = k    # Y position, high byte
+                    if not extceil:
+                        y_hi += 2
 
                     obj_id = int(a)	# object id
 
