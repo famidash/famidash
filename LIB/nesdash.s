@@ -41,6 +41,13 @@ sprite_data = _sprite_data
 	parallax_scroll_column: .res 1
 	parallax_scroll_column_start: .res 1
 
+.segment "CODE"
+shiftBy4table:
+.byte $00, $10, $20, $30
+.byte $40, $50, $60, $70
+.byte $80, $90, $A0, $B0
+.byte $C0, $D0, $E0, $F0
+
 .segment "XCD_BANK_00"
 
 ;void __fastcall__ oam_meta_spr_flipped(uint8_t x,uint8_t y,const void *data);
@@ -282,26 +289,26 @@ single_rle_byte:
 .segment "CODE_2"
 
 .export _unrle_next_column
-_unrle_next_column:
+.proc _unrle_next_column
 
     ; Count up to zero to remove a cmp instruction
     ldx rld_load_value
     ldy #$00
     lda rld_value
 
-    @FirstLoop:
+    firstLoop:
         sta columnBuffer - ($100 - (15 + 15 + 15 + 12)), x
         dec rld_run
-        bmi @UpdateValueRun
+        bmi updateValueRun
         inx 
-        bmi @FirstLoop
-        bpl @WriteSetup ; Guaranteed jump
+        bmi firstLoop
+        bpl end ; Guaranteed jump
     
-    @UpdateValueRun:
+    updateValueRun:
         ; if bit 7 of the byte is set, then its a run of length 1
         ; otherwise this is a length < 127 byte and we need to read another
         lda (level_data), y
-        bmi @SingleByteRun
+        bmi singleByteRun
         sta rld_run               ;__ Load rld_run, ++level_data
         incw_check level_data     ;__
 
@@ -311,68 +318,81 @@ _unrle_next_column:
 
         lda rld_value
         inx 
-        bmi @FirstLoop
-        bpl @WriteSetup ; Unconditional
+        bmi firstLoop
+        bpl end ; Unconditional
     
-    @SingleByteRun:
+    singleByteRun:
         and #$7f
         sta rld_value
         ; y = 0
         sty rld_run
         incw_check level_data
         inx 
-        bmi @FirstLoop
+        bmi firstLoop
         ; and then fallthrough to copying to the collision map
 
-    @WriteSetup:
+    end:
 
-    ; We have 27 writes to make to the collision map, thats 27 * 6 bytes for an unrolled loop.
-    ; roughly twice the size for much more perf. We'll want this function to be fast when we
-    ; do practice mode so we can quickly reload to the middle of levels
-    ldx _rld_column
+		ldx _rld_column
+		inx
+		.if use_illegal_opcodes
+			lda #$0F
+			sax _rld_column
+		.else
+			txa
+			and #$0f
+			sta _rld_column
+		.endif
+	rts
+.endproc
+
+.export _copy_column_to_collmap
+.proc _copy_column_to_collmap
+	.if use_illegal_opcodes
+		ldx _rld_column
+		dex
+		lda #$0F
+		axs #$00
+	.else
+		lda _rld_column
+		clc
+		adc #$01
+		and #$0F
+		tax
+	.endif
 	ldy rld_load_value
 	cpy #<-(15+15+12)
-	bcs @write_collmap1
+	bcs write_collmap1
 		.repeat 15, I
 			lda columnBuffer + I
 			sta collMap0 + I * 16, x
 		.endrepeat
-	@write_collmap1:
+	write_collmap1:
 	cpy #<-(15+12)
-	bcs @write_collmap2
+	bcs write_collmap2
 		.repeat 15, I
 			lda columnBuffer+(15*1) + I
 			sta collMap1 + I * 16, x
 		.endrepeat
-	@write_collmap2:
+	write_collmap2:
 	cpy #<-(12)
-	bcs @write_collmap3
+	bcs write_collmap3
 		.repeat 15, I
 			lda columnBuffer+(15*2) + I
 			sta collMap2 + I * 16, x
 		.endrepeat
-	@write_collmap3:
+	write_collmap3:
 		.repeat 12, I
 			lda columnBuffer+(15*3) + I
 			sta collMap3 + I * 16, x
 		.endrepeat
-
+	write_ground:
 		.repeat 3, I
 			lda ground + I * 16, x
 			sta columnBuffer+(15*3)+12+I
 		.endrepeat
-    inx
-    txa
-    and #$0F
-    sta _rld_column
-    rts
-
-shiftBy4table:
-.byte $00, $10, $20, $30
-.byte $40, $50, $60, $70
-.byte $80, $90, $A0, $B0
-.byte $C0, $D0, $E0, $F0
-
+	rts
+.endproc
 
 .global metatiles_top_left, metatiles_top_right, metatiles_bot_left, metatiles_bot_right, metatiles_attr
 .import _increase_parallax_scroll_column
@@ -396,6 +416,8 @@ shiftBy4table:
 
     CurrentRow = tmp1
     LoopCount = tmp2
+
+	SeamValue = ptr3+1
 
     .export _draw_screen_R_frame0 := frame0
     .export _draw_screen_R_frame1 := frame1
@@ -437,6 +459,7 @@ frame0:
         JSR mmc3_set_prg_bank_1
 
         JSR _unrle_next_column
+		JSR _copy_column_to_collmap
 
 frame1:
 
@@ -578,6 +601,16 @@ NametableAddrHi = tmp1
         AND	#$0F
         STA	ptr3
 
+		; TODO: More logic:
+		; Y ≥	| Y <	| A		| B		|
+		; 	0	|  $78	|	0	|	1	|
+		;  $78	| $178	|  0/2	|	1	|
+		; $178	| $278	|	2	|  1/3	|
+		; $278	| $2F0	|	2	|	3	|
+		; $10 is added to Y at all F0 boundaries but the edge
+
+		; Get seam position for attributes
+
         ; Get the ptr (I am not bothering with 2 separate loops)
         LDA	#>collMap2
         STA	ptr1+1
@@ -585,14 +618,11 @@ NametableAddrHi = tmp1
         AND	#$0E
         ; ADC #(<collMap0-1)    ; The carry is set by the CMP used to jump into this routine
         STA	ptr1
-		; BCC :+
-		; 	INC ptr1+1
-		; :
 
         LDA	#8 - 1
 		LDX #0
 		STX ptr2+1
-        JSR attributeSetup
+        JSR attributeCalc
 
         ; Last byte has no bottom tiles
         LDA	columnBuffer+7
@@ -602,17 +632,9 @@ NametableAddrHi = tmp1
         ; Update pointer
 		INC ptr1+1
 
-		; TODO: More logic:
-		; Y ≥	| Y <	| A		| B		|
-		; 	0	|  $78	|	0	|	1	|
-		;  $78	| $178	|  0/2	|	1	|
-		; $178	| $278	|	2	|  1/3	|
-		; $278	| $2F0	|	2	|	3	|
-		; $10 is added to Y at all F0 boundaries but the edge
-
         ; Update new maximum
         LDA	#8+8 - 1
-        JSR attributeSetup
+        JSR attributeCalc
 
 		; Last byte has no bottom tiles
         LDA	columnBuffer+15
@@ -680,10 +702,12 @@ NametableAddrHi = tmp1
         STA	scroll_count
         RTS
 
-	attributeSetup:
+	attributeCalc:
+		tmp5 = ptr2
+		ColumnBufferIdx = ptr2+1
 		STA	LoopCount
 
-    	attributeLoop1:
+    	@loop:
             ; Read lower right metatile
             LDY #$11
             LDA	(ptr1),Y
@@ -697,7 +721,7 @@ NametableAddrHi = tmp1
 			ASL
 			ASL
 			ora metatiles_attr,y	; Lower left
-            STA	ptr2
+            STA	tmp5
 
             ; Read upper right metatile
             LDY #$01
@@ -714,9 +738,9 @@ NametableAddrHi = tmp1
 			ora metatiles_attr,y	; Upper left
 
 			; Combine
-			LDY ptr2	; Y has the lower metatile attrs, will shift by 4
+			LDY tmp5	; Y has the lower metatile attrs, will shift by 4
 			ORA	shiftBy4table,Y
-			LDX ptr2+1
+			LDX ColumnBufferIdx
 			STA	columnBuffer,X
 
             ; Increment pointer
@@ -726,13 +750,12 @@ NametableAddrHi = tmp1
             ; is valid
             ADC #$20
             STA	ptr1
-			; BCC :+            ;
-			; 	INC ptr1+1    ;   coll map starts at 0
-			; :                 ;
 
-            INC ptr2+1
+
+
+            INC ColumnBufferIdx
             DEC LoopCount
-            BPL attributeLoop1
+            BPL @loop
         RTS
 
     right_tilewriteloop:

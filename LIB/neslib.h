@@ -293,9 +293,3 @@ void __fastcall__ delay(uint8_t frames);
 #define NTADR_B(x,y) 	(NAMETABLE_B|(((y)<<5)|(x)))
 #define NTADR_C(x,y) 	(NAMETABLE_C|(((y)<<5)|(x)))
 #define NTADR_D(x,y) 	(NAMETABLE_D|(((y)<<5)|(x)))
-
-//macro to get MSB and LSB
-
-#define MSB(x)			(((x)>>8))
-#define LSB(x)			(((x)&0xff))
-
