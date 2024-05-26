@@ -12,6 +12,9 @@ sprite_data = _sprite_data
 
 .define gamemode_count 8
 
+; 1 makes some code slightly faster, 0 makes it work on famiclones
+.define use_illegal_opcodes 1
+
 .segment "ZEROPAGE"
 	rld_value:		.res 1
 	rld_run:		.res 1
@@ -1440,7 +1443,12 @@ drawplayer_center_offsets:
 		BNE @no_round		    ;__
         @round:	    
 			STA	_cube_rotate+0	;__ low_byte = 0
-			LAX _cube_rotate+1	;	LAX abs is apparently stable
+			.if use_illegal_opcodes
+				LAX _cube_rotate+1	;	LAX abs is apparently stable
+			.else
+				LDA _cube_rotate+1
+				TAX
+			.endif
 			SEC					;
 			SBC #12				;
 			BCC :+				;	Limit table idx to 0..12
@@ -1844,7 +1852,12 @@ drawplayer_common := _drawplayerone::common
 		ORA	_player_vel_y+2		;
 		BNE @no_round			;__
 			STA	_cube_rotate+2	;__ low_byte = 0
-			LAX _cube_rotate+3	;	LAX abs is apparently stable
+			.if use_illegal_opcodes
+				LAX _cube_rotate+3	;	LAX abs is apparently stable
+			.else
+				LDA _cube_rotate+3	;
+				TAX
+			.endif
 			SEC					;
 			SBC #12				;
 			BCC :+				;	Limit table idx to 0..12
