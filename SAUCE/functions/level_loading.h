@@ -1,11 +1,8 @@
 // prototype
 void init_sprites(void);
 #include "../defines/bg_charmap.h"
-const unsigned char attemptstex[]="PQQRSTQ"; //ATTEMPT
-const unsigned char wtxt[]="w";
-const unsigned char htxt[]="x";
-const unsigned char atxt[]="y";
-const unsigned char rtxt[]="z";
+const unsigned char attempttext[]="PQQRSTQ"; //ATTEMPT
+const unsigned char whartxt[]="wxyz";	// WHAR
 void setdefaultoptions();
 /* 
 	Reset run-length decoder back to zero
@@ -19,6 +16,8 @@ void __fastcall__ init_rld(unsigned char level);
 	Implemented in asm
 */
 void __fastcall__ unrle_next_column(void);
+
+void __fastcall__ copy_column_to_collmap(void);
 
 /* 
 	Scrolling to the right, draw metatiles as we go
@@ -50,8 +49,9 @@ void increase_parallax_scroll_column() {
 }
 extern unsigned char scroll_count;
 void unrle_first_screen(void){ // run-length decode the first screen of a level
-	unsigned char i;
-	unsigned int ii;
+	// register unsigned char i;
+	#define i (*((unsigned char *)&ii))
+	register unsigned long ii;
 	init_sprites();
 
 	cube_data[0] = 0;
@@ -67,8 +67,20 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 		scroll_count = 0;
 		scroll_x = practice_scroll_x - 256;
 		scroll_y = practice_scroll_y;
-		for (ii = 0; ii <= practice_scroll_x >> 4; ii++) {
-			unrle_next_column();
+		// for (i = practice_scroll_x >> 24, i++; i > 0; i--) {
+		// 	for (ii = practice_scroll_x >> 8, ii++; ii > 0; ii--) {
+		// 		unrle_next_column();
+		// 		increase_parallax_scroll_column();
+		// 		scroll_count = !scroll_count;
+		// 	}
+		// }
+		// for (i = byte(low_byte(practice_scroll_x) >> 4), i++; i > 0; i--) {
+		// 	unrle_next_column(); copy_column_to_collmap();
+		// 	increase_parallax_scroll_column();
+		// 	scroll_count = !scroll_count;
+		// }
+		for (ii = (practice_scroll_x >> 4), ++ii; ii > 0; ii--) {
+			unrle_next_column(); copy_column_to_collmap();
 			increase_parallax_scroll_column();
 			scroll_count = !scroll_count;
 		}
@@ -105,7 +117,7 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 	//	memcpy(famistudio_state, practice_famistudio_state, sizeof(practice_famistudio_state));
 	} else {
 		// To get the draw screen R to start in the left nametable, scroll must be negative.
-		scroll_x = -256;
+		low_word(scroll_x) = LSW(-256); high_word(scroll_x) = MSW(-256);
 	}
 
 	// Draw the nametable starting from where the scroll is set
@@ -113,14 +125,14 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
     do {
 		draw_screen_R();
 		flush_vram_update2();
-		scroll_x += 1;
+		++scroll_x;
 		i++;
 	} while (i != 0);
 
 	set_scroll_x(scroll_x);
 	set_scroll_y(scroll_y);
 	if (!has_practice_point) {
-		multi_vram_buffer_horz((const char*)attemptstex,sizeof(attemptstex)-1,NTADR_C(7, 15));
+		multi_vram_buffer_horz((const char*)attempttext,sizeof(attempttext)-1,NTADR_C(7, 15));
 		
 		TOTALCOINSONES = 0;
 		TOTALCOINSTENS = 0;
@@ -143,14 +155,8 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 		}
 		TOTALCOINSONES = TOTALCOINSTEMP;
 
-		if (TOTALATTEMPTSTHOUSANDS >= 10) {
-			multi_vram_buffer_horz((const char*)wtxt,sizeof(wtxt)-1,NTADR_C(15, 15));
-			multi_vram_buffer_horz((const char*)htxt,sizeof(htxt)-1,NTADR_C(16, 15));
-			multi_vram_buffer_horz((const char*)atxt,sizeof(atxt)-1,NTADR_C(17, 15));
-			multi_vram_buffer_horz((const char*)rtxt,sizeof(rtxt)-1,NTADR_C(18, 15));
-
-
-		}
+		if (TOTALATTEMPTSTHOUSANDS >= 10)
+			multi_vram_buffer_horz((const char*)whartxt,sizeof(whartxt)-1,NTADR_C(15, 15));
 
 		else {
 			if (TOTALATTEMPTSTHOUSANDS) one_vram_buffer(0xf5+TOTALATTEMPTSTHOUSANDS, NTADR_C(15,15));
@@ -159,4 +165,5 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 			one_vram_buffer(0xf5+TOTALCOINSONES, NTADR_C(18,15));		
 		}
 	}
+	#undef i
 }
