@@ -20,9 +20,6 @@ sprite_data = _sprite_data
 	rld_run:		.res 1
 
 .segment "BSS"
-	; column buffer, to be pushed to the collision map
-	; 15 metatiles in the top screen 
-	; 12 metatiles in the bot screen
 	columnBuffer:   .res 15 + 15 + 15 + 15
 
 	current_song_bank:	.res 1
@@ -437,28 +434,30 @@ single_rle_byte:
     ;	Write 1 updates the lower nametable's right tiles
     ; Frame 2:
     ;	Attributes 
+start:
     
-    LDA	_scroll_x           ;__ Highbyte of scroll_x
-    LSR                     ;
-    LSR                     ;	>> 4
-    LSR                     ;
-    LSR                     ;__
-    STA	tmp4
+		LDA	_scroll_x           ;__ Highbyte of scroll_x
+		LSR                     ;
+		LSR                     ;	>> 4
+		LSR                     ;
+		LSR                     ;__
+		STA	tmp4
 
-    LDX scroll_count
-    BNE frame2
+		LDX scroll_count
+		BNE frame2
 
-    LDA	tmp4
-    CMP _rld_column         ;	If X == rld column, decompress shit
-    BEQ frame0
-    RTS
+		LDA	tmp4
+		CMP _rld_column         ;	If X == rld column, decompress shit
+		BEQ frame0
+		RTS
     
-frame2:
+	frame2:
         CPX #$01
         BEQ frame1
         JMP attributes
 
-frame0:
+tilewrites:
+	frame0:
         ; Switch banks
         LDA	_level_data_bank
         JSR mmc3_set_prg_bank_1
@@ -466,7 +465,7 @@ frame0:
         JSR _unrle_next_column
 		JSR _copy_column_to_collmap
 
-frame1:
+	frame1:
 
         ; Writing to nesdoug's VRAM buffer starts here
         LDX VRAM_INDEX
@@ -586,8 +585,58 @@ frame1:
 
         RTS
 
-    attributes:
-NametableAddrHi = tmp1
+	right_tilewriteloop:
+            ldy CurrentRow
+            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
+            tay
+            ; y is the metatile id
+            lda metatiles_top_right, y
+            STA	VRAM_BUF+TileOff0+3,X
+            lda metatiles_bot_right, y
+            STA	VRAM_BUF+TileOff0+4,X
+            
+            INX
+            INX
+            inc CurrentRow
+            DEC LoopCount
+            BPL right_tilewriteloop
+        rts
+    left_tilewriteloop:
+            ldy CurrentRow
+            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
+            tay
+            ; y is the metatile id
+            lda metatiles_top_left, y
+            STA	VRAM_BUF+TileOff0+3,X
+            lda metatiles_bot_left, y
+            STA	VRAM_BUF+TileOff0+4,X
+            
+            INX
+            INX
+            inc CurrentRow
+            DEC LoopCount
+            BPL left_tilewriteloop
+        rts
+        
+    RenderParallaxLoop:
+            lda VRAM_BUF+TileOff0+3,x
+            bne :+
+                ; empty tile, so replace it with the parallax for this
+                lda ParallaxBuffer, y
+                sta VRAM_BUF+TileOff0+3,x
+            :
+            iny
+            cpy ParallaxExtent
+            bne :+
+                ldy ParallaxBufferStart
+            :
+            inx
+            dec LoopCount
+            bpl RenderParallaxLoop
+        rts
+
+attributes:
+		NametableAddrHi = tmp1
         ; Attribute write architecture:
 
         ; | Ad|dr |dat|
@@ -776,127 +825,28 @@ NametableAddrHi = tmp1
             BPL @loop
         RTS
 
-    right_tilewriteloop:
-            ldy CurrentRow
-            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
-            tay
-            ; y is the metatile id
-            lda metatiles_top_right, y
-            STA	VRAM_BUF+TileOff0+3,X
-            lda metatiles_bot_right, y
-            STA	VRAM_BUF+TileOff0+4,X
-            
-            INX
-            INX
-            inc CurrentRow
-            DEC LoopCount
-            BPL right_tilewriteloop
-        rts
-    left_tilewriteloop:
-            ldy CurrentRow
-            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
-            tay
-            ; y is the metatile id
-            lda metatiles_top_left, y
-            STA	VRAM_BUF+TileOff0+3,X
-            lda metatiles_bot_left, y
-            STA	VRAM_BUF+TileOff0+4,X
-            
-            INX
-            INX
-            inc CurrentRow
-            DEC LoopCount
-            BPL left_tilewriteloop
-        rts
-        
-    RenderParallaxLoop:
-	    lda _no_parallax
-	    bne @nopar
-            lda VRAM_BUF+TileOff0+3,x
-            bne :+
-                ; empty tile, so replace it with the parallax for this
-                lda ParallaxBuffer, y
-                sta VRAM_BUF+TileOff0+3,x
-            :
-            iny
-            cpy ParallaxExtent
-            bne :+
-                ldy ParallaxBufferStart
-            :
-            inx
-            dec LoopCount
-            bpl RenderParallaxLoop
-	@nopar:
-            rts
-    ; Before returning, loop again through the vram buffer and write the parallax
-    ; parallax_bg_write:
-    ;     ldx #27 - 1
-
-    ;     ; based on the current scroll value.
-    ;     ; y is the metatile current row, x is the current VRAM_BUF offset
-    ;     ; tmp4 is the parallax_scroll_column_start value
-    ;     ; which is where in the parallax buffer we are rendering from
-
-    ;     ldy ParallaxColumnStart
-    ;     cpy #9 - 1
-    ;     bne :+
-    ;         ; annoyingly when we are drawing the last row we have to do it differently
-    ;         jsr render_last_tile
-    ;         bne write_tile1
-    ;     :
-    ;     lda ParallaxBuffer, y
-    ;     clc
-    ;     adc parallax_scroll_column
-    ; write_tile1:
-    ;     sta VRAM_BUF+TileOff0+3,X
-    ;     iny 
-    ;     cpy #9
-    ;     bcc :+
-    ;         ldy #0
-    ;     :
-    ;     ; Render the second tile
-    ;     cpy #9 - 1
-    ;     bne :+
-    ;         jsr render_last_tile
-    ;         bne write_tile2
-    ;     :
-    ;     lda ParallaxBuffer, y
-    ;     clc
-    ;     adc parallax_scroll_column
-    ; write_tile2:
-    ;     sta VRAM_BUF+TileOff0+4,X
-    ;     iny 
-    ;     cpy #9
-    ;     bcc :+
-    ;         ldy #0
-    ;     :
-    ;     sty ParallaxColumnStart
-
-    ;     jmp NextMetatile
-    ;     RTS
-
-; Column striped parallax data definition
-; add to the tile for the next row, up to 6.
 ParallaxBuffer:
-ParallaxBufferOffset:
-.byte ParallaxBufferCol0 - ParallaxBuffer
-.byte ParallaxBufferCol1 - ParallaxBuffer
-.byte ParallaxBufferCol2 - ParallaxBuffer
-.byte ParallaxBufferCol3 - ParallaxBuffer
-.byte ParallaxBufferCol4 - ParallaxBuffer
-.byte ParallaxBufferCol5 - ParallaxBuffer
-ParallaxBufferCol0:
-.byte $80, $90, $a0, $b0, $86, $96, $a6, $b6, $8c
-ParallaxBufferCol1:
-.byte $81, $91, $a1, $b1, $87, $97, $a7, $b7, $8d
-ParallaxBufferCol2:
-.byte $82, $92, $a2, $b2, $88, $98, $a8, $b8, $8e
-ParallaxBufferCol3:
-.byte $83, $93, $a3, $b3, $89, $99, $a9, $b9, $9c
-ParallaxBufferCol4:
-.byte $84, $94, $a4, $b4, $8a, $9a, $aa, $ba, $9d
-ParallaxBufferCol5:
-.byte $85, $95, $a5, $b5, $8b, $9b, $ab, $bb, $9e
+	; Column striped parallax data definition
+	; add to the tile for the next row, up to 6.
+	ParallaxBufferOffset:
+		.byte ParallaxBufferCol0 - ParallaxBuffer
+		.byte ParallaxBufferCol1 - ParallaxBuffer
+		.byte ParallaxBufferCol2 - ParallaxBuffer
+		.byte ParallaxBufferCol3 - ParallaxBuffer
+		.byte ParallaxBufferCol4 - ParallaxBuffer
+		.byte ParallaxBufferCol5 - ParallaxBuffer
+	ParallaxBufferCol0:
+		.byte $80, $90, $a0, $b0, $86, $96, $a6, $b6, $8c
+	ParallaxBufferCol1:
+		.byte $81, $91, $a1, $b1, $87, $97, $a7, $b7, $8d
+	ParallaxBufferCol2:
+		.byte $82, $92, $a2, $b2, $88, $98, $a8, $b8, $8e
+	ParallaxBufferCol3:
+		.byte $83, $93, $a3, $b3, $89, $99, $a9, $b9, $9c
+	ParallaxBufferCol4:
+		.byte $84, $94, $a4, $b4, $8a, $9a, $aa, $ba, $9d
+	ParallaxBufferCol5:
+		.byte $85, $95, $a5, $b5, $8b, $9b, $ab, $bb, $9e
 
 .endproc
 
