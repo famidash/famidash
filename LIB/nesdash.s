@@ -29,6 +29,8 @@ sprite_data = _sprite_data
 	rld_load_value:		.res 1
 	min_scroll_y:		.res 2
 
+	seam_scroll_y:		.res 2
+
 .export _scroll_count := scroll_count
 .export _extceil := extceil
 .export _auto_fs_updates := auto_fs_updates
@@ -463,6 +465,31 @@ tilewrites:
         JSR _unrle_next_column
 		JSR _copy_column_to_collmap
 
+		; Seam position:
+		; Y ≥	| Y <	| A		| B		|
+		; 	0	|  $78	|	0	|	1	|
+		;  $78	| $178	|  0/2	|	1	|
+		; $178	| $278	|	2	|  1/3	|
+		; $278	| $2F0	|	2	|	3	|
+		; $10 is added to Y at all F0 boundaries but the edge
+
+		; Get seam position for attributes
+		; Seampos = (((Y-$78)>>4)&$FE)<<4 = (Y-78)&$FFE0 
+		LDX	_scroll_y+1
+		LDA	_scroll_y
+		SEC
+		SBC	#$78	;
+		BCS	:+		;	AX = scroll_y - $78
+			DEX		;__
+		:
+		CPX	#$02	;
+		BCS	:+		;	if X == 2 or -1 (aka no seam)
+			LDA #$FF;	seam_scroll_y = $FFFF
+			TAX		;
+		:			;__
+		STA	seam_scroll_y
+		STX seam_scroll_y
+
 	frame1:
 
         ; Writing to nesdoug's VRAM buffer starts here
@@ -658,22 +685,22 @@ attributes:
 			STA	ptr3
 		.endif
 
-		; TODO: More logic:
-		; Y ≥	| Y <	| A		| B		|
-		; 	0	|  $78	|	0	|	1	|
-		;  $78	| $178	|  0/2	|	1	|
-		; $178	| $278	|	2	|  1/3	|
-		; $278	| $2F0	|	2	|	3	|
-		; $10 is added to Y at all F0 boundaries but the edge
-
-		; Get seam position for attributes
+		; Seam pos for attributes:
+		; <seam_scroll_y & $E0 | >seam_scroll_y & 1 
+		LDA seam_scroll_y
+		AND #$E0
+		STA SeamValue
+		LDA seam_scroll_y+1
+		AND #$03	; add bit 1 to not use if FFFF
+		ORA SeamValue
+		STA SeamValue
 
         ; Get the ptr (I am not bothering with 2 separate loops)
-        LDA	#>collMap2
+        LDA	#>collMap0
         STA	ptr1+1
         LDA	ptr3
         AND	#$0E
-        ; ADC #(<collMap0-1)    ; The carry is set by the CMP used to jump into this routine
+        ; ADC #(<collMap0-1)    ; The low byte is 0
         STA	ptr1
 
         LDA	#8 - 1
@@ -814,14 +841,20 @@ attributes:
             ; always shifts 0 into it if the metatile data
             ; is valid
             ADC #$20
-            STA	ptr1
-
-
+			CMP SeamValue
+			STA	ptr1
+			BNE :+
+				LDA #2-1	; Carry set by the CMP
+				ADC ptr1+1
+				STA ptr1+1
+				DEC SeamValue	; to not activate it again
+			:
 
             INC ColumnBufferIdx
             DEC LoopCount
             BPL @loop
         RTS
+
 
 ParallaxBuffer:
 	; Column striped parallax data definition
