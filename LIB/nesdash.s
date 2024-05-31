@@ -35,6 +35,7 @@ sprite_data = _sprite_data
 .export _scroll_count := scroll_count
 .export _extceil := extceil
 .export _auto_fs_updates := auto_fs_updates
+.export _min_scroll_y := min_scroll_y
 
 .export _parallax_scroll_column := parallax_scroll_column
 .export _parallax_scroll_column_start := parallax_scroll_column_start
@@ -230,9 +231,9 @@ _init_rld:
 	ADC #$01			;
 	STA rld_load_value	;__
 
-	LDA	#$80			;- (to automatically shift out 1)
+	LDA	#$01			;- (to automatically shift out 1)
 	CPX	#27+1			;	Extceil flag
-	ROL					;
+	ROR					;
 	STA	extceil			;__
 
 	@min_scroll_y_calc:
