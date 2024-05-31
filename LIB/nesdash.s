@@ -219,10 +219,14 @@ _init_rld:
 
 	incw_check level_data
 
-	LDA	(level_data),y	;
-	TAX					;
-	EOR #$FF			;	Level height
-	CLC					;
+	.if use_illegal_opcodes
+		lax (level_data),y
+	.else
+		LDA	(level_data),y
+		TAX
+	.endif
+	EOR #$FF			;
+	CLC					;	Level height
 	ADC #$01			;
 	STA rld_load_value	;__
 
@@ -354,8 +358,8 @@ single_rle_byte:
 		axs #$00
 	.else
 		lda _rld_column
-		clc
-		adc #$01
+		sec
+		sbc #$01
 		and #$0F
 		tax
 	.endif
@@ -595,9 +599,14 @@ NametableAddrHi = tmp1
         ; Decremented rld_column, very useful
         LDX _rld_column
         DEX
-        TXA
-        AND	#$0F
-        STA	ptr3
+		.if use_illegal_opcodes
+			lda #$0f
+			sax ptr3
+		.else
+			TXA
+			AND	#$0F
+			STA	ptr3
+		.endif
 
 		; TODO: More logic:
 		; Y ≥	| Y <	| A		| B		|
@@ -708,8 +717,12 @@ NametableAddrHi = tmp1
     	@loop:
             ; Read lower right metatile
             LDY #$11
-            LDA	(ptr1),Y
-            tax
+			.if use_illegal_opcodes
+				lax (ptr1),y
+			.else
+				LDA	(ptr1),Y
+				tax
+			.endif
             ; Read lower left metatile
 			dey
 			LDA	(ptr1), Y
@@ -723,8 +736,12 @@ NametableAddrHi = tmp1
 
             ; Read upper right metatile
             LDY #$01
-            LDA	(ptr1),Y
-            tax
+            .if use_illegal_opcodes
+				lax (ptr1),y
+			.else
+				LDA	(ptr1),Y
+				tax
+			.endif
 			; Read upper left metatile
 			dey
 			LDA	(ptr1), Y
