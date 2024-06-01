@@ -486,11 +486,10 @@ tilewrites:
 		:
 		CPX	#$02	;
 		BCS	:+		;	if X == 2 or -1 (aka no seam)
-			LDA #$FF;	seam_scroll_y = $FFFF
-			TAX		;
+			LDX #$FF;	seam_scroll_y = $FFxx
 		:			;__
 		STA	seam_scroll_y
-		STX seam_scroll_y
+		STX seam_scroll_y+1
 
 	frame1:
 
@@ -716,7 +715,18 @@ attributes:
         STA	columnBuffer+7
 
         ; Update pointer
-		INC ptr1+1
+		; If there is a seam, we are switching from collmap 2
+		; to 1 -> DEC (also update the seamvalue here)
+		; If there isn't, we are either switching
+		; from 0 to 1 or from 2 to 3 -> INC
+		BIT seam_scroll_y
+		BMI :+
+			DEC	ptr1+1
+			DEC SeamValue
+			BNE	:++	; = BRA
+		:
+			INC ptr1+1
+		:
 
         ; Update new maximum
         LDA	#8+8 - 1
@@ -946,10 +956,10 @@ ParallaxBuffer:
 	; sreg[1] = len
 	; xargs[0:1] = data
 
-	.define spaceChr $FE
-	.define data xargs+0
-	.define total_len sreg+0
-	.define len sreg+1
+	spaceChr = $FE
+	data = xargs+0
+	total_len = sreg+0
+	len = sreg+1
 
 	LDY VRAM_INDEX
 	STA	VRAM_BUF, Y	;
@@ -1352,18 +1362,10 @@ drawcube_sprite_table:
 	.byte NOFLIP|6, V_FLIP|5, V_FLIP|4, V_FLIP|3, V_FLIP|2, V_FLIP|1
 	.byte HVFLIP|0, HVFLIP|1, HVFLIP|2, HVFLIP|3, HVFLIP|4, HVFLIP|5
 	.byte HVFLIP|6, H_FLIP|5, H_FLIP|4, H_FLIP|3, H_FLIP|2, H_FLIP|1
-	.undef NOFLIP
-	.undef H_FLIP
-	.undef V_FLIP
-	.undef HVFLIP
 
 drawcube_sprite_way:
 	; Bits 6-7: FLIP
 	; Bits 0-2: actual idx
-	.define NOFLIP $00
-	.define H_FLIP $40
-	.define V_FLIP $80
-	.define HVFLIP $C0
 	.byte NOFLIP|0, NOFLIP|1, NOFLIP|2, NOFLIP|3, NOFLIP|4, NOFLIP|5
 	.byte NOFLIP|6, H_FLIP|5, H_FLIP|4, H_FLIP|3, H_FLIP|2, H_FLIP|1
 	.byte H_FLIP|0, HVFLIP|1, HVFLIP|2, HVFLIP|3, HVFLIP|4, HVFLIP|5
