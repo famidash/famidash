@@ -2304,8 +2304,8 @@ drawplayer_common := _drawplayerone::common
 	TAY				;__
 
 	LDA	_temp_room	;	tmp3 = temp_room&1;
-	AND	#$01		;__
-	ORA	#(>collMap2);
+	AND	#$03		;__
+	ORA	#(>collMap0);
     STA	ptr1+1      ;
 	LDA	(ptr1),Y	; collision = collisionMap0[coordinates];
 	STA	_collision	;__
