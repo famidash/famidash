@@ -488,11 +488,27 @@ tilewrites:
 			DEX		;__
 		:
 		CPX	#$02	;
-		BCS	:+		;	if X == 2 or -1 (aka no seam)
-			LDX #$FF;	seam_scroll_y = $FFxx
+		BCC	:+		;	if X == 2 or -1 (aka no seam)
+			INX
+			TXA
+			.if use_illegal_opcodes
+				AXS #$7C	; = ORX #$84
+			.else
+				ORA #$84
+				TAX
+			.endif
 		:			;__
 		STA	seam_scroll_y
 		STX seam_scroll_y+1
+
+		; Total seam scroll system:
+		; High byte	| Seam screen	| A		| B		|
+		;	00		|		00		|  0/2	|	1	|
+		;	01		|		01		|	2	|  1/3	|
+		;	84		|	There isn't	|	0	| 	1	|
+		;	87		|	There isn't	|	2	|	3	|
+		;	No seam can be distinguished by bits 7 or 1
+		;	First
 
 	frame1:
 
@@ -695,34 +711,30 @@ attributes:
 		AND #$E0
 		STA SeamValue
 		LDA seam_scroll_y+1
-		AND #$03	; add bit 1 to not use if FFFF
+		AND #$05	; add bit 2 to not use if no seam
 		ORA SeamValue
 		STA SeamValue
 
         ; Get the ptr (I am not bothering with 2 separate loops)
-        LDA	#>collMap0
+		AND #$01		;	Bit 1 is directly from >seam_scroll_y
+		ASL				;	For values 0 or 84 load collmap 0
+        ORA	#>collMap0	;__	For values 1 or 87 load collmap 2
         STA	ptr1+1
         LDA	ptr3
         AND	#$0E
-        ; ADC #(<collMap0-1)    ; The low byte is 0
+        ; ADC #<collMap0    ; The low byte is 0
         STA	ptr1
 
-        LDA	#8 - 1
 		LDX #0
 		STX ptr2+1
         JSR attributeCalc
-
-        ; Last byte has no bottom tiles
-        LDA	columnBuffer+7
-        AND	#$0F
-        STA	columnBuffer+7
 
         ; Update pointer
 		; If there is a seam, we are switching from collmap 2
 		; to 1 -> DEC (also update the seamvalue here)
 		; If there isn't, we are either switching
 		; from 0 to 1 or from 2 to 3 -> INC
-		BIT seam_scroll_y
+		BIT seam_scroll_y+1
 		BMI :+
 			DEC	ptr1+1
 			DEC SeamValue
@@ -731,17 +743,13 @@ attributes:
 			INC ptr1+1
 		:
 
-        ; Update new maximum
-        LDA	#8+8 - 1
         JSR attributeCalc
-
-		; Last byte has no bottom tiles
-        LDA	columnBuffer+15
-        AND	#$0F
-        STA	columnBuffer+15
 
         ; Get address hi byte (either left or right side)
         lda _scroll_x + 1 ; high byte
+
+
+
         and #%00000001
         eor #%00000001
         asl
@@ -761,39 +769,32 @@ attributes:
 		.endif
         
         ; Store address
-        LDY VRAM_INDEX
-		.if !use_illegal_opcodes
-			CLC	; AXS doesn't use carry
-		.endif
-		; Legal vs illegal version:
-		; Legal: CLC, Preserve A in X, store A, clobber A, get a from X, add to A, repeat (carry is never set)
-		; Illegal: Store A, clobber A, add to X, get A from X, repeat
-		; Illegal version saves 2 bytes, 2 + 2*8 cycles
+        LDX VRAM_INDEX
+		CLC
         addressLoop:
             ; Low byte
-			.if !use_illegal_opcodes
-				TAX
-			.endif
-            STA	VRAM_BUF+AttrOff0+1,Y
-            STA VRAM_BUF+AttrOff1+1,Y
+            STA	VRAM_BUF+AttrOff0+1,X
+            STA VRAM_BUF+AttrOff1+1,X
+			TAY
             ; High byte
             lda NametableAddrHi
-            STA	VRAM_BUF+AttrOff0,Y
+            STA	VRAM_BUF+AttrOff0,X
             ORA	#$08
-            STA	VRAM_BUF+AttrOff1,Y
+            STA	VRAM_BUF+AttrOff1,X
 
-			INY
-			INY
-			INY
-
-            TXA
 			.if use_illegal_opcodes
-				AXS #<-8
-			.else
 				TXA
-				; C is cleared by CLC and BCC
-				ADC #$08
+				AXS #<-3
+				; Saves 2 cycles per loop
+			.else
+				INX
+				INX
+				INX
 			.endif
+
+			TYA
+			; C is cleared by CLC and BCC
+			ADC #$08
             BCC addressLoop
         
         LDY #16
@@ -810,6 +811,7 @@ attributes:
 			.if use_illegal_opcodes
 				TXA
 				AXS #3
+				; Saves 2 cycles
 			.else
 				DEX
 				DEX
@@ -819,7 +821,7 @@ attributes:
             BNE dataLoop
         
         ; Finish off the routine
-        ; X has VRAM_INDEX, mark this block as taken
+        ; X has (the old) VRAM_INDEX, mark this block as taken
         LDA	#$FF
         STA	VRAM_BUF+AttrEnd,X
         ; Reset frame counter
@@ -830,6 +832,7 @@ attributes:
 	attributeCalc:
 		tmp5 = ptr2
 		ColumnBufferIdx = ptr2+1
+        LDA	#8 - 1
 		STA	LoopCount
 
     	@loop:
@@ -888,7 +891,6 @@ attributes:
 				LDA #2-1	; Carry set by the CMP
 				ADC ptr1+1
 				STA ptr1+1
-				DEC SeamValue	; to not activate it again
 			:
 
             INC ColumnBufferIdx
