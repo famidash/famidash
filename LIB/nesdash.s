@@ -509,10 +509,29 @@ tilewrites:
 		;	01		|		01		|	2	|  1/3	|
 		;	84		|	There isn't	|	0	| 	1	|
 		;	87		|	There isn't	|	2	|	3	|
-		;	No seam can be distinguished by bits 7 or 1
-		;	First
+		;	No seam can be distinguished by bits 7 or 2
+		;	First nametable's data can be distinguished by bit 0
 
 	frame1:
+		; Load seam value
+		CPX #$80	; Put last bit of X into carry
+		BCS :+	; Skip everything if no seam
+			LSR
+			LSR
+			LSR
+			AND #$0E
+			ORA shiftBy4table, X	; X can only be 0 or 1
+		:
+		STA SeamValue
+
+		; Load initial column buffer index
+		TXA
+		AND #$01
+		BNE :+
+			LDA #15+15
+		:
+		STA CurrentRow
+
 
         ; Writing to nesdoug's VRAM buffer starts here
         LDX VRAM_INDEX
@@ -550,11 +569,6 @@ tilewrites:
 
         ; The sequence itself:
         
-        ; Load Y value
-        LDA rld_load_value
-		SEC
-		SBC #$03
-        sta CurrentRow
         ; Load max value
         LDA	#15 - 1
         STA	LoopCount
@@ -565,7 +579,7 @@ tilewrites:
             ; Right side write
             ; Call for upper tiles
             JSR right_tilewriteloop
-            jmp @WriteBottomHalf
+            BMI @WriteBottomHalf	; The loop keeps looping via a BPL, therefore a BMI = BRA
 		@LeftWrite:
             JSR left_tilewriteloop
 	@WriteBottomHalf:
@@ -573,16 +587,21 @@ tilewrites:
         LDA	#15 - 1
         STA	LoopCount
         ; Add offset to X
-        TXA
-        CLC
-        ADC #(TileSizeHi-(15*2))
-        TAX
-        
+		.if use_illegal_opcodes
+			TXA
+			AXS #<-(TileSizeHi-(15*2))
+		.else
+			TXA
+			CLC
+			ADC #(TileSizeHi-(15*2))
+			TAX
+        .endif
+
         LDA	scroll_count
         AND	#1
         beq @LeftWrite2
             JSR right_tilewriteloop
-            jmp @RenderParallax
+            BMI @RenderParallax	; The loop keeps looping via a BPL, therefore a BMI = BRA
 		@LeftWrite2:
             ; Call for lower tiles
             JSR left_tilewriteloop
@@ -623,10 +642,16 @@ tilewrites:
         STA	VRAM_BUF+TileEnd,X
 
         ; Declare this section as taken
-        TXA
-        CLC
-        ADC #TileEnd
-        STA	VRAM_INDEX
+		.if use_illegal_opcodes
+			TXA
+			AXS #<-TileEnd
+			STX VRAM_INDEX
+		.else
+			TXA
+			CLC
+			ADC #TileEnd
+			STA	VRAM_INDEX
+		.endif
 
         INC scroll_count
 
@@ -634,7 +659,7 @@ tilewrites:
 
 	right_tilewriteloop:
             ldy CurrentRow
-            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
+            LDA	columnBuffer, Y
             tay
             ; y is the metatile id
             lda metatiles_top_right, y
@@ -644,13 +669,19 @@ tilewrites:
             
             INX
             INX
-            inc CurrentRow
+			LDA CurrentRow
+			CMP SeamValue
+			SEC
+			BNE :+
+				ADC #15+15-1
+			: ADC #0
+            STA CurrentRow
             DEC LoopCount
             BPL right_tilewriteloop
         rts
     left_tilewriteloop:
             ldy CurrentRow
-            LDA	columnBuffer - ($100 - (15 + 15 + 15 + 15)),Y
+            LDA	columnBuffer, Y
             tay
             ; y is the metatile id
             lda metatiles_top_left, y
@@ -660,7 +691,13 @@ tilewrites:
             
             INX
             INX
-            inc CurrentRow
+			LDA CurrentRow
+			CMP SeamValue
+			SEC
+			BNE :+
+				ADC #15+15-1
+			: ADC #0
+            STA CurrentRow
             DEC LoopCount
             BPL left_tilewriteloop
         rts
@@ -801,10 +838,16 @@ attributes:
         
         LDY #16
 
-        LDA	VRAM_INDEX
-        ADC #AttrEnd-1  ; Carry is set by the ADC : BCC
-        STA	VRAM_INDEX  ; State that the block is now occupied
-        TAX
+		.if use_illegal_opcodes
+			LAX VRAM_INDEX
+			AXS #<-(AttrEnd-1)
+			STX VRAM_INDEX
+		.else
+			LDA	VRAM_INDEX
+			ADC #AttrEnd-1  ; Carry is set by the ADC : BCC
+			STA	VRAM_INDEX  ; State that the block is now occupied
+			TAX
+		.endif
 
         dataLoop:
             LDA	columnBuffer-1,Y
@@ -882,18 +925,25 @@ attributes:
 			STA	columnBuffer,X
 
             ; Increment pointer
-            LDA	ptr1
-            ; Last thing affecting carry is the ASL, which
-            ; always shifts 0 into it if the metatile data
-            ; is valid
-            ADC #$20
-			CMP SeamValue
-			STA	ptr1
+			.if use_illegal_opcodes
+				LAX ptr1
+				CPX SeamValue
+			.else
+				LDA	ptr1
+				CMP SeamValue
+			.endif
 			BNE :+
-				LDA #2-1	; Carry set by the CMP
-				ADC ptr1+1
-				STA ptr1+1
+				INC ptr1+1
+				INC ptr1+1
 			:
+			.if use_illegal_opcodes
+				AXS #<-$20
+				STX ptr1
+			.else
+				CLC
+				ADC #$20
+				STA	ptr1
+			.endif
 
             INC ColumnBufferIdx
             DEC LoopCount
