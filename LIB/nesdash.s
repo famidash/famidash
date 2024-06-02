@@ -95,10 +95,15 @@ shiftBy4table:
 		iny
 		EOR xargs+0
 		sta OAM_BUF+2,x
-		inx
-		inx
-		inx
-		inx
+		.if use_illegal_opcodes
+			txa			;	aka X += 4
+			axs #<-4	;__
+		.else
+			inx
+			inx
+			inx
+			inx
+		.endif
 		jmp loop
 
 	end:
@@ -744,30 +749,51 @@ attributes:
         ora #$23
         sta NametableAddrHi
         
-        LDA	ptr3
-        LSR
-        ORA	#$C0
+		.if use_illegal_opcodes
+			; ptr3 ain't used no more after this
+			LDA #$C0
+			SRE ptr3
+			; saves 1 byte, 0 cycles
+		.else
+        	LDA	ptr3
+			LSR
+			ORA	#$C0
+		.endif
         
         ; Store address
-        LDX VRAM_INDEX
+        LDY VRAM_INDEX
+		.if !use_illegal_opcodes
+			CLC	; AXS doesn't use carry
+		.endif
+		; Legal vs illegal version:
+		; Legal: CLC, Preserve A in X, store A, clobber A, get a from X, add to A, repeat (carry is never set)
+		; Illegal: Store A, clobber A, add to X, get A from X, repeat
+		; Illegal version saves 2 bytes, 2 + 2*8 cycles
         addressLoop:
             ; Low byte
-            STA	VRAM_BUF+AttrOff0+1,X
-            STA	VRAM_BUF+AttrOff1+1,X
-            TAY
+			.if !use_illegal_opcodes
+				TAX
+			.endif
+            STA	VRAM_BUF+AttrOff0+1,Y
+            STA VRAM_BUF+AttrOff1+1,Y
             ; High byte
             lda NametableAddrHi
-            STA	VRAM_BUF+AttrOff0,X
+            STA	VRAM_BUF+AttrOff0,Y
             ORA	#$08
-            STA	VRAM_BUF+AttrOff1,X
-            TYA
+            STA	VRAM_BUF+AttrOff1,Y
 
-            INX 
-            INX
-            INX
+			INY
+			INY
+			INY
 
-            CLC
-            ADC #$08
+            TXA
+			.if use_illegal_opcodes
+				AXS #<-8
+			.else
+				TXA
+				; C is cleared by CLC and BCC
+				ADC #$08
+			.endif
             BCC addressLoop
         
         LDY #16
@@ -781,9 +807,14 @@ attributes:
             LDA	columnBuffer-1,Y
             STA	VRAM_BUF-3+2,X
 
-            DEX
-            DEX
-            DEX
+			.if use_illegal_opcodes
+				TXA
+				AXS #3
+			.else
+				DEX
+				DEX
+				DEX
+			.endif
             DEY
             BNE dataLoop
         
