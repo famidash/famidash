@@ -503,6 +503,8 @@ tilewrites:
 		STA	seam_scroll_y
 		STX seam_scroll_y+1
 
+		JMP :+
+
 		; Total seam scroll system:
 		; High byte	| Seam screen	| A		| B		|
 		;	00		|		00		|  0/2	|	1	|
@@ -513,6 +515,11 @@ tilewrites:
 		;	First nametable's data can be distinguished by bit 0
 
 	frame1:
+		LDA seam_scroll_y
+		LDX seam_scroll_y+1
+
+		:
+
 		; Load seam value
 		CPX #$80	; Put last bit of X into carry
 		BCS :+	; Skip everything if no seam
@@ -521,13 +528,16 @@ tilewrites:
 			LSR
 			AND #$0E
 			ORA shiftBy4table, X	; X can only be 0 or 1
+			STA SeamValue
+			JMP :++
+		:	
+		STX SeamValue
 		:
-		STA SeamValue
 
 		; Load initial column buffer index
 		TXA
 		AND #$01
-		BNE :+
+		BEQ :+
 			LDA #15+15
 		:
 		STA CurrentRow
@@ -840,7 +850,7 @@ attributes:
 
 		.if use_illegal_opcodes
 			LAX VRAM_INDEX
-			AXS #<-(AttrEnd-1)
+			AXS #<-AttrEnd
 			STX VRAM_INDEX
 		.else
 			LDA	VRAM_INDEX
