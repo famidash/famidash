@@ -114,87 +114,85 @@ def export_bg(folder: str, levels: Iterable[str]):
 """)
         
 def export_spr(folder: str, levels: Iterable[str]):
-    all_data = []
-    for level in levels:
-        lines = []
-        with open(f"{folder}/{level}_SP.csv") as f:
-            lines = list(csv.reader(f))
-        extceil = len(lines) == 59
-        level_data = []
-        rows = len(lines)
-        columns = len(lines[0])
-        count1 = 0
-        count2 = 0
-        for i in range(0, columns):
-            for j in range(0, rows):
-                a = str(lines[j][i])
-                if (a != "-1"):
-                    k = i % 16
-                    x_lo = k * 16 # (str(hex(k)) + "0, ")		# X position, low byte
+	all_data = []
+	for level in levels:
+		lines = []
+		with open(f"{folder}/{level}_SP.csv") as f:
+			lines = list(csv.reader(f))
+		level_data = []
+		rows = len(lines)
+		columns = len(lines[0])
+		rowOffset = 57 - rows
+		count1 = 0
+		count2 = 0
+		for i in range(0, columns):
+			for j in range(0, rows):
+				a = str(lines[j][i])
+				if (a != "-1"):
+					k = i & 0xF
+					x_lo = k * 16 # (str(hex(k)) + "0, ")		# X position, low byte
 
-                    obj_id = int(a)	# object id
-                    
-                    if obj_id == 0x3E: #right medium post
-                        x_lo -= 8
-                    elif obj_id == 0x40: #right long post
-                        x_lo -= 16
+					obj_id = int(a)	# object id
+					
+					if obj_id == 0x3E: #right medium post
+						x_lo -= 8
+					elif obj_id == 0x40: #right long post
+						x_lo -= 16
 
-                    k = i // 16
-                    x_hi = k	  # X position, high byte
+					k = i // 16
+					x_hi = k	  # X position, high byte
 
-                    y_lo = j % 16 * 16 # Y position, low byte
-                    if int(a) in [10,13,37,253]: # ADJUST HEIGHT FOR BOTTOM PADS
-                        y_lo += 8
-             
-                    k = (j % 32) // 16
-                    y_hi = k    # Y position, high byte
-                    if not extceil:
-                        y_hi += 2
+					y = ((rowOffset + j) & 0x3F) << 4
+					if level == "polargeist" and obj_id == 0x0d:
+						y -= 6
+					if level == "clutterfunk" and obj_id == 0x10:
+						count1 += 1
+						if count1 == 2:
+							y -= 8
+					if level == "clutterfunk" and obj_id == 0xfc:
+						count2 += 1
+						if count2 == 3:
+							y -= 8                     
+						elif count2 == 4:
+							y -= 8                     
+					if obj_id == 0x42:
+						y -= 8
+					elif obj_id == 0x43:
+						y -= 8
+					elif obj_id == 0x47:
+						y -= 8
+					y_lo = y & 0xFF
+					y_hi = (y >> 8) & 0xFF
 
-                    obj_id = int(a)	# object id
+					if int(a) in [10,13,37,253]: # ADJUST HEIGHT FOR BOTTOM PADS
+						y_lo += 8
 
-                    if level == "polargeist" and obj_id == 0x0d:
-                        y_lo -= 6
-                    if level == "clutterfunk" and obj_id == 0x10:
-                        count1 += 1
-                        if count1 == 2:
-                            y_lo -= 8
-                    if level == "clutterfunk" and obj_id == 0xfc:
-                        count2 += 1
-                        if count2 == 3:
-                           y_lo -= 8                     
-                        elif count2 == 4:
-                           y_lo -= 8                     
-                    if obj_id == 0x42:
-                        y_lo -= 8
-                    elif obj_id == 0x43:
-                        y_lo -= 8
-                    elif obj_id == 0x47:
-                        y_lo -= 8
-                    level_data.append([x_lo, x_hi, y_lo, y_hi, obj_id])
-                    # newfile.write("0, ")					# unused
-                    # newfile.write("0, ")					# unused
-                    # newfile.write("0, \n	")					# unused
+					obj_id = int(a)	# object id
 
-        level_data.append([0xff]) # add terminator byte
-        all_data.append((len(level_data) * 5 - 4, level_data))
-        print(f"Sprites data for {level} takes {len(level_data) * 5 - 4} bytes")
+					level_data.append([x_lo, x_hi, y_lo, y_hi, obj_id])
+					# newfile.write("0, ")					# unused
+					# newfile.write("0, ")					# unused
+					# newfile.write("0, \n	")					# unused
 
-        out_str = ""
-        current_bank = 0
-        bytes_filled = 0
-        for (i, (length, data)) in enumerate(all_data):
-            if bytes_filled + length > 0x2000:
-                current_bank += 1
-                bytes_filled = 0
-            out_str += f'.segment "SPR_BANK_{current_bank:02X}"\n'
-            out_str += f"sprite_data_{levels[i]}:\n"
-            for sprite in data:
-                out_str += f"  .byte {','.join([f'${x:02x}' for x in sprite])}\n"
-            bytes_filled += length
+		level_data.append([0xff]) # add terminator byte
+		all_data.append((len(level_data) * 5 - 4, level_data))
+		print(f"Sprites data for {level} takes {len(level_data) * 5 - 4} bytes")
 
-        with open(own_path.joinpath("all_sprite_data.s"), 'w') as out:
-            out.write(f"""
+		out_str = ""
+		current_bank = 0
+		bytes_filled = 0
+		for (i, (length, data)) in enumerate(all_data):
+			if bytes_filled + length > 0x2000:
+				current_bank += 1
+				bytes_filled = 0
+			out_str += f'.segment "SPR_BANK_{current_bank:02X}"\n'
+			out_str += f"sprite_data_{levels[i]}:\n"
+			for sprite in data:
+				out_str += f"  .byte {','.join([f'${x:02x}' for x in sprite])}\n"
+			bytes_filled += length
+
+		with open(own_path.joinpath("all_sprite_data.s"), 'w') as out:
+			out.write(f"""
 
 ;;; Generated by export_levels.py
 

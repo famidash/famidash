@@ -1323,7 +1323,25 @@ SpriteOffset = ptr2
     jmp mmc3_set_prg_bank_1
 .endproc
 
-
+; uint16_t calculate_linear_scroll_y();
+.export _calculate_linear_scroll_y
+.proc _calculate_linear_scroll_y
+	LDY _scroll_y+1
+	INY
+	LDA _scroll_y
+	LDX #0
+	CLC
+	loop:
+		DEY
+		BEQ end
+		ADC #$F0
+		BCC loop
+			INX
+			CLC
+			BCC loop
+	end:
+	RTS
+.endproc
 
 ; char get_position(void){
 ;     tmp5 -= scroll_x;
@@ -1354,6 +1372,13 @@ SpriteOffset = ptr2
 .import _activesprites_active, _scroll_x, _scroll_y
 .export _check_spr_objects := check_spr_objects
 .proc check_spr_objects
+	realScrollY = ptr1
+
+	jsr _calculate_linear_scroll_y
+	sta realScrollY
+	stx realScrollY+1
+
+
     ; for each sprite we want to check to see if its active
     ; if it is, update its realx/y position
     ; if its not, attempt to load another sprite
@@ -1384,10 +1409,10 @@ check_sprite_loop:
         ; sprite is alive AND onscreen x, so now check the Y position
         lda _activesprites_y, y
         clc ; NOTICE: intentionally subtract 1 extra to position them on the screen better
-        sbc _scroll_y
+        sbc realScrollY
         sta _activesprites_realy, x
         lda _activesprites_y+1, y
-        sbc _scroll_y+1
+        sbc realScrollY+1
         bne sprite_offscreen
 
         ; totally onscreen so finish updating its scroll position
