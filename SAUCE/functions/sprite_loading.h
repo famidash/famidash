@@ -433,12 +433,11 @@ void sprite_collide_lookup() {
     case ROBOT_MODE:
         gamemode = collided;
         robotjumptime[currplayer] = 0;
-	return;
+		return;
     case SHIP_MODE:
         gamemode = collided;
-	robotjumptime[currplayer] = 0;
-	target_scroll_y = activesprites_y[index];
-//	return;
+		robotjumptime[currplayer] = 0;
+		target_scroll_y = activesprites_y[index];
         // fallthrough
     case NOSPRITE:
         return;

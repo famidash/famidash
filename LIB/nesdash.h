@@ -67,6 +67,7 @@ void __fastcall__ _one_vram_buffer_repeat(uint32_t args);
 void __fastcall__ _draw_padded_text(uint32_t args);
 #define draw_padded_text(data, len, total_len, ppu_address) (pxargs[0] = data, storeBytesToSreg(total_len, len), __A__ = LSB(ppu_address), __AX__<<=8, __AX__ |= MSB(ppu_address)|NT_UPD_HORZ, _draw_padded_text(__EAX__))
 
+unsigned short calculate_linear_scroll_y();
 void __fastcall__ playPCM();
 
 extern uint8_t parallax_scroll_column;
@@ -166,5 +167,5 @@ extern uint8_t PAL_BUF[32];
 #define crossPRGBankJump8_16(sym, args) (crossPRGBankJump8_0(sym, args), __asm__("lda ptr3 \n ldx ptr3+1"), __AX__)
 #define crossPRGBankJump16_16(sym, args) (crossPRGBankJump16_0(sym, args), __asm__("lda ptr3 \n ldx ptr3+1"), __AX__)
 
-#define sec_sbc(a, b) (__A__ = (a), __asm__("sec \nadc %v", b), __A__)
+#define sec_adc(a, b) (__A__ = (a), __asm__("sec \nadc %v", b), __A__)
 #define clc_sbc(a, b) (__A__ = (a), __asm__("clc \nsbc %v", b), __A__)

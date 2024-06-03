@@ -60,18 +60,17 @@ void do_the_scroll_thing(){
 
 
 	else {			//ship stuff
-			// TODO: Adjust
-			if (target_scroll_y > 0x0120) {
+			if (target_scroll_y > 0x0300) {
 				target_scroll_y--;
 				target_scroll_y--;
 				--high_byte(currplayer_y); --high_byte(currplayer_y);
-				scroll_y = sub_scroll_y(2, scroll_y);
+				scroll_y = add_scroll_y(2, scroll_y);
 			}
-			if (target_scroll_y < 0x110) {
+			if (target_scroll_y < 0x02f0) {
 				target_scroll_y++;
 				target_scroll_y++;
 				++high_byte(currplayer_y); ++high_byte(currplayer_y);
-				scroll_y = add_scroll_y(2, scroll_y);
+				scroll_y = sub_scroll_y(2, scroll_y);
 			}
 			while (scroll_y < min_scroll_y) {
 				++scroll_y;
@@ -79,7 +78,7 @@ void do_the_scroll_thing(){
 			}
 			// 2F0 immediately overflows into 300
 			if (high_byte(scroll_y) >= MSB(0x300)) {
-				high_byte(currplayer_y) = clc_sbc(high_byte(currplayer_y), scroll_y);
+				high_byte(currplayer_y) = sec_adc(high_byte(currplayer_y), scroll_y);
 				scroll_y = 0x2EF;
 			}
 
