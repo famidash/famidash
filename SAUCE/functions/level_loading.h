@@ -81,7 +81,8 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 		// 	scroll_count = !scroll_count;
 		// }
 		for (ii = (practice_scroll_x >> 4), ++ii; ii > 0; ii--) {
-			unrle_next_column(); copy_column_to_collmap();
+			unrle_next_column();
+			mmc3_set_prg_bank_1(GET_BANK(copy_column_to_collmap)); copy_column_to_collmap();
 			increase_parallax_scroll_column();
 			scroll_count = !scroll_count;
 		}
@@ -123,6 +124,7 @@ void unrle_first_screen(void){ // run-length decode the first screen of a level
 
 	// Draw the nametable starting from where the scroll is set
 	i = 0;
+	mmc3_set_prg_bank_1(GET_BANK(draw_screen_R));
     do {
 		draw_screen_R();
 		flush_vram_update2();

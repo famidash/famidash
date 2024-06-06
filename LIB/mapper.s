@@ -52,13 +52,19 @@ MMC3_REG_MIRRORING = $a000
         STA MMC3_REG_BANK_DATA
         rts
     .export _mmc3_pop_prg_bank_1
-
+    mmc3_set_prg_bank_1:
+    _mmc3_set_prg_bank_1:
+        STA mmc3PRG1Bank
+    mmc3_tmp_prg_bank_1:    ; ONLY MEANT FOR USE WITH NMI-RELATED TEMPORARY BANKSWITCHING
+        PHA
+        lda #MMC3_REG_SEL_PRG_BANK_1
     mmc3_internal_set_bank:
         ora mmc3ChrInversionSetting
         sta MMC3_REG_BANK_SELECT
         PLA
         sta MMC3_REG_BANK_DATA
         rts
+    .export _mmc3_set_prg_bank_1
 
     ; Store mirroring value to mmc3 register
     mmc3_set_prg_bank_0:
@@ -67,15 +73,6 @@ MMC3_REG_MIRRORING = $a000
         lda #MMC3_REG_SEL_PRG_BANK_0
         BNE mmc3_internal_set_bank  ; BRA
     .export _mmc3_set_prg_bank_0
-
-    mmc3_set_prg_bank_1:
-    _mmc3_set_prg_bank_1:
-        STA mmc3PRG1Bank
-    mmc3_tmp_prg_bank_1:    ; ONLY MEANT FOR USE WITH NMI-RELATED TEMPORARY BANKSWITCHING
-        PHA
-        lda #MMC3_REG_SEL_PRG_BANK_1
-        BNE mmc3_internal_set_bank  ; BRA
-    .export _mmc3_set_prg_bank_1
 
     mmc3_set_2kb_chr_bank_0:
     _mmc3_set_2kb_chr_bank_0:

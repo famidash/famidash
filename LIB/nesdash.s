@@ -131,6 +131,20 @@ shiftBy4table:
 	:
 .endmacro
 
+; Store to ptr3 manually
+.macro crossPRGBankJump routine, bank
+	lda #<routine
+	ldx #>routine
+	.ifblank bank
+	ldy #<.bank(routine)
+	.else
+	ldy bank
+	.endif
+	jsr __crossPRGBankJump 
+.endmacro
+
+.segment "CODE"
+
 .export __one_vram_buffer_repeat
 .proc __one_vram_buffer_repeat
 	; xa = ppu_address
@@ -154,6 +168,8 @@ shiftBy4table:
 	sta VRAM_INDEX
 	rts
 .endproc
+
+.segment "CODE_2"
 
 .global _level_list_lo, _level_list_hi, _level_list_bank, _sprite_list_lo, _sprite_list_hi, _sprite_list_bank
 .import _song, _speed, _lastgcolortype, _lastbgcolortype
@@ -355,6 +371,8 @@ single_rle_byte:
 	rts
 .endproc
 
+.pushseg
+.segment "XCD_BANK_01"
 .export _copy_column_to_collmap
 .proc _copy_column_to_collmap
 	.if use_illegal_opcodes
@@ -466,11 +484,9 @@ start:
 tilewrites:
 	frame0:
         ; Switch banks
-        LDA	_level_data_bank
-        JSR mmc3_set_prg_bank_1
+        crossPRGBankJump _unrle_next_column, _level_data_bank
 
-        JSR _unrle_next_column
-		JSR _copy_column_to_collmap
+		crossPRGBankJump _copy_column_to_collmap
 
 		; Seam position:
 		; Y ≥	| Y <	| A		| B		|
@@ -985,6 +1001,7 @@ ParallaxBuffer:
 		.byte $85, $95, $a5, $b5, $8b, $9b, $ab, $bb, $9e
 
 .endproc
+.popseg
 
 .import _ground
 .export _load_ground
@@ -1910,12 +1927,12 @@ drawplayer_center_offsets:
 	sprite_table_table_lo:
 		.byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT, <_SPIDER, <_WAVE, <_SWING
 		.byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT, <_MINI_SPIDER, <_MINI_WAVE, <_MINI_SWING
-	sprite_table_table_hi:
-		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT, >_SPIDER, >_WAVE, >_SWING
-		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE, >_MINI_SWING
 	sprite_table_table_lo2:
 		.byte <_CUBE, <_SHIP, <_BALL, <_UFO, <_ROBOT_ALT, <_SPIDER, <_WAVE, <_SWING
 		.byte <_MINI_CUBE, <_MINI_SHIP, <_MINI_BALL, <_MINI_UFO, <_MINI_ROBOT_ALT, <_MINI_SPIDER, <_MINI_WAVE, <_MINI_SWING
+	sprite_table_table_hi:
+		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT, >_SPIDER, >_WAVE, >_SWING
+		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE, >_MINI_SWING
 	sprite_table_table_hi2:
 		.byte >_CUBE, >_SHIP, >_BALL, >_UFO, >_ROBOT_ALT, >_SPIDER, >_WAVE, >_SWING
 		.byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT_ALT, >_MINI_SPIDER, >_MINI_WAVE, >_MINI_SWING
@@ -2284,12 +2301,12 @@ drawplayer_common := _drawplayerone::common
 	sprite_table_table_lo:
 		.byte <_CUBE2, <_SHIP2, <_BALL2, <_UFO2, <_ROBOT2, <_SPIDER2, <_WAVE2, <_SWING2
 		.byte <_MINI_CUBE2, <_MINI_SHIP2, <_MINI_BALL2, <_MINI_UFO2, <_MINI_ROBOT2, <_MINI_SPIDER2, <_MINI_WAVE2, <_MINI_SWING2
+	sprite_table_table_lo2:
+		.byte <_CUBE2, <_SHIP2, <_BALL2, <_UFO2, <_ROBOT_ALT, <_SPIDER2, <_WAVE2, <_SWING2
+		.byte <_MINI_CUBE2, <_MINI_SHIP2, <_MINI_BALL2, <_MINI_UFO2, <_MINI_ROBOT2, <_MINI_SPIDER2, <_MINI_WAVE2, <_MINI_SWING2
 	sprite_table_table_hi:
 		.byte >_CUBE2, >_SHIP2, >_BALL2, >_UFO2, >_ROBOT2, >_SPIDER2, >_WAVE2, >_SWING2
 		.byte >_MINI_CUBE2, >_MINI_SHIP2, >_MINI_BALL2, >_MINI_UFO2, >_MINI_ROBOT2, >_MINI_SPIDER2, >_MINI_WAVE2, >_MINI_SWING2
-	sprite_table_table_lo2:
-		.byte <_CUBE2, <_SHIP2, <_BALL2, <_UFO2, <_ROBOT_ALT, <_SPIDER,2 <_WAVE2, <_SWING2
-		.byte <_MINI_CUBE2, <_MINI_SHIP2, <_MINI_BALL2, <_MINI_UFO2, <_MINI_ROBOT2, <_MINI_SPIDER2, <_MINI_WAVE2, <_MINI_SWING2
 	sprite_table_table_hi2:
 		.byte >_CUBE2, >_SHIP2, >_BALL2, >_UFO2, >_ROBOT_ALT, >_SPIDER2, >_WAVE2, >_SWING2
 		.byte >_MINI_CUBE2, >_MINI_SHIP2, >_MINI_BALL2, >_MINI_UFO2, >_MINI_ROBOT2, >_MINI_SPIDER2, >_MINI_WAVE2, >_MINI_SWING2
@@ -2344,8 +2361,10 @@ drawplayer_common := _drawplayerone::common
 
 .endproc
 
-.export crossPRGBankJump
-.proc crossPRGBankJump
+.segment "CODE_2"
+
+.export __crossPRGBankJump
+.proc __crossPRGBankJump
 	; AX = address of function
 	; Y = bank of function
 	STA ptr4

@@ -454,7 +454,7 @@ void state_game(){
 //	if (DEBUG_MODE) gray_line();  
   		oam_clear();
 
-		// mmc3_set_prg_bank_1(GET_BANK(draw_screen_R)); // it's in a const bank
+		mmc3_set_prg_bank_1(GET_BANK(draw_screen_R));
         draw_screen_R(); 
 		mmc3_set_prg_bank_1(GET_BANK(draw_sprites));	
         draw_sprites();
