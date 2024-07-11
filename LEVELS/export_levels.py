@@ -142,6 +142,8 @@ def export_spr(folder: str, levels: Iterable[str]):
 						x_lo -= 8
 					elif obj_id == 0x40: #right long post
 						x_lo -= 16
+					if obj_id > 0x7F and obj_id < 0xF0:
+						x_hi -= 10
 
 					k = i // 16
 					x_hi = k	  # X position, high byte
