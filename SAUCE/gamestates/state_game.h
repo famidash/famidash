@@ -78,6 +78,7 @@ void x_movement_coll() {
 				currplayer_vel_y = (tmp5 + 0x200)^0xFFFF;
 			}
 		}
+		else { currplayer_vel_y = tmp5; }
 	}
 	if (slope_frames) {
 		slope_frames -= 1;
