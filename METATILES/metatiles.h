@@ -18,6 +18,8 @@
 #define COL_UP_RIGHT 0x21
 #define COL_UP_LEFT 0x20
 
+#define COL_SLOPE_LU45 0x16
+#define COL_SLOPE_RU45 0x15
 #define COL_SLOPE_LD66_BOT 0x14
 #define COL_SLOPE_RD66_BOT 0x13
 #define COL_SLOPE_LD66_TOP 0x12

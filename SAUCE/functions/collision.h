@@ -432,6 +432,7 @@ char bg_coll_slope() {
 				return 1;
 			}
 			else return 0;
+			
 		case COL_SLOPE_RD45:
 			tmp7 = (temp_x & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = temp_y & 0x0f;
@@ -445,6 +446,23 @@ char bg_coll_slope() {
 
 			slope_type = SLOPE_45DEG_DOWN;
 			break;			
+
+		case COL_SLOPE_RU45:
+			if (currplayer_gravity) {
+				tmp7 = (temp_x & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
+				tmp4 = temp_y & 0x0f;
+				slope_type = SLOPE_45DEG_UP;
+			}
+			break;
+		case COL_SLOPE_LU45:
+			if (currplayer_gravity) {
+				if (gamemode == 6) break;
+				tmp7 = (temp_x & 0x0f) ^ 0x0f;	// = 0x0f - (0x10 - (temp_x & 0x0f))
+				tmp4 = (-(temp_y & 0X0f) >> 1);
+			}
+			slope_type = SLOPE_45DEG_DOWN;
+			break;			
+
 		case COL_SLOPE_RD22_TOP:
 			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = ((temp_y) & 0x0e) | 0x1;

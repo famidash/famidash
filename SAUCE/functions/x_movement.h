@@ -78,6 +78,9 @@ void x_movement(){
 	if (currplayer_y < 0x0600 && scroll_y == 0x08){
 		uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
 	}
+	if (currplayer_y > 0x0B700 && scroll_y == 0xEF){
+		uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
+	}
 	
 
 	else if (!(pad[controllingplayer] & PAD_A)) uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);
