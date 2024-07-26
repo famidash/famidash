@@ -394,8 +394,11 @@ void state_game(){
 				if ((pad_new[0] & PAD_RIGHT) && DEBUG_MODE) {
 					speed == 4 ? speed = 0 : speed++;
 				}
+//				if ((pad_new[0] & PAD_LEFT) && DEBUG_MODE) {
+//					speed == 0 ? speed = 4 : speed--;
+//				}
 				if ((pad_new[0] & PAD_LEFT) && DEBUG_MODE) {
-					speed == 0 ? speed = 4 : speed--;
+					gravity_mod == 4 ? gravity_mod = 0 : gravity_mod++;
 				}
 				if ((pad[0] & PAD_DOWN) && (pad_new[0] & PAD_A)) {
 					kandokidshack++;
