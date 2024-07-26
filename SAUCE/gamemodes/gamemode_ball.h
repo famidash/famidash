@@ -15,42 +15,85 @@ void ball_movement(void){
 		if (gamemode == 7) {
 			if(!currplayer_gravity){
 				if(currplayer_vel_y > SWING_MAX_FALLSPEED){
-					currplayer_vel_y += -SWING_GRAVITY;
-				} else currplayer_vel_y += SWING_GRAVITY;
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y += !mini ? -SWING_GRAVITY : -MINI_SWING_GRAVITY; break;
+						case 1: currplayer_vel_y += !mini ? -SWING_GRAVITY/3 : -MINI_SWING_GRAVITY/3; break;
+						case 2: currplayer_vel_y += !mini ? -SWING_GRAVITY/2 : -MINI_SWING_GRAVITY/2; break;
+						case 3: currplayer_vel_y += !mini ? -SWING_GRAVITY/3*2 : -MINI_SWING_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y += !mini ? -SWING_GRAVITY*2 : -MINI_SWING_GRAVITY*2; break;
+					};
+				} else {
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y += !mini ? SWING_GRAVITY : MINI_SWING_GRAVITY; break;
+						case 1: currplayer_vel_y += !mini ? SWING_GRAVITY/3 : MINI_SWING_GRAVITY/3; break;
+						case 2: currplayer_vel_y += !mini ? SWING_GRAVITY/2 : MINI_SWING_GRAVITY/2; break;
+						case 3: currplayer_vel_y += !mini ? SWING_GRAVITY/3*2 : MINI_SWING_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y += !mini ? SWING_GRAVITY*2 : MINI_SWING_GRAVITY*2; break;
+					};
+				}
 			}
 			else{
 				if(currplayer_vel_y < -SWING_MAX_FALLSPEED){
-					currplayer_vel_y -= -SWING_GRAVITY;
-				} else currplayer_vel_y -= SWING_GRAVITY;
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y -= !mini ? -SWING_GRAVITY : -MINI_SWING_GRAVITY; break;
+						case 1: currplayer_vel_y -= !mini ? -SWING_GRAVITY/3 : -MINI_SWING_GRAVITY/3; break;
+						case 2: currplayer_vel_y -= !mini ? -SWING_GRAVITY/2 : -MINI_SWING_GRAVITY/2; break;
+						case 3: currplayer_vel_y -= !mini ? -SWING_GRAVITY/3*2 : -MINI_SWING_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y -= !mini ? -SWING_GRAVITY*2 : -MINI_SWING_GRAVITY*2; break;
+					};
+				} else {
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y -= !mini ? SWING_GRAVITY : MINI_SWING_GRAVITY; break;
+						case 1: currplayer_vel_y -= !mini ? SWING_GRAVITY/3 : MINI_SWING_GRAVITY/3; break;
+						case 2: currplayer_vel_y -= !mini ? SWING_GRAVITY/2 : MINI_SWING_GRAVITY/2; break;
+						case 3: currplayer_vel_y -= !mini ? SWING_GRAVITY/3*2 : MINI_SWING_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y -= !mini ? SWING_GRAVITY*2 : MINI_SWING_GRAVITY*2; break;
+					};
+				}
 			}
 		}
 	else {		
 
-
-		if(!mini){
-			if(!currplayer_gravity){
-				if(currplayer_vel_y > BALL_MAX_FALLSPEED){
-					currplayer_vel_y += -BALL_GRAVITY;
-				} else currplayer_vel_y += BALL_GRAVITY;
-			}
-			else{
-				if(currplayer_vel_y < -BALL_MAX_FALLSPEED){
-					currplayer_vel_y -= -BALL_GRAVITY;
-				} else currplayer_vel_y -= BALL_GRAVITY;
+		if(!currplayer_gravity){
+			if(currplayer_vel_y > BALL_MAX_FALLSPEED){
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y += !mini ? -BALL_GRAVITY : -MINI_BALL_GRAVITY; break;
+					case 1: currplayer_vel_y += !mini ? -BALL_GRAVITY/3 : -MINI_BALL_GRAVITY/3; break;
+					case 2: currplayer_vel_y += !mini ? -BALL_GRAVITY/2 : -MINI_BALL_GRAVITY/2; break;
+					case 3: currplayer_vel_y += !mini ? -BALL_GRAVITY/3*2 : -MINI_BALL_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y += !mini ? -BALL_GRAVITY*2 : -MINI_BALL_GRAVITY*2; break;
+				};
+			} else {
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y += !mini ? BALL_GRAVITY : MINI_BALL_GRAVITY; break;
+					case 1: currplayer_vel_y += !mini ? BALL_GRAVITY/3 : MINI_BALL_GRAVITY/3; break;
+					case 2: currplayer_vel_y += !mini ? BALL_GRAVITY/2 : MINI_BALL_GRAVITY/2; break;
+					case 3: currplayer_vel_y += !mini ? BALL_GRAVITY/3*2 : MINI_BALL_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y += !mini ? BALL_GRAVITY*2 : MINI_BALL_GRAVITY*2; break;
+				};
 			}
 		}
-		else {
-			if(!currplayer_gravity){
-				if(currplayer_vel_y > MINI_BALL_MAX_FALLSPEED){
-					currplayer_vel_y += -MINI_BALL_GRAVITY;
-				} else currplayer_vel_y += MINI_BALL_GRAVITY;
+		else{
+			if(currplayer_vel_y < -BALL_MAX_FALLSPEED){
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y -= !mini ? -BALL_GRAVITY : -MINI_BALL_GRAVITY; break;
+					case 1: currplayer_vel_y -= !mini ? -BALL_GRAVITY/3 : -MINI_BALL_GRAVITY/3; break;
+					case 2: currplayer_vel_y -= !mini ? -BALL_GRAVITY/2 : -MINI_BALL_GRAVITY/2; break;
+					case 3: currplayer_vel_y -= !mini ? -BALL_GRAVITY/3*2 : -MINI_BALL_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? -BALL_GRAVITY*2 : -MINI_BALL_GRAVITY*2; break;
+				};
+			} else {
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y -= !mini ? BALL_GRAVITY : MINI_BALL_GRAVITY; break;
+					case 1: currplayer_vel_y -= !mini ? BALL_GRAVITY/3 : MINI_BALL_GRAVITY/3; break;
+					case 2: currplayer_vel_y -= !mini ? BALL_GRAVITY/2 : MINI_BALL_GRAVITY/2; break;
+					case 3: currplayer_vel_y -= !mini ? BALL_GRAVITY/3*2 : MINI_BALL_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? BALL_GRAVITY*2 : MINI_BALL_GRAVITY*2; break;
+				};
 			}
-			else{
-				if(currplayer_vel_y < -MINI_BALL_MAX_FALLSPEED){
-					currplayer_vel_y -= -MINI_BALL_GRAVITY;
-				} else currplayer_vel_y -= MINI_BALL_GRAVITY;
-			}
-		}	
+		}
+		
+		
 	}
 		
 		currplayer_y += currplayer_vel_y;
