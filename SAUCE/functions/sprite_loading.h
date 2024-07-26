@@ -99,6 +99,11 @@
 #define DASH_GRAVITY_ORB_UPWARDS		0x5C
 #define DASH_ORB_DOWNWARDS			0x5D
 #define DASH_GRAVITY_ORB_DOWNWARDS		0x5E
+#define GRAVITY_13_PORTAL			0x5F
+#define GRAVITY_12_PORTAL			0x60
+#define GRAVITY_23_PORTAL			0x61
+#define GRAVITY_2X_PORTAL			0x62
+#define GRAVITY_1X_PORTAL			0x63
 
 #define FORCED_TRAILS_ON			0xF0
 #define FORCED_TRAILS_OFF			0xF1
@@ -318,6 +323,7 @@ char sprite_height_lookup(){
 		case SWING_MODE:
 		case NINJA_MODE:
 		case GROWTH_PORTAL:
+		case GRAVITY_23_PORTAL:
 		case TELEPORT_PORTAL_ENTER:
 			return 0x2f;
 		case COIN1:
@@ -543,6 +549,11 @@ void sprite_collide_lookup() {
 	case J_BLOCK: jblocked[currplayer] = 1; return;
 	case D_BLOCK: dblocked[currplayer] = 1; return;
 	case F_BLOCK: fblocked[currplayer] = 1; return;
+	case GRAVITY_1X_PORTAL: gravity_mod = 0; return;
+	case GRAVITY_13_PORTAL: gravity_mod = 1; return;
+	case GRAVITY_12_PORTAL: gravity_mod = 2; return;
+	case GRAVITY_23_PORTAL: gravity_mod = 3; return;
+	case GRAVITY_2X_PORTAL: gravity_mod = 4; return;
 	case CUBE_MODE:
 		if (retro_mode) gamemode = 4;
 		else gamemode = 0;

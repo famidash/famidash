@@ -3251,6 +3251,7 @@ sprite_data_theoryofeverything:
 sprite_data_electroman:
   .byte $00,$00,$50,$01,$82
   .byte $00,$00,$60,$01,$c1
+  .byte $30,$00,$80,$01,$63
   .byte $b0,$00,$a0,$01,$2b
   .byte $c0,$00,$70,$01,$3d
   .byte $c0,$00,$a0,$01,$2d
