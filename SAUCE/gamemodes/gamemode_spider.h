@@ -2,7 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
-
+void cube_vel_stuff();
 void spider_movement(void){
 // handle y
 
@@ -11,44 +11,7 @@ void spider_movement(void){
 	//if(currplayer_vel_y < 0x400){
 	if (!dashing[currplayer]) {
 
-		if(!currplayer_gravity){
-			if(currplayer_vel_y > CUBE_MAX_FALLSPEED){
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
-					};
-				}
-		}
-		else{
-			if(currplayer_vel_y < -CUBE_MAX_FALLSPEED){
-				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
-					case 1: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
-					case 2: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
-					case 3: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
-				};
-			} else {
-				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
-					case 1: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
-					case 2: currplayer_vel_y -= !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
-					case 3: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
-				};
-			}
-		}
+		cube_vel_stuff();
 	
 		currplayer_y += currplayer_vel_y;
 	}
