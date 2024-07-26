@@ -16,7 +16,7 @@ void ship_movement(void){
 						case 1: currplayer_vel_y += !mini ? -SHIP_GRAVITY/3 : -MINI_SHIP_GRAVITY/3; break;
 						case 2: currplayer_vel_y += !mini ? -SHIP_GRAVITY/2 : -MINI_SHIP_GRAVITY/2; break;
 						case 3: currplayer_vel_y += !mini ? -SHIP_GRAVITY/3*2 : -MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -SHIP_GRAVITY*2 : -MINI_SHIP_GRAVITY*2; break;
+						case 4: currplayer_vel_y += !mini ? -SHIP_GRAVITY*8/6 : -MINI_SHIP_GRAVITY*8/6; break;
 					};
 				} else {
 					switch (gravity_mod) {
@@ -24,7 +24,7 @@ void ship_movement(void){
 						case 1: currplayer_vel_y += !mini ? SHIP_GRAVITY/3 : MINI_SHIP_GRAVITY/3; break;
 						case 2: currplayer_vel_y += !mini ? SHIP_GRAVITY/2 : MINI_SHIP_GRAVITY/2; break;
 						case 3: currplayer_vel_y += !mini ? SHIP_GRAVITY/3*2 : MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? SHIP_GRAVITY*2 : MINI_SHIP_GRAVITY*2; break;
+						case 4: currplayer_vel_y += !mini ? SHIP_GRAVITY*8/6 : MINI_SHIP_GRAVITY*8/6; break;
 					};
 				}
 			}
@@ -35,7 +35,7 @@ void ship_movement(void){
 						case 1: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/3 : -MINI_SHIP_GRAVITY/3; break;
 						case 2: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/2 : -MINI_SHIP_GRAVITY/2; break;
 						case 3: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/3*2 : -MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? -SHIP_GRAVITY*2 : -MINI_SHIP_GRAVITY*2; break;
+						case 4: currplayer_vel_y -= !mini ? -SHIP_GRAVITY*8/6 : -MINI_SHIP_GRAVITY*8/6; break;
 					};
 				} else {
 					switch (gravity_mod) {
@@ -43,7 +43,7 @@ void ship_movement(void){
 						case 1: currplayer_vel_y -= !mini ? SHIP_GRAVITY/3 : MINI_SHIP_GRAVITY/3; break;
 						case 2: currplayer_vel_y -= !mini ? SHIP_GRAVITY/2 : MINI_SHIP_GRAVITY/2; break;
 						case 3: currplayer_vel_y -= !mini ? SHIP_GRAVITY/3*2 : MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? SHIP_GRAVITY*2 : MINI_SHIP_GRAVITY*2; break;
+						case 4: currplayer_vel_y -= !mini ? SHIP_GRAVITY*8/6 : MINI_SHIP_GRAVITY*8/6; break;
 					};
 				}
 			}
