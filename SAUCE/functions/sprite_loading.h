@@ -323,7 +323,11 @@ char sprite_height_lookup(){
 		case SWING_MODE:
 		case NINJA_MODE:
 		case GROWTH_PORTAL:
+		case GRAVITY_13_PORTAL:
+		case GRAVITY_12_PORTAL:
 		case GRAVITY_23_PORTAL:
+		case GRAVITY_2X_PORTAL:
+		case GRAVITY_1X_PORTAL:
 		case TELEPORT_PORTAL_ENTER:
 			return 0x2f;
 		case COIN1:
