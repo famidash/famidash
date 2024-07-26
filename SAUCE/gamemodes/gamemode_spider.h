@@ -10,30 +10,46 @@ void spider_movement(void){
 	// currplayer_vel_y is signed
 	//if(currplayer_vel_y < 0x400){
 	if (!dashing[currplayer]) {
-		if(!mini){
-			if(!currplayer_gravity){
-				if(currplayer_vel_y > CUBE_MAX_FALLSPEED){
-					currplayer_vel_y += -CUBE_GRAVITY;
-				} else currplayer_vel_y += CUBE_GRAVITY;
-			}
-			else{
-				if(currplayer_vel_y < -CUBE_MAX_FALLSPEED){
-					currplayer_vel_y -= -CUBE_GRAVITY;
-				} else currplayer_vel_y -= CUBE_GRAVITY;
+
+		if(!currplayer_gravity){
+			if(currplayer_vel_y > CUBE_MAX_FALLSPEED){
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y += !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
+						case 1: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
+						case 2: currplayer_vel_y += !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
+						case 3: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y += !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
+					};
+				} else {
+					switch (gravity_mod) {
+						case 0: currplayer_vel_y += !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
+						case 1: currplayer_vel_y += !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
+						case 2: currplayer_vel_y += !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
+						case 3: currplayer_vel_y += !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
+						case 4: currplayer_vel_y += !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
+					};
+				}
+		}
+		else{
+			if(currplayer_vel_y < -CUBE_MAX_FALLSPEED){
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y -= !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
+					case 1: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
+					case 2: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
+					case 3: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
+				};
+			} else {
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y -= !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
+					case 1: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
+					case 2: currplayer_vel_y -= !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
+					case 3: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
+				};
 			}
 		}
-		else {
-			if(!currplayer_gravity){
-				if(currplayer_vel_y > MINI_CUBE_MAX_FALLSPEED){
-					currplayer_vel_y += -MINI_CUBE_GRAVITY;
-				} else currplayer_vel_y += MINI_CUBE_GRAVITY;
-			}
-			else{
-				if(currplayer_vel_y < -MINI_CUBE_MAX_FALLSPEED){
-					currplayer_vel_y -= -MINI_CUBE_GRAVITY;
-				} else currplayer_vel_y -= MINI_CUBE_GRAVITY;
-			}
-		}		
+	
 		currplayer_y += currplayer_vel_y;
 	}
 	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
