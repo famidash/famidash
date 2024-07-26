@@ -38,7 +38,7 @@ void cube_movement(void){
 						case 0: currplayer_vel_y -= !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
 						case 1: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
 						case 2: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
-						case 3: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3)2; break;
+						case 3: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
 						case 4: currplayer_vel_y -= !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
 					};
 				} else {
