@@ -1907,6 +1907,40 @@ const unsigned char Pink_Jump_Pad4[]={
 	  8,-8,0x59,1|OAM_FLIP_H,
 	0x80
 };
+const unsigned char Green_Jump_Pad[]={
+
+	  0,-8,0x59,0,
+	  8,-8,0x5B,0|OAM_FLIP_H,
+	  0,-0,0x59,0|OAM_FLIP_V,
+	  8,-0,0x5B,0|OAM_FLIP_H|OAM_FLIP_V,
+	0x80
+};
+const unsigned char Green_Jump_Pad2[]={
+
+	  0,-8,0x5B,0,
+	  8,-8,0x5D,0|OAM_FLIP_H,
+	  0,-0,0x5B,0|OAM_FLIP_V,
+	  8,-0,0x5D,0|OAM_FLIP_H|OAM_FLIP_V,
+	0x80
+};
+const unsigned char Green_Jump_Pad3[]={
+
+	  0,-8,0x5D,0,
+	  8,-8,0x5F,0|OAM_FLIP_H,
+	  0,-0,0x5D,0|OAM_FLIP_V,
+	  8,-0,0x5F,0|OAM_FLIP_H|OAM_FLIP_V,
+	  
+	0x80
+};
+const unsigned char Green_Jump_Pad4[]={
+
+	  0,-8,0x5F,0,
+	  8,-8,0x59,0|OAM_FLIP_H,
+	  0,-0,0x5F,0|OAM_FLIP_V,
+	  8,-0,0x59,0|OAM_FLIP_H|OAM_FLIP_V,
+	  
+	0x80
+};
 const unsigned char Red_Jump_Pad[]={
 
 	  0,-8,0x59,2,
@@ -2364,6 +2398,13 @@ const struct SpriteFrame PINK_PAD_U_SPRITES[]={
 	{5, Pink_Jump_Pad_U4},
 };
 
+const struct SpriteFrame GREEN_PAD_SPRITES[]={
+	{5, Green_Jump_Pad},
+	{5, Green_Jump_Pad},
+	{5, Green_Jump_Pad},
+	{5, Green_Jump_Pad},
+};
+
 const struct SpriteFrame GRAVITY_PAD_SPRITES[]={
 	{5, Gravity_Pad},
 	{5, Gravity_Pad2},
@@ -2530,6 +2571,7 @@ const unsigned char * const Metasprites[]={
 	Gravity_2x_Portal,
 	Gravity_1x_Portal,
 	Portal_Gamemode_Cube,
+	Green_Jump_Pad,
 	};
 
 
@@ -2640,6 +2682,7 @@ const void* const animation_frame_list[] = {
 	NULL,
 	NULL,
 	RANDOM_GAMEMODE_PORTAL,
+	GREEN_PAD_SPRITES,
 };
 
 // Number of UNIQUE animation frames
@@ -2749,6 +2792,7 @@ const unsigned char animation_frame_length[] = {
 	0,
 	0,
 	sizeof(RANDOM_GAMEMODE_PORTAL) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
+	sizeof(GREEN_PAD_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
 };
 
 #pragma rodata-name (pop)

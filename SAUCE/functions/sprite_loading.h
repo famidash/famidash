@@ -105,6 +105,7 @@
 #define GRAVITY_2X_PORTAL			0x62
 #define GRAVITY_1X_PORTAL			0x63
 #define RANDOM_MODE_PORTAL			0x64
+#define GREEN_PAD				0x65
 
 #define MASK_SPRITES_ON				0xEE
 #define MASK_SPRITES_OFF			0xEF
@@ -307,6 +308,7 @@ char sprite_height_lookup(){
 		case YELLOW_PAD_UP:
 		case PINK_PAD_UP:
 		case PINK_PAD_DOWN:
+		case GREEN_PAD:
 		case RED_PAD_UP:
 		case RED_PAD_DOWN:
 		case GRAVITY_PAD_DOWN:
@@ -611,6 +613,10 @@ void sprite_collide_lookup() {
 		return;
 	case GROWTH_PORTAL:
 		mini = 0;
+		return;
+	case GREEN_PAD:
+		currplayer_gravity ^= 1;
+		activesprites_activated[index]++;
 		return;
 	case DUAL_PORTAL:
 		dual = 1;

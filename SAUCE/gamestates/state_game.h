@@ -182,11 +182,11 @@ void state_game(){
 
 		if (retro_mode) { if (gamemode == 0) gamemode = 4; }
 
-		if (level == xstep || level == clutterfunk || level == theory_of_everything || level == decode || level == test3 || level == electroman_adventures) {									//
+		if (level == xstep || level == clutterfunk || level == theory_of_everything || level == decode || level == electroman_adventures) {									//
 			if ((kandoframecnt & 0x1F) == 0x10 ) mmc3_set_2kb_chr_bank_1(32);		//  BANKBLANKCLOUD
 			else if ((kandoframecnt & 0x1F) == 0x00) mmc3_set_2kb_chr_bank_1(30);		// DECO PULSE
 		}											//
-		else if (level == test ||level == test2 || level == test4) {
+		else if (level == test ||level == test2 || level == test3 || level == test4) {
 			if ((kandoframecnt & 0x1F) == 0x10 ) mmc3_set_2kb_chr_bank_1(36);		//  BANKBLANK3 EXTRA PORTALS
 			else if ((kandoframecnt & 0x1F) == 0x00) mmc3_set_2kb_chr_bank_1(34);		// NO DECO
 		} 
