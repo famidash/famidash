@@ -4088,6 +4088,10 @@ sprite_data_test:
   .byte $c0,$04,$20,$01,$59
   .byte $c0,$04,$60,$01,$5a
   .byte $e0,$04,$40,$01,$5f
+  .byte $e0,$05,$40,$01,$63
+  .byte $20,$06,$50,$01,$44
+  .byte $40,$06,$10,$01,$4f
+  .byte $50,$06,$80,$01,$4e
   .byte $ff
 .segment "SPR_BANK_02"
 sprite_data_test2:

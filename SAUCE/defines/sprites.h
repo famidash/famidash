@@ -1203,14 +1203,14 @@ const unsigned char Speed_10_Portal[]={
 	0x80
 };
 const unsigned char Speed_20_Portal[]={
-	  0,  0,0xA5,0,	
-	  8,  0,0xA5,0|OAM_FLIP_H|OAM_FLIP_V,	
-	  10,  0,0xA5,0,	  
-	  18,  0,0xA5,0|OAM_FLIP_H|OAM_FLIP_V,	  
-	  0,  13,0xA5,0|OAM_FLIP_V,	
-	  8,  13,0xA5,0|OAM_FLIP_H,	
-	  10,  13,0xA5,0|OAM_FLIP_V,	
-	  18,  13,0xA5,0|OAM_FLIP_H,	
+	  0,  0,0xA9,0,	
+	  5,  0,0xA9,0|OAM_FLIP_H|OAM_FLIP_V,	
+	  6,  0,0xA9,0,	  
+	  11,  0,0xA9,0|OAM_FLIP_H|OAM_FLIP_V,	  
+	  0,  13,0xA9,0|OAM_FLIP_V,	
+	  5,  13,0xA9,0|OAM_FLIP_H,	
+	  6,  13,0xA9,0|OAM_FLIP_V,	
+	  11,  13,0xA9,0|OAM_FLIP_H,	
 	0x80
 };
 const unsigned char Speed_30_Portal[]={
@@ -1623,6 +1623,13 @@ const unsigned char Dash_Orb[]={
 
 	  0,  0,0xD1,0,
 	  8,  0,0xD3,0,
+	0x80
+};
+
+const unsigned char Black_Orb[]={
+
+	  0,  0,0xA5,0,
+	  8,  0,0xA5,0|OAM_FLIP_H,
 	0x80
 };
 
@@ -2490,7 +2497,7 @@ const unsigned char * const Metasprites[]={
 	Long_Light_Left, //chain shifted down 8px
 	Short_Light_U,
 	Chain_U,
-	nometa,
+	Black_Orb,
 	Dash_Orb,
 	Dash_Gravity_Orb,
 	BG_Spike_Group2,
