@@ -27,7 +27,7 @@
 	.export __memcpy,__memfill,_delay
 	
 	.export _flush_vram_update2, _oam_set, _oam_get
-
+	.import _disco_sprites
 	.segment "NESLIB"
 
 ;NMI handler
@@ -482,6 +482,17 @@ oam_meta_spr_params_set:	; Put &data into PTR, X and Y into SCRX and SCRY respec
 	lda (PTR),y		;attribute
 	iny
 	sta OAM_BUF+2,x
+	lda _disco_sprites
+	beq @no
+	lda OAM_BUF+2,x
+	and #$FC
+	sta OAM_BUF+2,X
+	jsr rand1
+	and #$3
+	clc
+	adc OAM_BUF+2,X
+	sta OAM_BUF+2,X
+	@no:	
 	inx
 	inx
 	inx

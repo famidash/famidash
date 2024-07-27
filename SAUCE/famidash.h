@@ -135,6 +135,7 @@ uint8_t collision_D;
 uint16_t old_x;
 uint16_t old_y;
 
+
 uint8_t mini;
 uint8_t eject_L; // from the left
 uint8_t eject_R; // remember these from the collision sub routine
@@ -271,6 +272,8 @@ uint8_t level_data_bank;
 uint8_t sprite_data_bank;
 uint8_t menuselection; // = 0x00;
 uint8_t settingvalue;
+
+uint8_t disco_sprites;
 
 uint8_t gameState = 0x01;
 
