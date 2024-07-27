@@ -106,6 +106,9 @@
 #define GRAVITY_1X_PORTAL			0x63
 #define RANDOM_MODE_PORTAL			0x64
 
+#define MASK_SPRITES_ON				0xEE
+#define MASK_SPRITES_OFF			0xEF
+
 #define FORCED_TRAILS_ON			0xF0
 #define FORCED_TRAILS_OFF			0xF1
 #define PLAYER_TRAILS_ON			0xF2
@@ -161,9 +164,10 @@ void init_sprites(void){	// required to be in a fixed bank
 	tmp4 = max_loaded_sprites;
 	do {
 		if (sprite_data[0] == TURN_OFF) break;
-		load_next_sprite(--tmp4);
-		if (activesprites_x_hi[tmp4] != 0) activesprites_active[tmp4] = 0;
-	} while (tmp4 != 0);
+		load_next_sprite();
+		if (activesprites_x_hi[spr_index] != 0) activesprites_active[spr_index] = 0;
+		if (activesprites_x_lo[spr_index] == 0xFF) activesprites_active[spr_index] = 0;
+	} while (spr_index != 0);
 }
 
 #pragma code-name(push, "XCD_BANK_00")
@@ -216,7 +220,7 @@ char sprite_height_lookup(){
 					return 0x00;
 	}
 
-	else if ((type >= 0x80) && (type < 0xF0)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
+	else if ((type >= 0x80) && (type < 0xED)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
 				if (discomode) return 0;
 					
 				tmp2 = (type & 0x3F);                        
@@ -235,8 +239,10 @@ char sprite_height_lookup(){
 				activesprites_type[index] = 0xFF; 
 				return 0;
 	}
+	else if (type == MASK_SPRITES_ON) { disco_sprites = 1; activesprites_type[index] = 0xFF; return 0; }
+	else if (type == MASK_SPRITES_OFF) { disco_sprites = 0; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_ON) { slowmode = 1; activesprites_type[index] = 0xFF; return 0; }
-	else if (type == SLOWMODE_OFF) { slowmode = 0;activesprites_type[index] = 0xFF; return 0; }
+	else if (type == SLOWMODE_OFF) { slowmode = 0; activesprites_type[index] = 0xFF; return 0; }
 	else if (type >= COINGOTTEN1 && type <= COINGOTTEN3) return 0x17;	// Coin
 	else if (type >= SPEED_05_PORTAL && type <= SPEED_20_PORTAL) // Speed portals
 		return 0x1F;
@@ -249,7 +255,7 @@ char sprite_height_lookup(){
 
 	switch(type) {
 		case NOSPRITE:
-			return 0;
+			activesprites_x_lo[index] = 0xFF; return 0;
 		case FORCED_TRAILS_ON:
 			forced_trails = 1;
 			activesprites_type[index] = 0xFF;
