@@ -2403,6 +2403,17 @@ const struct SpriteFrame RED_ORB_SPRITES[]={
 	{5, Red_Jump_Orb4},
 };
 
+const struct SpriteFrame RANDOM_GAMEMODE_PORTAL[]={
+	{5, Portal_Gamemode_Cube},
+	{5, Portal_Gamemode_Ship},
+	{5, Portal_Gamemode_Ball},
+	{5, Portal_Gamemode_UFO},
+	{5, Portal_Gamemode_Robot},
+	{5, Portal_Gamemode_Spider},
+	{5, Portal_Gamemode_Wave},
+	{5, Portal_Gamemode_Swing},
+};
+
 
 const unsigned char nometa[] = {0x80};
 
@@ -2511,7 +2522,7 @@ const unsigned char * const Metasprites[]={
 	Gravity_23_Portal,
 	Gravity_2x_Portal,
 	Gravity_1x_Portal,
-	
+	Portal_Gamemode_Cube,
 	};
 
 
@@ -2621,6 +2632,7 @@ const void* const animation_frame_list[] = {
 	NULL,
 	NULL,
 	NULL,
+	RANDOM_GAMEMODE_PORTAL,
 };
 
 // Number of UNIQUE animation frames
@@ -2729,6 +2741,7 @@ const unsigned char animation_frame_length[] = {
 	0,
 	0,
 	0,
+	sizeof(RANDOM_GAMEMODE_PORTAL) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
 };
 
 #pragma rodata-name (pop)

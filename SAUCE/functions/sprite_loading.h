@@ -104,6 +104,7 @@
 #define GRAVITY_23_PORTAL			0x61
 #define GRAVITY_2X_PORTAL			0x62
 #define GRAVITY_1X_PORTAL			0x63
+#define RANDOM_MODE_PORTAL			0x64
 
 #define FORCED_TRAILS_ON			0xF0
 #define FORCED_TRAILS_OFF			0xF1
@@ -322,6 +323,7 @@ char sprite_height_lookup(){
 		case WAVE_MODE:
 		case SWING_MODE:
 		case NINJA_MODE:
+		case RANDOM_MODE_PORTAL:
 		case GROWTH_PORTAL:
 		case GRAVITY_13_PORTAL:
 		case GRAVITY_12_PORTAL:
@@ -593,6 +595,10 @@ void sprite_collide_lookup() {
 		return;
 	case NINJA_MODE:
 		gamemode = 8;
+		return;
+	case RANDOM_MODE_PORTAL:
+		gamemode = rand8() & 7;
+		activesprites_activated[index]++;
 		return;
 	case MINI_PORTAL:
 		mini = 1;
