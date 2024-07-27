@@ -1909,35 +1909,35 @@ const unsigned char Pink_Jump_Pad4[]={
 };
 const unsigned char Green_Jump_Pad[]={
 
+	  0,8,0x59,0|OAM_FLIP_V,
+	  8,8,0x5B,0|OAM_FLIP_H|OAM_FLIP_V,
 	  0,-8,0x59,0,
 	  8,-8,0x5B,0|OAM_FLIP_H,
-	  0,-0,0x59,0|OAM_FLIP_V,
-	  8,-0,0x5B,0|OAM_FLIP_H|OAM_FLIP_V,
 	0x80
 };
 const unsigned char Green_Jump_Pad2[]={
 
+	  0,8,0x5B,0|OAM_FLIP_V,
+	  8,8,0x5D,0|OAM_FLIP_H|OAM_FLIP_V,
 	  0,-8,0x5B,0,
 	  8,-8,0x5D,0|OAM_FLIP_H,
-	  0,-0,0x5B,0|OAM_FLIP_V,
-	  8,-0,0x5D,0|OAM_FLIP_H|OAM_FLIP_V,
 	0x80
 };
 const unsigned char Green_Jump_Pad3[]={
 
+	  0,8,0x5D,0|OAM_FLIP_V,
+	  8,8,0x5F,0|OAM_FLIP_H|OAM_FLIP_V,
 	  0,-8,0x5D,0,
 	  8,-8,0x5F,0|OAM_FLIP_H,
-	  0,-0,0x5D,0|OAM_FLIP_V,
-	  8,-0,0x5F,0|OAM_FLIP_H|OAM_FLIP_V,
 	  
 	0x80
 };
 const unsigned char Green_Jump_Pad4[]={
 
+	  0,8,0x5F,0|OAM_FLIP_V,
+	  8,8,0x59,0|OAM_FLIP_H|OAM_FLIP_V,
 	  0,-8,0x5F,0,
 	  8,-8,0x59,0|OAM_FLIP_H,
-	  0,-0,0x5F,0|OAM_FLIP_V,
-	  8,-0,0x59,0|OAM_FLIP_H|OAM_FLIP_V,
 	  
 	0x80
 };
@@ -2400,9 +2400,9 @@ const struct SpriteFrame PINK_PAD_U_SPRITES[]={
 
 const struct SpriteFrame GREEN_PAD_SPRITES[]={
 	{5, Green_Jump_Pad},
-	{5, Green_Jump_Pad},
-	{5, Green_Jump_Pad},
-	{5, Green_Jump_Pad},
+	{5, Green_Jump_Pad2},
+	{5, Green_Jump_Pad3},
+	{5, Green_Jump_Pad4},
 };
 
 const struct SpriteFrame GRAVITY_PAD_SPRITES[]={
