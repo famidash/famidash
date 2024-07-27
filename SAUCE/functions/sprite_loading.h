@@ -106,6 +106,7 @@
 #define GRAVITY_1X_PORTAL			0x63
 #define RANDOM_MODE_PORTAL			0x64
 #define GREEN_PAD				0x65
+#define DEATH_CHANCE				0x66
 
 #define MASK_SPRITES_ON				0xEE
 #define MASK_SPRITES_OFF			0xEF
@@ -241,6 +242,7 @@ char sprite_height_lookup(){
 				return 0;
 	}
 	else if (type == MASK_SPRITES_ON) { disco_sprites = 1; activesprites_type[index] = 0xFF; return 0; }
+	else if (type == DEATH_CHANCE) { if (!(rand8() & 15)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; }
 	else if (type == MASK_SPRITES_OFF) { disco_sprites = 0; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_ON) { slowmode = 1; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_OFF) { slowmode = 0; activesprites_type[index] = 0xFF; return 0; }
