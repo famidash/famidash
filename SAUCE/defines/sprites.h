@@ -2404,14 +2404,14 @@ const struct SpriteFrame RED_ORB_SPRITES[]={
 };
 
 const struct SpriteFrame RANDOM_GAMEMODE_PORTAL[]={
-	{5, Portal_Gamemode_Cube},
-	{5, Portal_Gamemode_Ship},
-	{5, Portal_Gamemode_Ball},
-	{5, Portal_Gamemode_UFO},
-	{5, Portal_Gamemode_Robot},
-	{5, Portal_Gamemode_Spider},
-	{5, Portal_Gamemode_Wave},
-	{5, Portal_Gamemode_Swing},
+	{10, Portal_Gamemode_Cube},
+	{10, Portal_Gamemode_Ship},
+	{10, Portal_Gamemode_Ball},
+	{10, Portal_Gamemode_UFO},
+	{10, Portal_Gamemode_Robot},
+	{10, Portal_Gamemode_Spider},
+	{10, Portal_Gamemode_Wave},
+	{10, Portal_Gamemode_Swing},
 };
 
 
