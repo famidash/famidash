@@ -223,10 +223,9 @@ char sprite_height_lookup(){
 	else if ((type >= 0x80) && (type < 0xED)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
 				if (discomode) return 0;
 					
-				if (type & 0x3F == 0x20) tmp2 = 0x30;
-				else tmp2 = (type & 0x3F);                        
+				tmp2 = (type & 0x3F);                        
 				
-				
+						
 				if (type >= 0xC0){
 					pal_col(6, tmp2);
 					pal_col(5, oneShadeDarker(tmp2)); 
