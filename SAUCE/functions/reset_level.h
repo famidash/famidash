@@ -82,6 +82,7 @@ void reset_level(void) {
     player_vel_y[0] = 0;
     player_vel_x[1] = 0;
     player_vel_y[1] = 0;
+    disco_sprites = 0;
     target_scroll_y = 0x0180;
     currplayer_vel_x = 0;
     currplayer_vel_y = 0;
