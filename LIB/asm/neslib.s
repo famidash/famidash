@@ -17,7 +17,7 @@
 	.export _ppu_off,_ppu_on_all,_ppu_on_bg,_ppu_on_spr,_ppu_mask,_ppu_system
 	.export _oam_clear,_oam_clear_player,_oam_size,__oam_spr,__oam_meta_spr,_oam_hide_rest
 	.export _ppu_wait_frame,_ppu_wait_nmi
-	.export __scroll,_split
+	.export __scroll,_split,_newrand
 	.export _bank_spr,_bank_bg
 	.export __vram_read,__vram_write
 	.export _pad_poll ;,_pad_trigger,_pad_state
@@ -931,7 +931,20 @@ _rand8:
 	ldx #0
 	rts
 
+_newrand:
 
+	lda RAND_SEED
+	clc
+	sbc RAND_SEED+1
+	sta RAND_SEED+1
+	sbc RAND_SEED+2
+	sta RAND_SEED+2
+	sbc RAND_SEED+3
+	sta RAND_SEED+3
+	sbc RAND_SEED
+	sta RAND_SEED
+	ldx #0
+	rts
 
 ;uint16_t __fastcall__ rand16();
 
