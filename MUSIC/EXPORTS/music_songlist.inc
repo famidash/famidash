@@ -16,3 +16,4 @@ song_jumper = 14
 song_dry_out = 15
 song_cant_let_go = 16
 song_max = 17
+song_random = 18

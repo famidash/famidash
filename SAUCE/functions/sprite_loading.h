@@ -242,7 +242,14 @@ char sprite_height_lookup(){
 				return 0;
 	}
 	else if (type == MASK_SPRITES_ON) { disco_sprites = 1; activesprites_type[index] = 0xFF; return 0; }
-	else if (type == DEATH_CHANCE) { if (!(newrand() & 63)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; }
+	else if (type == DEATH_CHANCE) { 
+		tmp7 = (newrand() & 15) + 1;
+		for (tmp2 = 0; tmp2 < tmp7; tmp2++) {
+			newrand();
+		};
+
+		if (!(newrand() & 63)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; 
+	}
 	else if (type == MASK_SPRITES_OFF) { disco_sprites = 0; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_ON) { slowmode = 1; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_OFF) { slowmode = 0; activesprites_type[index] = 0xFF; return 0; }

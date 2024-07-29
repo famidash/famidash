@@ -16,6 +16,7 @@
 #define song_dry_out 15
 #define song_cant_let_go 16
 #define song_max 17
+#define song_random 18
 #define sfx_death 0
 #define sfx_click 1
 #define sfx_level_complete 2
