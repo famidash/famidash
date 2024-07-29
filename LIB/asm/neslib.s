@@ -931,19 +931,36 @@ _rand8:
 	ldx #0
 	rts
 
-_newrand:
+;_newrand:
+;
+;	lda RAND_SEED
+;	clc
+;	sbc RAND_SEED+1
+;	sta RAND_SEED+1
+;	sbc RAND_SEED+2
+;	sta RAND_SEED+2
+;	sbc RAND_SEED+3
+;	sta RAND_SEED+3
+;	sbc RAND_SEED
+;	sta RAND_SEED
+;	ldx #0
+;	rts
 
-	lda RAND_SEED
-	clc
-	sbc RAND_SEED+1
-	sta RAND_SEED+1
-	sbc RAND_SEED+2
-	sta RAND_SEED+2
-	sbc RAND_SEED+3
-	sta RAND_SEED+3
-	sbc RAND_SEED
-	sta RAND_SEED
-	ldx #0
+_newrand:
+	ldy #8
+	lda RAND_SEED+0
+:
+	asl
+	rol RAND_SEED+1
+	rol RAND_SEED+2
+	rol RAND_SEED+3
+	bcc :+
+	eor #$C5
+:
+	dey
+	bne :--
+	sta RAND_SEED+0
+	cmp #0
 	rts
 
 ;uint16_t __fastcall__ rand16();
