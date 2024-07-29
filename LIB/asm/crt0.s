@@ -247,17 +247,25 @@ detectNTSC:
 	ldy #>sounds
 	jsr famistudio_sfx_init
 
-	lda $60FE
+	lda $60FC
 	beq @fallback
 	sta <RAND_SEED
-	lda $60FF
+	lda $60FD
 	beq @fallback
 	sta <RAND_SEED+1
+	lda $60FE
+	beq @fallback
+	sta <RAND_SEED+2
+	lda $60FF
+	beq @fallback
+	sta <RAND_SEED+3
         bne @done
 @fallback:
 	lda #$FD
 	sta <RAND_SEED
 	sta <RAND_SEED+1
+	sta <RAND_SEED+2
+	sta <RAND_SEED+3
 @done:
 	lda #0
 	sta PPU_SCROLL
