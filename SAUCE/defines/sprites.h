@@ -2572,7 +2572,6 @@ const unsigned char * const Metasprites[]={
 	Gravity_1x_Portal,
 	Portal_Gamemode_Cube,
 	Green_Jump_Pad,
-	nometa,
 	};
 
 
@@ -2684,7 +2683,6 @@ const void* const animation_frame_list[] = {
 	NULL,
 	RANDOM_GAMEMODE_PORTAL,
 	GREEN_PAD_SPRITES,
-	NULL,
 };
 
 // Number of UNIQUE animation frames
