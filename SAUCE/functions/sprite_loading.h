@@ -131,7 +131,7 @@
 #define GRAVITY_PAD_UP_INVISIBLE		0XFE
 #define NOSPRITE				0XFF
 
-extern void load_next_sprite(uint8_t slot);
+extern void load_next_sprite(void);
 
 extern void check_spr_objects(void);
 
@@ -165,7 +165,7 @@ void init_sprites(void){	// required to be in a fixed bank
 
 	for (tmp4 = max_loaded_sprites-1; tmp4 != 0; --tmp4) activesprites_type[tmp4] = 0xFF;
 
-	tmp4 = max_loaded_sprites;
+	spr_index = 0;
 	do {
 		if (sprite_data[0] == TURN_OFF) break;
 		load_next_sprite();

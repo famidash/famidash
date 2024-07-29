@@ -1252,7 +1252,7 @@ play:
 ; Because i JMPed, the routine is over
 
 
-; void load_next_sprite(uint8_t slot);
+; void load_next_sprite();
 .segment "CODE_2"
 
 .import _activesprites_x_lo, _activesprites_x_hi
@@ -1262,19 +1262,26 @@ play:
 
 .export _load_next_sprite := load_next_sprite
 .proc load_next_sprite
+.import _spr_index
+SpriteData = ptr1
+SpriteOffset = ptr2
 
-	; Check that the pointer is valid
-	ldy _sprite_data+1
-	beq early_exit
+    lda mmc3PRG1Bank
+    pha
 
-    ; Paste current free sprite slot into X
-   	tax
+    lda _sprite_data_bank
+    jsr mmc3_set_prg_bank_1
+
+    ; And also keep the "max sprite id" number in x
+    ; This is premultiplied by two for the word sized x/y fields which come first
+    ldx _spr_index
 
     ; Now read the data into the sprite
+    
     ldy #0
     lda (_sprite_data),y
     cmp #$ff
-    beq exit
+    beq @Exit
     iny
     
     ; X - 2 bytes
@@ -1303,20 +1310,28 @@ play:
 
     ; Increment to the next sprite index - 
     ; Add the 5 back to the pointer
-    lda	#$05
-    clc
-    adc	_sprite_data
-    sta	_sprite_data
-	ldy _sprite_data+1
-    bcc	:+
-        iny
+    LDA #$05
+    CLC
+    ADC _sprite_data
+    STA _sprite_data
+    BCC :+
+        INC _sprite_data+1
     :
 
-exit:
-	;	Y is currently 0
-	sty _sprite_data+1	;__	invalidate the sprite pointer
-early_exit:
-	rts
+    ; Increment the _spr_index and and it with #$0F
+    INX
+	.if USE_ILLEGAL_OPCODES
+		LDA #$0F
+		SAX _spr_index
+	.else
+		TXA
+		AND #$0F
+		STA _spr_index
+	.endif
+
+@Exit:
+    pla
+    jmp mmc3_set_prg_bank_1
 .endproc
 
 
@@ -1327,14 +1342,6 @@ early_exit:
 
 .export _check_spr_objects := check_spr_objects
 .proc check_spr_objects
-	; save current bank
-    lda mmc3PRG1Bank
-    pha
-
-	; load sprite data bank
-    lda _sprite_data_bank
-    jsr mmc3_set_prg_bank_1
-
     ; for each sprite we want to check to see if its active
     ; if it is, update its realx/y position
     ; if its not, attempt to load another sprite
@@ -1342,20 +1349,18 @@ early_exit:
 
 check_sprite_loop:
         ; X is the current sprite object
-		lda _activesprites_type, x	;	If the sprite (e.g. color triggers)
-		cmp #$ff					;	has been marked as "complete",
-		beq sprite_dead				;__
-		
-        lda _activesprites_x_lo, x	;
-        sec							;	Or the sprite has
-        sbc _scroll_x				;	went offscreen,
-        lda _activesprites_x_hi, x	;
-        sbc _scroll_x+1				;__
+        ; Load two byte X coord to see if we went offscreen
+        lda _activesprites_x_lo, x
+        sec
+        sbc _scroll_x
+        lda _activesprites_x_hi, x
+        sbc _scroll_x+1
         bpl sprite_alive
-
-	sprite_dead:					;__	Load a new one in its place
-            txa						;	Takes the "slot" argument in A
-			jsr load_next_sprite	;__	But also preserves the X
+            txa
+            pha
+                jsr load_next_sprite
+            pla
+            tax
             lda #0
             jmp write_active
     sprite_alive:
@@ -1378,15 +1383,13 @@ check_sprite_loop:
 
         lda #1
         bne write_active ; unconditional
-	sprite_offscreen:
+sprite_offscreen:
         lda #0
-	write_active:
+write_active:
         sta _activesprites_active, x
         dex
         bpl check_sprite_loop
-end:
-	pla
-	jmp mmc3_set_prg_bank_1
+    rts
 .endproc
 
 .segment "XCD_BANK_04"

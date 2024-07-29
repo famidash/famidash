@@ -21,11 +21,11 @@ void checkcoinproceed(){
 
 
 void state_lvldone() {
-	#define current_state tmp2
-	#define sprite_0_y tmp3
-	#define delay_spr_0 tmp4
-	#define delay_timer tmpptr1
-	#define top_scroll scroll_x
+#define current_state tmp2
+#define sprite_0_y tmp3
+#define delay_spr_0 tmp4
+#define delay_timer tmpptr1
+#define top_scroll scroll_x
     ppu_off();
 
 	delay_spr_0 = 0x20;
@@ -124,7 +124,7 @@ void state_lvldone() {
     set_scroll_x(0);
     set_scroll_y(top_scroll);
 
-	//	one_vram_buffer(0xD0+coins, NTADR_A(12,9));
+//	one_vram_buffer(0xD0+coins, NTADR_A(12,9));
 
     ppu_on_all();
 
@@ -343,11 +343,11 @@ void state_lvldone() {
 			break;
 		}
 	}
-	#undef current_state
-	#undef sprite_0_y
-	#undef delay_spr_0
-	#undef delay_timer
-	#undef top_scroll
+#undef current_state
+#undef sprite_0_y
+#undef delay_spr_0
+#undef delay_timer
+#undef top_scroll
 }
 
 
@@ -372,21 +372,21 @@ void bgmtest() {
 		music_update();
 		pad_poll(0); // read the first controller
 		
-		one_vram_buffer(' ', NTADR_A(14, 10));
-		one_vram_buffer(0xd0+song, NTADR_A(15,10));
-		one_vram_buffer(' ', NTADR_A(14, 17));
-		one_vram_buffer(0xd0+sfx, NTADR_A(15,17));
+		one_vram_buffer(' '-1, NTADR_A(14, 10));
+		one_vram_buffer(0xb0+song, NTADR_A(15,10));
+		one_vram_buffer(' '-1, NTADR_A(14, 17));
+		one_vram_buffer(0xb0+sfx, NTADR_A(15,17));
 
 		if (settingvalue == 0) {
-			one_vram_buffer('c', NTADR_A(11, 8));
-			one_vram_buffer(' ', NTADR_A(11, 15));
+			one_vram_buffer('c', NTADR_A(11, 7));
+			one_vram_buffer(' ', NTADR_A(11, 14));
 			if (pad_new[0] & PAD_RIGHT) { song++; if (song == song_max) {song = 0;} }
 			if (pad_new[0] & PAD_LEFT) { if (song == 0) {song = song_max - 1;} else song--; }
 			if ((pad_new[0] & PAD_START || pad_new[0] & PAD_A)) music_play(song);
 		}		
 		else if (settingvalue == 1) {
-			one_vram_buffer(' ', NTADR_A(11, 8));
-			one_vram_buffer('c', NTADR_A(11, 15));
+			one_vram_buffer(' ', NTADR_A(11, 7));
+			one_vram_buffer('c', NTADR_A(11, 14));
 			if (pad_new[0] & PAD_RIGHT) { sfx++; if (sfx == sfx_max) {sfx= 0;} };
 			if (pad_new[0] & PAD_LEFT) { if (sfx == 0) {sfx = sfx_max - 1;} else sfx--; }
 			if ((pad_new[0] & PAD_START || pad_new[0] & PAD_A)) famistudio_sfx_play(sfx, 0);
@@ -395,7 +395,7 @@ void bgmtest() {
 		if (pad_new[0] & PAD_DOWN) settingvalue ^= 1;
 		if (pad_new[0] & PAD_UP) settingvalue ^= 1;
 		
-		if (pad_new[0] & PAD_SELECT) famistudio_music_stop();
+				
 		if (pad_new[0] & PAD_B) {
 			tmp3--;			
 			one_vram_buffer(' ', NTADR_A(11, 7));
@@ -405,7 +405,7 @@ void bgmtest() {
 			return;
 		}
 	}
-	#undef sfx
+#undef sfx
 }
 
 
