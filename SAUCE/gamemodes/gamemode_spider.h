@@ -3,23 +3,19 @@
 #pragma rodata-name(push, "XCD_BANK_01")
 
 void cube_vel_stuff();
+void common_gravity_routine();
 void spider_movement(void){
 // handle y
 
 // currplayer_gravity
 	// currplayer_vel_y is signed
 	//if(currplayer_vel_y < 0x400){
-	if (!dashing[currplayer]) {
+	fallspeed_big = CUBE_MAX_FALLSPEED;
+	fallspeed_mini = MINI_CUBE_MAX_FALLSPEED;
+	gravity_big = CUBE_GRAVITY;
+	gravity_mini = MINI_CUBE_GRAVITY;
 
-		cube_vel_stuff();
-	
-		currplayer_y += currplayer_vel_y;
-	}
-	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
-	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
-	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else currplayer_vel_y = 1;
+	common_gravity_routine();
 
 	Generic.x = high_byte(currplayer_x);
 	

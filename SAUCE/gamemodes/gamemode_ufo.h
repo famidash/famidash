@@ -8,54 +8,14 @@ void ufo_movement(void){
 // currplayer_gravity
 	// currplayer_vel_y is signed
 	//if(currplayer_vel_y < 0x400){
-	if (!dashing[currplayer]) {
+		fallspeed_big = UFO_MAX_FALLSPEED;
+		fallspeed_mini = MINI_UFO_MAX_FALLSPEED;
+		gravity_big = UFO_GRAVITY;
+		gravity_mini = MINI_UFO_GRAVITY;
+		common_gravity_routine();
 
-			if(!currplayer_gravity){
-			if(currplayer_vel_y > UFO_MAX_FALLSPEED){
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? -UFO_GRAVITY : -MINI_UFO_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? -UFO_GRAVITY/3 : -MINI_UFO_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? -UFO_GRAVITY/2 : -MINI_UFO_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? -UFO_GRAVITY/3*2 : -MINI_UFO_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -UFO_GRAVITY*2 : -MINI_UFO_GRAVITY*2; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? UFO_GRAVITY : MINI_UFO_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? UFO_GRAVITY/3 : MINI_UFO_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? UFO_GRAVITY/2 : MINI_UFO_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? UFO_GRAVITY/3*2 : MINI_UFO_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? UFO_GRAVITY*2 : MINI_UFO_GRAVITY*2; break;
-					};
-				}
-			}
-			else{
-			if(currplayer_vel_y < -UFO_MAX_FALLSPEED){
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y -= !mini ? -UFO_GRAVITY : -MINI_UFO_GRAVITY; break;
-						case 1: currplayer_vel_y -= !mini ? -UFO_GRAVITY/3 : -MINI_UFO_GRAVITY/3; break;
-						case 2: currplayer_vel_y -= !mini ? -UFO_GRAVITY/2 : -MINI_UFO_GRAVITY/2; break;
-						case 3: currplayer_vel_y -= !mini ? -UFO_GRAVITY/3*2 : -MINI_UFO_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? -UFO_GRAVITY*2 : -MINI_UFO_GRAVITY*2; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y -= !mini ? UFO_GRAVITY : MINI_UFO_GRAVITY; break;
-						case 1: currplayer_vel_y -= !mini ? UFO_GRAVITY/3 : MINI_UFO_GRAVITY/3; break;
-						case 2: currplayer_vel_y -= !mini ? UFO_GRAVITY/2 : MINI_UFO_GRAVITY/2; break;
-						case 3: currplayer_vel_y -= !mini ? UFO_GRAVITY/3*2 : MINI_UFO_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? UFO_GRAVITY*2 : MINI_UFO_GRAVITY*2; break;
-					};
-				}
-			}
-	
+		
 		currplayer_y += currplayer_vel_y;
-	}
-	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
-	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
-	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else currplayer_vel_y = 1;
 
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);

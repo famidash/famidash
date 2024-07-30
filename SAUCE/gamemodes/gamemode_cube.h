@@ -2,8 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
-void cube_vel_stuff();
-
+void common_gravity_routine();
 void cube_movement(void){
 // handle y
 
@@ -13,18 +12,15 @@ void cube_movement(void){
 
 	if ((pad_new[controllingplayer] & PAD_A) && currplayer_vel_y != 0) uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
 
-	if (!dashing[currplayer]) {
+	fallspeed_big = CUBE_MAX_FALLSPEED;
+	fallspeed_mini = MINI_CUBE_MAX_FALLSPEED;
+	gravity_big = CUBE_GRAVITY;
+	gravity_mini = MINI_CUBE_GRAVITY;
+	common_gravity_routine();
 
-		cube_vel_stuff();
+	
+	currplayer_y += currplayer_vel_y;
 
-		
-		currplayer_y += currplayer_vel_y;
-	}
-	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
-	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
-	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else currplayer_vel_y = 1;
 
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
@@ -187,47 +183,52 @@ void cube_movement(void){
 }	
 
 
-void cube_vel_stuff(void) {
-
+void common_gravity_routine(void) {
+	if (!dashing[currplayer]) {
 		if(!currplayer_gravity){
-			if(currplayer_vel_y > CUBE_MAX_FALLSPEED){
+			if(currplayer_vel_y > (!mini ? fallspeed_big : fallspeed_mini)) {
 					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
+						case 0: currplayer_vel_y += !mini ? -gravity_big : -gravity_mini; break;
+						case 1: currplayer_vel_y += !mini ? -gravity_big/3 : -gravity_mini/3; break;
+						case 2: currplayer_vel_y += !mini ? -gravity_big/2 : -gravity_mini/2; break;
+						case 3: currplayer_vel_y += !mini ? -gravity_big/3*2 : -gravity_mini/3*2; break;
+						case 4: currplayer_vel_y += !mini ? -gravity_big*2 : -gravity_mini*2; break;
 					};
 				} else {
 					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
+						case 0: currplayer_vel_y += !mini ? gravity_big : gravity_mini; break;
+						case 1: currplayer_vel_y += !mini ? gravity_big/3 : gravity_mini/3; break;
+						case 2: currplayer_vel_y += !mini ? gravity_big/2 : gravity_mini/2; break;
+						case 3: currplayer_vel_y += !mini ? gravity_big/3*2 : gravity_mini/3*2; break;
+						case 4: currplayer_vel_y += !mini ? gravity_big*2 : gravity_mini*2; break;
 					};
 				}
 		}
 		else{
-			if(currplayer_vel_y < -CUBE_MAX_FALLSPEED){
+			if(currplayer_vel_y < (!mini ? -fallspeed_big : -fallspeed_mini)) {
 				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? -CUBE_GRAVITY : -MINI_CUBE_GRAVITY; break;
-					case 1: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3 : -MINI_CUBE_GRAVITY/3; break;
-					case 2: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/2 : -MINI_CUBE_GRAVITY/2; break;
-					case 3: currplayer_vel_y -= !mini ? -CUBE_GRAVITY/3*2 : -MINI_CUBE_GRAVITY/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? -CUBE_GRAVITY*2 : -MINI_CUBE_GRAVITY*2; break;
+					case 0: currplayer_vel_y -= !mini ? -gravity_big : -gravity_mini; break;
+					case 1: currplayer_vel_y -= !mini ? -gravity_big/3 : -gravity_mini/3; break;
+					case 2: currplayer_vel_y -= !mini ? -gravity_big/2 : -gravity_mini/2; break;
+					case 3: currplayer_vel_y -= !mini ? -gravity_big/3*2 : -gravity_mini/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? -gravity_big*2 : -gravity_mini*2; break;
 				};
 			} else {
 				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? CUBE_GRAVITY : MINI_CUBE_GRAVITY; break;
-					case 1: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3 : MINI_CUBE_GRAVITY/3; break;
-					case 2: currplayer_vel_y -= !mini ? CUBE_GRAVITY/2 : MINI_CUBE_GRAVITY/2; break;
-					case 3: currplayer_vel_y -= !mini ? CUBE_GRAVITY/3*2 : MINI_CUBE_GRAVITY/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? CUBE_GRAVITY*2 : MINI_CUBE_GRAVITY*2; break;
+					case 0: currplayer_vel_y -= !mini ? gravity_big : gravity_mini; break;
+					case 1: currplayer_vel_y -= !mini ? gravity_big/3 : gravity_mini/3; break;
+					case 2: currplayer_vel_y -= !mini ? gravity_big/2 : gravity_mini/2; break;
+					case 3: currplayer_vel_y -= !mini ? gravity_big/3*2 : gravity_mini/3*2; break;
+					case 4: currplayer_vel_y -= !mini ? gravity_big*2 : gravity_mini*2; break;
 				};
 			}
 		}
-
+	}
+	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
+	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
+	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
+	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
+	else currplayer_vel_y = 1;
 }
 
 
