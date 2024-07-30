@@ -1,7 +1,7 @@
 #pragma code-name(push, "XCD_BANK_01")
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
-
+void common_gravity_routine();
 void ufo_movement(void){
 // handle y
 
