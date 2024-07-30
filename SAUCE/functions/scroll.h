@@ -24,7 +24,7 @@ void do_the_scroll_thing(){
 		}
 		high_byte(currplayer_x) = high_byte(currplayer_x) + tmp1;
 	}
-//	if (gamemode != 1) {
+	if (gamemode != 5) {
 		if (!dual) {
 			if (currplayer_y < 0x4000 && (scroll_y > 0x08)){ // change y scroll (upward)
 				tmp1 = MSB(0x4000 - currplayer_y);
@@ -63,9 +63,9 @@ void do_the_scroll_thing(){
 			}
 			if (scroll_y > 0xEF) scroll_y = 0xEF;
 		}
-/*
-	}
 
+	}
+/*
 	else {			//ship stuff
 			if (target_scroll_y > 0x0120) {
 				target_scroll_y--;

@@ -569,17 +569,20 @@ void settings() {
 					trails ^= 1; break;					
 				case 7:
 					if (pad[0] & PAD_A && pad_new[0] & PAD_START) {
-					setdefaultoptions();
+						setdefaultoptions();
 						// one_vram_buffer(0xb0+TOTALCOINSTENS, NTADR_A(17,17));
-						// one_vram_buffer(0xb0+TOTALCOINSONES, NTADR_A(18,17));					
-						sfx_play(sfx_death, 0);
-						music_play(song_menu_theme);
+						// one_vram_buffer(0xb0+TOTALCOINSONES, NTADR_A(18,17));
+						// music_play(song_menu_theme);
+						//famistudio_sfx_play(sfx_death, 0);
 						// one_vram_buffer_horz_repeat(' ', 1, NTADR_A(16, 15));					
 					}
 					break;
 			}
 		}
-		if (options & platformer) twoplayer = 0;		
+		if (options & platformer) {
+			twoplayer = 0;
+			one_vram_buffer('X',NTADR_A(26,7));
+		}
 		if (twoplayer) options &= platformer^0xff;		
 
 		if (pad_new[0] & PAD_B) {

@@ -6,22 +6,12 @@
 void wave_movement(void){
 
 	if (!dashing[currplayer]) {
-		if(!mini){
-			if(currplayer_gravity){
-				currplayer_vel_y = -currplayer_vel_x;
-			}
-			else{
-				currplayer_vel_y = currplayer_vel_x;
-			}
+		if(currplayer_gravity){
+			currplayer_vel_y = !mini ? -currplayer_vel_x : -(currplayer_vel_x << 1);
 		}
-		else {
-			if(currplayer_gravity){
-				currplayer_vel_y = -(currplayer_vel_x << 1);
-			}
-			else{
-				currplayer_vel_y = currplayer_vel_x << 1;
-			}
-		}	
+		else{
+			currplayer_vel_y = !mini ? currplayer_vel_x : currplayer_vel_x << 1;
+		}
 
 		if (pad[controllingplayer] & PAD_A) currplayer_vel_y = -currplayer_vel_y;
 

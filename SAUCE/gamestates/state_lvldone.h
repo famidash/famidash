@@ -8,7 +8,7 @@ extern volatile unsigned char VRAM_UPDATE;
 
 void checkcointimer(){
 	if (tmp1 == 1){
-		famistudio_sfx_play(sfx_coin,0);
+		sfx_play(sfx_coin,0);
 		tmp1 = 50;
 	}
 }

@@ -1,6 +1,6 @@
 ; Custom routines implemented specifically for famidash (some are totally not stolen from famitower)
 .importzp _gamemode
-.importzp _tmp1, _tmp2, _tmp3, _tmp4, _tmp5, _tmp6, _tmp7, _tmp8  ; C-safe temp storage
+.importzp _tmp1, _tmp2, _tmp3, _tmp4, _tmp5, _tmp6, _tmp7, _tmp8, _tmp9, _max_fallspeed_big, _max_fallspeed_mini, _gravity_big, _gravity_mini  ; C-safe temp storage
 .import pusha, pushax, callptr4
 .import _scroll_x
 
