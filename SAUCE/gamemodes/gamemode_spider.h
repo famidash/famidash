@@ -39,6 +39,49 @@ void spider_movement(void){
 				currplayer_gravity = 1;
 				do {
 					high_byte(currplayer_y) -= 0x08;
+					if (!dual) {
+						if (currplayer_y < 0x4000 && (scroll_y > 0x08)){ // change y scroll (upward)
+							tmp1 = MSB(0x4000 - currplayer_y);
+							scroll_y -= tmp1;
+							high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+						}
+						while (scroll_y < 0x08) {
+							++scroll_y;
+							--high_byte(currplayer_y);
+						}
+
+						
+						if (currplayer_y > 0xA000){ // change y scroll (upward)
+							tmp1 = MSB(currplayer_y - 0xA000);
+							scroll_y += tmp1;
+							if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+						}
+						if (scroll_y > 0xEF) scroll_y = 0xEF;
+					}
+					else {
+						if (currplayer_y < 0x0700 && (scroll_y > 0x08)){ // change y scroll (upward)
+							tmp1 = MSB(0x0700 - currplayer_y);
+							scroll_y -= tmp1;
+							high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+						}
+						while (scroll_y < 0x08) {
+							++scroll_y;
+							--high_byte(currplayer_y);
+						}
+
+						
+						if (currplayer_y > 0xF000){ // change y scroll (upward)
+							tmp1 = MSB(currplayer_y - 0xF000);
+							scroll_y += tmp1;
+							if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+						}
+						if (scroll_y > 0xEF) scroll_y = 0xEF;
+					}
+					set_scroll_y(scroll_y);
+					if (currplayer_y < 0x0600 && scroll_y == 0x08){
+						uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
+						break;
+					}
 					Generic.y = high_byte(currplayer_y); // the rest should be the same
 				} while (!bg_coll_U());
 				high_byte(currplayer_y) -= eject_U;
@@ -54,6 +97,46 @@ void spider_movement(void){
 				currplayer_gravity = 0;
 				do {
 					high_byte(currplayer_y) += 0x08;
+					if (!dual) {
+						if (currplayer_y < 0x4000 && (scroll_y > 0x08)){ // change y scroll (upward)
+							tmp1 = MSB(0x4000 - currplayer_y);
+							scroll_y -= tmp1;
+							high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+						}
+						while (scroll_y < 0x08) {
+							++scroll_y;
+							--high_byte(currplayer_y);
+						}
+
+						
+						if (currplayer_y > 0xA000){ // change y scroll (upward)
+							tmp1 = MSB(currplayer_y - 0xA000);
+							scroll_y += tmp1;
+							if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+						}
+						if (scroll_y > 0xEF) scroll_y = 0xEF;
+					}
+					else {
+						if (currplayer_y < 0x0700 && (scroll_y > 0x08)){ // change y scroll (upward)
+							tmp1 = MSB(0x0700 - currplayer_y);
+							scroll_y -= tmp1;
+							high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+						}
+						while (scroll_y < 0x08) {
+							++scroll_y;
+							--high_byte(currplayer_y);
+						}
+
+						
+						if (currplayer_y > 0xF000){ // change y scroll (upward)
+							tmp1 = MSB(currplayer_y - 0xF000);
+							scroll_y += tmp1;
+							if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+						}
+						if (scroll_y > 0xEF) scroll_y = 0xEF;
+					}
+					set_scroll_y(scroll_y);
+					
 					Generic.y = high_byte(currplayer_y); // the rest should be the same
 				} while (!bg_coll_D());
 
