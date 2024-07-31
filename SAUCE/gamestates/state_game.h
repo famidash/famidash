@@ -406,7 +406,7 @@ void state_game(){
 				else if ((pad[0] & PAD_UP) && (pad_new[0] & PAD_A)) {
 					kandokidshack2++;
 				}
-				else if ((pad_new[0] & PAD_A) && DEBUG_MODE && !retro_mode) {
+				else if ((pad_new[0] & PAD_A) && DEBUG_MODE) {
 					gamemode == 8 ? gamemode = 0 : gamemode++;
 					ppu_off();
 					//one_vram_buffer(0xf5+gamemode, NTADR_A(18,15));	

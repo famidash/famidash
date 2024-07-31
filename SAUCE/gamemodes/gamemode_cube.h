@@ -1,7 +1,7 @@
 #pragma code-name(push, "XCD_BANK_01")
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
-
+void x_movement_coll();
 void common_gravity_routine();
 void cube_movement(void){
 // handle y
@@ -223,12 +223,14 @@ void cube_movement(void){
 			Generic.y = high_byte(currplayer_y);
 			
 
+		//	x_movement_coll();
 			if(bg_coll_D()){ // check collision below
 			    high_byte(currplayer_y) -= eject_D;
 			    low_byte(currplayer_y) = 0;
 			    currplayer_vel_y = JIMSHEATBALL_JUMP_VEL;
 			}
-			if (cube_data[currplayer] & 1) cube_data[currplayer] &= 2;
+
+		//	if (cube_data[currplayer] & 1) { jimsheatballalive[tmp9] = 0; cube_data[currplayer] &= 2; }
 			jimsheatballx[tmp9] = currplayer_x;
 			jimsheatbally[tmp9] = currplayer_y;
 			jimsheatball_vel_x[tmp9] = currplayer_vel_x;
