@@ -166,20 +166,48 @@ void cube_movement(void){
 		if (pad_new[currplayer] & PAD_B && !has_practice_point) {
 			if (!jimsheatballalive[0]) {
 				jimsheatballalive[0] = 1;
+				jimsheatball_vel_y[0] = JIMSHEATBALL_JUMP_VEL;
 				jimsheatballx[0] = high_byte(old_x);
-				jimsheatbally[0] = high_byte(player_y[0]);
+				high_byte(jimsheatbally[0]) = high_byte(player_y[0]);
 				jimsheatballframe[0] = 0;
 			}
 			else if (!jimsheatballalive[1]) {
 				jimsheatballalive[1] = 1;
+				jimsheatball_vel_y[1] = JIMSHEATBALL_JUMP_VEL;
 				jimsheatballx[1] = high_byte(old_x);
-				jimsheatbally[1] = high_byte(player_y[0]);
+				high_byte(jimsheatbally[1]) = high_byte(player_y[0]);
 				jimsheatballframe[1] = 0;
 			}
 
 		}
 	}
 // done with jims shit	
+	for (tmp9 = 0; tmp9 < 2; tmp9++) {
+		if (jimsheatballalive[tmp9]) {
+			if(jimsheatball_vel_y[tmp9] == 0) jimsheatball_vel_y[tmp9] = JIMSHEATBALL_JUMP_VEL;
+			else if(jimsheatball_vel_y[tmp9] > JIMSHEATBALL_MAX_FALLSPEED){
+				jimsheatball_vel_y[tmp9] += -JIMSHEATBALL_GRAVITY;
+			} else jimsheatball_vel_y[tmp9] += JIMSHEATBALL_GRAVITY;
+			//if (jimsheatball_vel_y[tmp9] > JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y[tmp9] = JIMSHEATBALL_MAX_FALLSPEED;
+			//if (jimsheatball_vel_y[tmp9] < -JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y[tmp9] = -JIMSHEATBALL_MAX_FALLSPEED;
+			jimsheatbally[tmp9] += jimsheatball_vel_y[tmp9];
+			
+			Generic.x = high_byte(jimsheatballx[tmp9]);
+			Generic.y = high_byte(jimsheatbally[tmp9]);
+			
+		
+			if(jimsheatball_vel_y[tmp9] > 0){
+				if(bg_coll_D()){ // check collision below
+				    high_byte(jimsheatbally[tmp9]) -= eject_D;
+				    low_byte(jimsheatbally[tmp9]) = 0;
+				    jimsheatball_vel_y[tmp9] = 0;
+				}
+			}
+			if (cube_data[currplayer] & 1) cube_data[currplayer] &= 2;
+		}
+	}
+	Generic.x = high_byte(currplayer_x);
+	Generic.y = high_byte(currplayer_y);
 }	
 
 

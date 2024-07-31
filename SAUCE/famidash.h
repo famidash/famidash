@@ -40,6 +40,7 @@
 #define MINI_WAVE_HEIGHT 0x01
 
 #define JUMP_VEL -0x590
+
 #define MINI_JUMP_VEL -0x4D0
 
 #define UFO_JUMP_VEL -0x3B0
@@ -84,6 +85,10 @@
 
 #define SHIP_GRAVITY 0x30
 #define MINI_SHIP_GRAVITY 0x2C
+
+#define JIMSHEATBALL_MAX_FALLSPEED 0x300
+#define JIMSHEATBALL_GRAVITY 0x34
+#define JIMSHEATBALL_JUMP_VEL -0x290
 
 #define COIN_1 0x01
 #define COIN_2 0x02
@@ -342,10 +347,12 @@ uint8_t dblocked[2];
 uint8_t gravity_mod;
 
 uint8_t jimsheatballalive[2]; //jims heatball shit
-uint8_t jimsheatballx[2]; //jims heatball shit
-uint8_t jimsheatbally[2];
+uint16_t jimsheatballx[2]; //jims heatball shit
+uint16_t jimsheatbally[2];
+int16_t jimsheatball_vel_x[2];
+int16_t jimsheatball_vel_y[2];
+
 uint8_t jimsheatballframe[2];
-int16_t jimsheatballvel_y[2];
 
 uint8_t player_old_posy[9];
 uint8_t discorefreshrate;
