@@ -134,7 +134,7 @@
 extern void load_next_sprite(void);
 
 extern void check_spr_objects(void);
-
+void scroll_thing_again2();
 extern char bg_coll_U();
 extern char bg_coll_D();
 
@@ -391,7 +391,7 @@ char sprite_height_lookup(){
 #define red_pad 0x08 << 3
 
 const short heights[] = {
-//  cube    ship    ball     ufo    robot   spider  wave   unused
+//  cube    ship    ball     ufo    robot   spider  wave   swing
 	0x590,  0x590,  0x4A0,  0x590,  0x590,  0x590,  0x000, 0x000, // yellow orb
 	0x7C0,  0x390,  0x550,  0x500,  0x7A0,  0x500,  0x000, 0x000, // yellow pad
 	0x3D0,  0x590,  0x3C0,  0x590,  0x450,  0x590,  0x000, 0x000, // pink orb
@@ -404,14 +404,14 @@ const short heights[] = {
 };
 
 const short mini_heights[] = {
-//  cube    ship    ball     ufo    robot   spider  wave   unused
+//  cube    ship    ball     ufo    robot   spider  wave   swing
 	0x4D0,  0x4D0,  0x410,  0x4D0,  0x4D0,  0x4D0,  0x000, 0x000, // yellow orb
 	0x5B0,  0x500,  0x4C0,  0x500,  0x5B0,  0x500,  0x000, 0x000, // yellow pad
 	0x350,  0x4D0,  0x500,  0x4D0,  0x350,  0x4D0,  0x000, 0x000, // pink orb
 	0x350,  0x4A0,  0x4A0,  0x500,  0x350,  0x4A0,  0x000, 0x000, // pink pad
-	0x950,  0x700,  0x600,  0x950,  0x950,  0x500,  0x000, 0x000, // red orb
+	0x850,  0x700,  0x600,  0x850,  0x850,  0x500,  0x000, 0x000, // red orb
 	0x590,  0x590,  0x560,  0x590,  0x590,  0x590,  0x000, 0x000, // yellow orb bigger
-   -0x1190,-0x1190,-0x1170,-0x1190,-0x1190,-0x1190, 0x000, 0x000, // black orb
+	-0x990,-0x990,-0x970,-0x990,-0x990,-0x990, 0x000, 0x000, // black orb
 	0x540,  0x540,  0x472,  0x4B0,  0x770,  0x4B0,  0x000, 0x000, // yellow orb smaller
 	0x950,  0x700,  0x600,  0x950,  0x950,  0x500,  0x000, 0x000, // red pad	
 };
@@ -715,7 +715,13 @@ void sprite_collide_lookup() {
 			currplayer_vel_y = 0;
 			currplayer_gravity = 1;
 			do {
-				high_byte(currplayer_y) -= 0x04;
+				high_byte(currplayer_y) -= 0x08;
+				scroll_thing_again2();
+				set_scroll_y(scroll_y);
+				if (currplayer_y < 0x0600 && scroll_y == 0x08){
+					uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x01);	//DIE if player goes too high
+					break;
+				}
 				Generic.y = high_byte(currplayer_y); // the rest should be the same
 			} while (!bg_coll_U());
 			high_byte(currplayer_y) -= eject_U;
@@ -732,7 +738,9 @@ void sprite_collide_lookup() {
 			currplayer_vel_y = 0;
 			currplayer_gravity = 0;
 			do {
-				high_byte(currplayer_y) += 0x04;
+				high_byte(currplayer_y) += 0x08;
+				scroll_thing_again2();
+				set_scroll_y(scroll_y);
 				Generic.y = high_byte(currplayer_y); // the rest should be the same
 			} while (!bg_coll_D());
 
@@ -873,6 +881,47 @@ void sprite_collide(){
 	Generic.height = mini ? MINI_CUBE_HEIGHT : CUBE_HEIGHT;
 }
 
+
+void scroll_thing_again2(void) {
+	if (!dual) {
+		if (currplayer_y < 0x4000 && (scroll_y > 0x08)){ // change y scroll (upward)
+			tmp1 = MSB(0x4000 - currplayer_y);
+			scroll_y -= tmp1;
+			high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+		}
+		while (scroll_y < 0x08) {
+			++scroll_y;
+			--high_byte(currplayer_y);
+		}
+
+		
+		if (currplayer_y > 0xA000){ // change y scroll (upward)
+			tmp1 = MSB(currplayer_y - 0xA000);
+			scroll_y += tmp1;
+			if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+		}
+		if (scroll_y > 0xEF) scroll_y = 0xEF;
+	}
+	else {
+		if (currplayer_y < 0x0700 && (scroll_y > 0x08)){ // change y scroll (upward)
+			tmp1 = MSB(0x0700 - currplayer_y);
+			scroll_y -= tmp1;
+			high_byte(currplayer_y) = high_byte(currplayer_y) + tmp1;
+		}
+		while (scroll_y < 0x08) {
+			++scroll_y;
+			--high_byte(currplayer_y);
+		}
+
+		
+		if (currplayer_y > 0xF000){ // change y scroll (upward)
+			tmp1 = MSB(currplayer_y - 0xF000);
+			scroll_y += tmp1;
+			if (scroll_y <= 0xEF) high_byte(currplayer_y) = high_byte(currplayer_y) - tmp1;
+		}
+		if (scroll_y > 0xEF) scroll_y = 0xEF;
+	}
+}
 
 #pragma code-name(pop)
 #pragma data-name(pop) 
