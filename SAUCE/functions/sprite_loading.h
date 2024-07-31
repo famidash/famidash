@@ -612,7 +612,7 @@ void sprite_collide_lookup() {
 	case TELEPORT_PORTAL_ENTER_EXTENSION:
 	case TELEPORT_PORTAL_ENTER:
 			high_byte(currplayer_y) = teleport_output;
-			activesprites_activated[index]++;
+			//activesprites_activated[index]++;
 		}
 		return;
 	case SPIDER_MODE:
