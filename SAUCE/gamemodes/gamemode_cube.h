@@ -182,30 +182,83 @@ void cube_movement(void){
 		}
 	}
 // done with jims shit	
-	for (tmp9 = 0; tmp9 < 2; tmp9++) {
-		if (jimsheatballalive[tmp9]) {
-			//if(jimsheatball_vel_y[tmp9] == 0) jimsheatball_vel_y[tmp9] = JIMSHEATBALL_JUMP_VEL;
-			if(jimsheatball_vel_y[tmp9] > JIMSHEATBALL_MAX_FALLSPEED){
-				jimsheatball_vel_y[tmp9] += -JIMSHEATBALL_GRAVITY;
-			} else jimsheatball_vel_y[tmp9] += JIMSHEATBALL_GRAVITY;
-			//if (jimsheatball_vel_y[tmp9] > JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y[tmp9] = JIMSHEATBALL_MAX_FALLSPEED;
-			//if (jimsheatball_vel_y[tmp9] < -JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y[tmp9] = -JIMSHEATBALL_MAX_FALLSPEED;
-			jimsheatbally[tmp9] += jimsheatball_vel_y[tmp9];
+	player_x[currplayer] = currplayer_x;
+	player_y[currplayer] = currplayer_y;
+	player_vel_x[currplayer] = currplayer_vel_x;
+	player_vel_y[currplayer] = currplayer_vel_y;
+	
+	
+	if (jimsheatballalive[0]) {
+
 			
-			Generic.x = high_byte(jimsheatballx[tmp9]);
-			Generic.y = high_byte(jimsheatbally[tmp9]);
-			
+		currplayer_x = jimsheatballx[0];
+		currplayer_y = jimsheatbally[0];
+		currplayer_vel_x = jimsheatball_vel_x[0];
+		currplayer_vel_y = jimsheatball_vel_y[0];
 		
-		//	if(jimsheatball_vel_y[tmp9] > 0){
-				if(bg_coll_D()){ // check collision below
-				    high_byte(jimsheatbally[tmp9]) -= eject_D;
-				    low_byte(jimsheatbally[tmp9]) = 0;
-				    jimsheatball_vel_y[tmp9] = JIMSHEATBALL_JUMP_VEL;
-				}
-		//	}
-			if (cube_data[currplayer] & 1) cube_data[currplayer] &= 2;
+
+		//if(jimsheatball_vel_y == 0) jimsheatball_vel_y = JIMSHEATBALL_JUMP_VEL;
+		if(currplayer_vel_y > JIMSHEATBALL_MAX_FALLSPEED){
+			currplayer_vel_y += -JIMSHEATBALL_GRAVITY;
+		} else currplayer_vel_y += JIMSHEATBALL_GRAVITY;
+		//if (jimsheatball_vel_y > JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y = JIMSHEATBALL_MAX_FALLSPEED;
+		//if (jimsheatball_vel_y < -JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y = -JIMSHEATBALL_MAX_FALLSPEED;
+		currplayer_y += currplayer_vel_y;
+		
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y);
+		
+
+		if(bg_coll_D()){ // check collision below
+		    high_byte(currplayer_y) -= eject_D;
+		    low_byte(currplayer_y) = 0;
+		    currplayer_vel_y = JIMSHEATBALL_JUMP_VEL;
 		}
+		if (cube_data[currplayer] & 1) cube_data[currplayer] &= 2;
+		jimsheatballx[0] = currplayer_x;
+		jimsheatbally[0] = currplayer_y;
+		jimsheatball_vel_x[0] = currplayer_vel_x;
+		jimsheatball_vel_y[0] = currplayer_vel_y;
+		
+	}	
+	if (jimsheatballalive[1]) {
+
+			
+		currplayer_x = jimsheatballx[1];
+		currplayer_y = jimsheatbally[1];
+		currplayer_vel_x = jimsheatball_vel_x[1];
+		currplayer_vel_y = jimsheatball_vel_y[1];
+		
+
+		//if(jimsheatball_vel_y == 0) jimsheatball_vel_y = JIMSHEATBALL_JUMP_VEL;
+		if(currplayer_vel_y > JIMSHEATBALL_MAX_FALLSPEED){
+			currplayer_vel_y += -JIMSHEATBALL_GRAVITY;
+		} else currplayer_vel_y += JIMSHEATBALL_GRAVITY;
+		//if (jimsheatball_vel_y > JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y = JIMSHEATBALL_MAX_FALLSPEED;
+		//if (jimsheatball_vel_y < -JIMSHEATBALL_MAX_FALLSPEED) jimsheatball_vel_y = -JIMSHEATBALL_MAX_FALLSPEED;
+		currplayer_y += currplayer_vel_y;
+		
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y);
+		
+
+		if(bg_coll_D()){ // check collision below
+		    high_byte(currplayer_y) -= eject_D;
+		    low_byte(currplayer_y) = 0;
+		    currplayer_vel_y = JIMSHEATBALL_JUMP_VEL;
+		}
+		if (cube_data[currplayer] & 1) cube_data[currplayer] &= 2;
+		jimsheatballx[1] = currplayer_x;
+		jimsheatbally[1] = currplayer_y;
+		jimsheatball_vel_x[1] = currplayer_vel_x;
+		jimsheatball_vel_y[1] = currplayer_vel_y;
+		
 	}
+	currplayer_x = player_x[currplayer];
+	currplayer_y = player_y[currplayer];
+	currplayer_vel_x = player_vel_x[currplayer];
+	currplayer_vel_y = player_vel_y[currplayer];
+		
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
 }	
