@@ -20,7 +20,7 @@ void ball_movement(void){
 		common_gravity_routine();
 
 		
-		currplayer_y += currplayer_vel_y;
+
 
 	}
 	else {		
@@ -31,7 +31,7 @@ void ball_movement(void){
 		common_gravity_routine();
 
 		
-		currplayer_y += currplayer_vel_y;
+
 
 
 	}

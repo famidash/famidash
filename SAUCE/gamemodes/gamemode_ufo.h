@@ -15,7 +15,7 @@ void ufo_movement(void){
 		common_gravity_routine();
 
 		
-		currplayer_y += currplayer_vel_y;
+
 
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);

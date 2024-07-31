@@ -106,10 +106,15 @@
 #define GRAVITY_1X_PORTAL			0x63
 #define RANDOM_MODE_PORTAL			0x64
 #define GREEN_PAD				0x65
+#define TELEPORT_PORTAL_UPWARDS_ENTER		0x66
+#define TELEPORT_PORTAL_DOWNWARDS_EXIT		0x67
+#define TELEPORT_PORTAL_DOWNWARDS_ENTER		0x68
+#define TELEPORT_PORTAL_UPWARDS_EXIT		0x69
 
 
 #define DEATH_CHANCE				0xDF
 
+#define TELEPORT_PORTAL_ENTER_EXTENSION		0xED
 #define MASK_SPRITES_ON				0xEE
 #define MASK_SPRITES_OFF			0xEF
 
@@ -300,6 +305,9 @@ char sprite_height_lookup(){
 		case DASH_GRAVITY_ORB_45DEG_UP:
 		case DASH_ORB_45DEG_DOWN:
 		case DASH_GRAVITY_ORB_45DEG_DOWN:
+		case TELEPORT_PORTAL_UPWARDS_ENTER:
+		case TELEPORT_PORTAL_DOWNWARDS_ENTER:
+		case TELEPORT_PORTAL_ENTER_EXTENSION:
 		case RED_ORB:
 		case D_BLOCK:
 		case S_BLOCK:
@@ -329,7 +337,8 @@ char sprite_height_lookup(){
 		case SPIDER_PAD_DOWN:
 			return 0x01;
 //            return 0x0F;
-
+		case TELEPORT_PORTAL_DOWNWARDS_EXIT:
+		case TELEPORT_PORTAL_UPWARDS_EXIT:		
 		case TELEPORT_PORTAL_EXIT:
 			teleport_output = activesprites_realy[index] + 0x10;
 			//intentional leak
@@ -598,6 +607,9 @@ void sprite_collide_lookup() {
 			currplayer_vel_y = 0;
 			orbed[currplayer] = 1;
 			cube_data[currplayer] &= 1;
+	case TELEPORT_PORTAL_UPWARDS_ENTER:
+	case TELEPORT_PORTAL_DOWNWARDS_ENTER:
+	case TELEPORT_PORTAL_ENTER_EXTENSION:
 	case TELEPORT_PORTAL_ENTER:
 			high_byte(currplayer_y) = teleport_output;
 			activesprites_activated[index]++;

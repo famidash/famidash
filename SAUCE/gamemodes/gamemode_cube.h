@@ -19,7 +19,7 @@ void cube_movement(void){
 	common_gravity_routine();
 
 	
-	currplayer_y += currplayer_vel_y;
+
 
 
 	Generic.x = high_byte(currplayer_x);
@@ -288,6 +288,7 @@ void common_gravity_routine(void) {
 				};
 			}
 		}
+		currplayer_y += currplayer_vel_y;
 	}
 	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
 	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
