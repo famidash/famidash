@@ -38,15 +38,12 @@ void draw_sprites(void){
 		// else if (long_temp_x < 10) {}
 	}
 
-	if (jimsheatballalive[0]) {
-		oam_meta_spr(jimsheatballx[0], high_byte(jimsheatbally[0]), Heat_Ball_Sprites[jimsheatballframe[0]]);		
-		jimsheatballframe[0] == 20 ? jimsheatballframe[0] = 0 : jimsheatballframe[0]++;
-		jimsheatballx[0] == 0xFF ? jimsheatballalive[0] = 0 : jimsheatballx[0]++;
-	}
-	if (jimsheatballalive[1]) {
-		oam_meta_spr(jimsheatballx[1], high_byte(jimsheatbally[1]), Heat_Ball_Sprites[jimsheatballframe[1]]);		
-		jimsheatballframe[1] == 20 ? jimsheatballframe[1] = 0 : jimsheatballframe[1]++;
-		jimsheatballx[1] == 0xFF ? jimsheatballalive[1] = 0 : jimsheatballx[1]++;
+	for (tmp9 = 0; tmp9 < 4; tmp9++) {
+		if (jimsheatballalive[tmp9]) {
+			oam_meta_spr(jimsheatballx[tmp9], high_byte(jimsheatbally[tmp9]), Heat_Ball_Sprites[jimsheatballframe[tmp9]]);		
+			jimsheatballframe[tmp9] == 20 ? jimsheatballframe[tmp9] = 0 : jimsheatballframe[tmp9]++;
+			jimsheatballx[tmp9] == 0xFF ? jimsheatballalive[tmp9] = 0 : jimsheatballx[tmp9]++;
+		}
 	}
 
 	

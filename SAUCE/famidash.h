@@ -88,7 +88,7 @@
 
 #define JIMSHEATBALL_MAX_FALLSPEED 0x300
 #define JIMSHEATBALL_GRAVITY 0x34
-#define JIMSHEATBALL_JUMP_VEL -0x290
+#define JIMSHEATBALL_JUMP_VEL -0x390
 
 #define COIN_1 0x01
 #define COIN_2 0x02
@@ -346,13 +346,13 @@ uint8_t iconbank;
 uint8_t dblocked[2];
 uint8_t gravity_mod;
 
-uint8_t jimsheatballalive[2]; //jims heatball shit
-uint16_t jimsheatballx[2]; //jims heatball shit
-uint16_t jimsheatbally[2];
-int16_t jimsheatball_vel_x[2];
-int16_t jimsheatball_vel_y[2];
+uint8_t jimsheatballalive[4]; //jims heatball shit
+uint16_t jimsheatballx[4]; //jims heatball shit
+uint16_t jimsheatbally[4];
+int16_t jimsheatball_vel_x[4];
+int16_t jimsheatball_vel_y[4];
 
-uint8_t jimsheatballframe[2];
+uint8_t jimsheatballframe[4];
 
 uint8_t player_old_posy[9];
 uint8_t discorefreshrate;
