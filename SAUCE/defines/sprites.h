@@ -1545,6 +1545,85 @@ const unsigned char Portal_Single[]={
 	0x80
 };
 
+const unsigned char Teleport_Portal_Horizontal_Upwards_Enter[]={
+
+
+	  0,  0,0x9C,0|OAM_FLIP_H,  
+	  8, 0,0x8E,0|OAM_FLIP_H,  
+	  16, 0,0x8C,0|OAM_FLIP_H,
+	  24, 0,0x8C,0,  
+
+	32, 0,0x8E,0,
+	40, 0,0x9C,0,  
+	0,8,0xE7,0|OAM_FLIP_H,
+	8,8,0xE5,0|OAM_FLIP_H,
+	16,8,0xE3,0|OAM_FLIP_H,
+	24,8,0xE3,0,
+	32,8,0xE5,0,
+	40,8,0xE7,0,
+
+	0x80
+};
+
+const unsigned char Teleport_Portal_Horizontal_Upwards_Exit[]={
+
+
+	  0,  0,0x9C,1|OAM_FLIP_H,  
+	  8, 0,0x8E,1|OAM_FLIP_H,  
+	  16, 0,0x8C,1|OAM_FLIP_H,
+	  24, 0,0x8C,1,  
+
+	32, 0,0x8E,1,
+	40, 0,0x9C,1,  
+	0,8,0xE7,1|OAM_FLIP_H,
+	8,8,0xE5,1|OAM_FLIP_H,
+	16,8,0xE3,1|OAM_FLIP_H,
+	24,8,0xE3,1,
+	32,8,0xE5,1,
+	40,8,0xE7,1,
+
+	0x80
+};
+
+const unsigned char Teleport_Portal_Horizontal_Downwards_Enter[]={
+
+
+	  0,  8,0x9C,0|OAM_FLIP_H|OAM_FLIP_V,  
+	  8, 8,0x8E,0|OAM_FLIP_H|OAM_FLIP_V,  
+	  16, 8,0x8C,0|OAM_FLIP_H|OAM_FLIP_V,
+	  24, 8,0x8C,0|OAM_FLIP_V,  
+
+	32, 8,0x8E,0|OAM_FLIP_V,
+	40, 8,0x9C,0|OAM_FLIP_V,  
+	0,0,0xE7,0|OAM_FLIP_H|OAM_FLIP_V,
+	8,0,0xE5,0|OAM_FLIP_H|OAM_FLIP_V,
+	16,0,0xE3,0|OAM_FLIP_H|OAM_FLIP_V,
+	24,0,0xE3,0|OAM_FLIP_V,
+	32,0,0xE5,0|OAM_FLIP_V,
+	40,0,0xE7,0|OAM_FLIP_V,
+
+	0x80
+};
+const unsigned char Teleport_Portal_Horizontal_Downwards_Exit[]={
+
+
+	  0,  8,0x9C,1|OAM_FLIP_H|OAM_FLIP_V,  
+	  8, 8,0x8E,1|OAM_FLIP_H|OAM_FLIP_V,  
+	  16, 8,0x8C,1|OAM_FLIP_H|OAM_FLIP_V,
+	  24, 8,0x8C,1|OAM_FLIP_V,  
+
+	32, 8,0x8E,1|OAM_FLIP_V,
+	40, 8,0x9C,1|OAM_FLIP_V,  
+	0,0,0xE7,1|OAM_FLIP_H|OAM_FLIP_V,
+	8,0,0xE5,1|OAM_FLIP_H|OAM_FLIP_V,
+	16,0,0xE3,1|OAM_FLIP_H|OAM_FLIP_V,
+	24,0,0xE3,1|OAM_FLIP_V,
+	32,0,0xE5,1|OAM_FLIP_V,
+	40,0,0xE7,1|OAM_FLIP_V,
+
+	0x80
+};
+
 const unsigned char Portal_Gravity_Down_Horizontal_Downwards[]={
 
 
@@ -2082,7 +2161,7 @@ const unsigned char Teleport_Square_Exit[]={
 const unsigned char Spider_Pad_Up[]={
 
 	  0, -8,0xE1,1,
-	  8, -8,0xE3,1|OAM_FLIP_H,
+	  8, -8,0xE1,1|OAM_FLIP_H,
 	0x80
 };
 
@@ -2110,7 +2189,7 @@ const unsigned char Spider_Pad_Up4[]={
 const unsigned char Spider_Pad_Down[]={
 
 	  0, -0,0xE1,1|OAM_FLIP_V,
-	  8, -0,0xE3,1|OAM_FLIP_H|OAM_FLIP_V,
+	  8, -0,0xE1,1|OAM_FLIP_H|OAM_FLIP_V,
 	0x80
 };
 
@@ -2572,6 +2651,10 @@ const unsigned char * const Metasprites[]={
 	Gravity_1x_Portal,
 	Portal_Gamemode_Cube,
 	Green_Jump_Pad,
+	Teleport_Portal_Horizontal_Upwards_Enter,
+	Teleport_Portal_Horizontal_Downwards_Exit,
+	Teleport_Portal_Horizontal_Downwards_Enter,
+	Teleport_Portal_Horizontal_Upwards_Exit,
 	};
 
 
@@ -2667,8 +2750,8 @@ const void* const animation_frame_list[] = {
 	RED_PAD_U_SPRITES,
 	NULL,
 	NULL,
-	SPIDER_PAD_UP_SPRITES,
-	SPIDER_PAD_DOWN_SPRITES,
+	NULL,
+	NULL,
 	NULL,
 	NULL,
 	NULL,
@@ -2683,6 +2766,11 @@ const void* const animation_frame_list[] = {
 	NULL,
 	RANDOM_GAMEMODE_PORTAL,
 	GREEN_PAD_SPRITES,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	
 };
 
 // Number of UNIQUE animation frames
@@ -2777,8 +2865,8 @@ const unsigned char animation_frame_length[] = {
 	sizeof(RED_PAD_U_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
 	0,
 	0,
-	sizeof(SPIDER_PAD_UP_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
-	sizeof(SPIDER_PAD_DOWN_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
+	0,
+	0,
 	0,
 	0,
 	0,
@@ -2793,6 +2881,9 @@ const unsigned char animation_frame_length[] = {
 	0,
 	sizeof(RANDOM_GAMEMODE_PORTAL) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
 	sizeof(GREEN_PAD_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
+	0,
+	0,
+	0,
 	0,
 };
 
