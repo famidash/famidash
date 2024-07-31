@@ -230,7 +230,7 @@ void cube_movement(void){
 			    currplayer_vel_y = JIMSHEATBALL_JUMP_VEL;
 			}
 
-		//	if (cube_data[currplayer] & 1) { jimsheatballalive[tmp9] = 0; cube_data[currplayer] &= 2; }
+			if (cube_data[currplayer] & 1) { cube_data[currplayer] &= 2; }
 			jimsheatballx[tmp9] = currplayer_x;
 			jimsheatbally[tmp9] = currplayer_y;
 			jimsheatball_vel_x[tmp9] = currplayer_vel_x;
