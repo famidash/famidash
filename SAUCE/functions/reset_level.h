@@ -67,14 +67,10 @@ void reset_level(void) {
 
     outline_color = 0x30;
 
-    jimsheatballalive[0] = 0;
-    jimsheatballalive[1] = 0;
-    jimsheatballalive[2] = 0;
-    jimsheatballalive[3] = 0;
-    jimsheatballalive[4] = 0;
-    jimsheatballalive[5] = 0;
-    jimsheatballalive[6] = 0;
-    jimsheatballalive[7] = 0;
+    for (tmp9 = 0; tmp9 < MAX_FIREBALLS; tmp9++) {
+
+	jimsheatballalive[tmp9] = 0;
+    }
 
     gravity_mod = 0;
     player_gravity[0] = 0x00;

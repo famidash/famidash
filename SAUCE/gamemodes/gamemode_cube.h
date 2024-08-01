@@ -164,61 +164,15 @@ void cube_movement(void){
 //jim's shit
 	if (retro_mode) {
 		if (pad_new[currplayer] & PAD_B && !has_practice_point) {
-			if (!jimsheatballalive[0]) {
-				jimsheatballalive[0] = 1;
-				jimsheatball_vel_y[0] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[0] = high_byte(old_x);
-				high_byte(jimsheatbally[0]) = high_byte(player_y[0]);
-				jimsheatballframe[0] = 0;
-			}
-			else if (!jimsheatballalive[1]) {
-				jimsheatballalive[1] = 1;
-				jimsheatball_vel_y[1] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[1] = high_byte(old_x);
-				high_byte(jimsheatbally[1]) = high_byte(player_y[0]);
-				jimsheatballframe[1] = 0;
-			}
-			else if (!jimsheatballalive[2]) {
-				jimsheatballalive[2] = 1;
-				jimsheatball_vel_y[2] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[2] = high_byte(old_x);
-				high_byte(jimsheatbally[2]) = high_byte(player_y[0]);
-				jimsheatballframe[2] = 0;
-			}
-			else if (!jimsheatballalive[3]) {
-				jimsheatballalive[3] = 1;
-				jimsheatball_vel_y[3] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[3] = high_byte(old_x);
-				high_byte(jimsheatbally[3]) = high_byte(player_y[0]);
-				jimsheatballframe[3] = 0;
-			}
-			else if (!jimsheatballalive[4]) {
-				jimsheatballalive[4] = 1;
-				jimsheatball_vel_y[4] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[4] = high_byte(old_x);
-				high_byte(jimsheatbally[4]) = high_byte(player_y[0]);
-				jimsheatballframe[4] = 0;
-			}
-			else if (!jimsheatballalive[5]) {
-				jimsheatballalive[5] = 1;
-				jimsheatball_vel_y[5] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[5] = high_byte(old_x);
-				high_byte(jimsheatbally[5]) = high_byte(player_y[0]);
-				jimsheatballframe[5] = 0;
-			}
-			else if (!jimsheatballalive[6]) {
-				jimsheatballalive[6] = 1;
-				jimsheatball_vel_y[6] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[6] = high_byte(old_x);
-				high_byte(jimsheatbally[6]) = high_byte(player_y[0]);
-				jimsheatballframe[6] = 0;
-			}
-			else if (!jimsheatballalive[7]) {
-				jimsheatballalive[7] = 1;
-				jimsheatball_vel_y[7] = JIMSHEATBALL_JUMP_VEL;
-				jimsheatballx[7] = high_byte(old_x);
-				high_byte(jimsheatbally[7]) = high_byte(player_y[0]);
-				jimsheatballframe[7] = 0;
+			for (tmp9 = 0; tmp9 < MAX_FIREBALLS; tmp9++) {
+				if (!jimsheatballalive[tmp9]) {
+					jimsheatballalive[tmp9] = 1;
+					jimsheatball_vel_y[tmp9] = JIMSHEATBALL_JUMP_VEL;
+					jimsheatballx[tmp9] = high_byte(old_x);
+					high_byte(jimsheatbally[tmp9]) = high_byte(player_y[0]);
+					jimsheatballframe[tmp9] = 0;
+					break;
+				}
 			}
 
 		}
@@ -231,7 +185,7 @@ void cube_movement(void){
 	player_vel_y[currplayer] = currplayer_vel_y;
 	player_gravity[currplayer] = currplayer_gravity;
 
-	for (tmp9 = 0; tmp9 < 8; tmp9++) {
+	for (tmp9 = 0; tmp9 < MAX_FIREBALLS; tmp9++) {
 	
 		if (jimsheatballalive[tmp9]) {
 

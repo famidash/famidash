@@ -346,13 +346,14 @@ uint8_t iconbank;
 uint8_t dblocked[2];
 uint8_t gravity_mod;
 
-uint8_t jimsheatballalive[8]; //jims heatball shit
-uint16_t jimsheatballx[8]; //jims heatball shit
-uint16_t jimsheatbally[8];
-int16_t jimsheatball_vel_x[8];
-int16_t jimsheatball_vel_y[8];
+#define MAX_FIREBALLS 16
 
-uint8_t jimsheatballframe[8];
+uint8_t jimsheatballalive[MAX_FIREBALLS]; //jims heatball shit
+uint16_t jimsheatballx[MAX_FIREBALLS]; //jims heatball shit
+uint16_t jimsheatbally[MAX_FIREBALLS];
+int16_t jimsheatball_vel_x[MAX_FIREBALLS];
+int16_t jimsheatball_vel_y[MAX_FIREBALLS];
+uint8_t jimsheatballframe[MAX_FIREBALLS];
 
 uint8_t player_old_posy[9];
 uint8_t discorefreshrate;
