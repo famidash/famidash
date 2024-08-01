@@ -167,7 +167,7 @@ void cube_movement(void){
 			for (tmp9 = 0; tmp9 < MAX_FIREBALLS; tmp9++) {
 				if (!jimsheatballalive[tmp9]) {
 					jimsheatballalive[tmp9] = 1;
-					if (pad[controllingplayer] & PAD_UP) jimsheatball_vel_y[tmp9] = (JIMSHEATBALL_JUMP_VEL * 3) / 2;
+					if (pad[controllingplayer] & PAD_UP) jimsheatball_vel_y[tmp9] = (JIMSHEATBALL_JUMP_VEL / 4) * 7;
 					else jimsheatball_vel_y[tmp9] = JIMSHEATBALL_JUMP_VEL;
 					jimsheatballx[tmp9] = high_byte(old_x);
 					high_byte(jimsheatbally[tmp9]) = high_byte(player_y[0]);
