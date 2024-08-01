@@ -8,54 +8,15 @@ void ship_movement(void){
 // currplayer_gravity
 	// currplayer_vel_y is signed
 	//if(currplayer_vel_y < 0x400){
-	if (!dashing[currplayer]) {
-			if(!currplayer_gravity){
-				if(currplayer_vel_y > SHIP_MAX_FALLSPEED){
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? -SHIP_GRAVITY : -MINI_SHIP_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? -SHIP_GRAVITY/3 : -MINI_SHIP_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? -SHIP_GRAVITY/2 : -MINI_SHIP_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? -SHIP_GRAVITY/3*2 : -MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -SHIP_GRAVITY*8/6 : -MINI_SHIP_GRAVITY*8/6; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? SHIP_GRAVITY : MINI_SHIP_GRAVITY; break;
-						case 1: currplayer_vel_y += !mini ? SHIP_GRAVITY/3 : MINI_SHIP_GRAVITY/3; break;
-						case 2: currplayer_vel_y += !mini ? SHIP_GRAVITY/2 : MINI_SHIP_GRAVITY/2; break;
-						case 3: currplayer_vel_y += !mini ? SHIP_GRAVITY/3*2 : MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y += !mini ? SHIP_GRAVITY*8/6 : MINI_SHIP_GRAVITY*8/6; break;
-					};
-				}
-			}
-			else{
-				if(currplayer_vel_y < -SHIP_MAX_FALLSPEED){
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y -= !mini ? -SHIP_GRAVITY : -MINI_SHIP_GRAVITY; break;
-						case 1: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/3 : -MINI_SHIP_GRAVITY/3; break;
-						case 2: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/2 : -MINI_SHIP_GRAVITY/2; break;
-						case 3: currplayer_vel_y -= !mini ? -SHIP_GRAVITY/3*2 : -MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? -SHIP_GRAVITY*8/6 : -MINI_SHIP_GRAVITY*8/6; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y -= !mini ? SHIP_GRAVITY : MINI_SHIP_GRAVITY; break;
-						case 1: currplayer_vel_y -= !mini ? SHIP_GRAVITY/3 : MINI_SHIP_GRAVITY/3; break;
-						case 2: currplayer_vel_y -= !mini ? SHIP_GRAVITY/2 : MINI_SHIP_GRAVITY/2; break;
-						case 3: currplayer_vel_y -= !mini ? SHIP_GRAVITY/3*2 : MINI_SHIP_GRAVITY/3*2; break;
-						case 4: currplayer_vel_y -= !mini ? SHIP_GRAVITY*8/6 : MINI_SHIP_GRAVITY*8/6; break;
-					};
-				}
-			}
+		fallspeed_big = SHIP_MAX_FALLSPEED;
+		fallspeed_mini = MINI_SHIP_MAX_FALLSPEED;
+		gravity_big = SHIP_GRAVITY;
+		gravity_mini = MINI_SHIP_GRAVITY;
+		common_gravity_routine();
+
 		if(currplayer_vel_y > (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED);
 		if(currplayer_vel_y < (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED);
-		currplayer_y += currplayer_vel_y;
-	}	
-	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
-	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
-	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
-	else currplayer_vel_y = 1;
+
 
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
