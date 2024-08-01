@@ -346,7 +346,7 @@ uint8_t iconbank;
 uint8_t dblocked[2];
 uint8_t gravity_mod;
 
-#define MAX_FIREBALLS 16
+#define MAX_FIREBALLS 20
 
 uint8_t jimsheatballalive[MAX_FIREBALLS]; //jims heatball shit
 uint16_t jimsheatballx[MAX_FIREBALLS]; //jims heatball shit
