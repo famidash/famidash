@@ -26,8 +26,8 @@ void reset_game_vars(){
 	practice_scroll_y = scroll_y;
 	practice_bg_color_type = lastbgcolortype;
 	practice_g_color_type = lastgcolortype;
-	gnd_palette_transition_timer = 0;		//palete fade code
-	bg_palette_transition_timer = 0;		//palette fade code
+//	gnd_palette_transition_timer = 0;		//palete fade code
+//	bg_palette_transition_timer = 0;		//palette fade code
 }
 
 

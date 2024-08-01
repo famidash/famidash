@@ -361,7 +361,7 @@ uint8_t discoframe;
 uint8_t no_parallax;
 uint8_t outline_color;
 uint8_t forced_trails;
-
+/*
 uint8_t gnd_palette_transition_timer;
 uint8_t original_gnd_palette_idx_0;
 uint8_t original_gnd_palette_idx_1;
@@ -377,7 +377,7 @@ uint8_t original_bg_palette_color_1;
 uint8_t original_bg_palette_color_2;
 
 uint8_t current_transition_timer_length;
-
+*/
 
 uint8_t kandowatchesyousleep;	//variable to say whether to go back to main menu or level select
 
