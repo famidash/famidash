@@ -71,6 +71,10 @@ void reset_level(void) {
     jimsheatballalive[1] = 0;
     jimsheatballalive[2] = 0;
     jimsheatballalive[3] = 0;
+    jimsheatballalive[4] = 0;
+    jimsheatballalive[5] = 0;
+    jimsheatballalive[6] = 0;
+    jimsheatballalive[7] = 0;
 
     gravity_mod = 0;
     player_gravity[0] = 0x00;

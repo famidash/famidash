@@ -192,6 +192,34 @@ void cube_movement(void){
 				high_byte(jimsheatbally[3]) = high_byte(player_y[0]);
 				jimsheatballframe[3] = 0;
 			}
+			else if (!jimsheatballalive[4]) {
+				jimsheatballalive[4] = 1;
+				jimsheatball_vel_y[4] = JIMSHEATBALL_JUMP_VEL;
+				jimsheatballx[4] = high_byte(old_x);
+				high_byte(jimsheatbally[4]) = high_byte(player_y[0]);
+				jimsheatballframe[4] = 0;
+			}
+			else if (!jimsheatballalive[5]) {
+				jimsheatballalive[5] = 1;
+				jimsheatball_vel_y[5] = JIMSHEATBALL_JUMP_VEL;
+				jimsheatballx[5] = high_byte(old_x);
+				high_byte(jimsheatbally[5]) = high_byte(player_y[0]);
+				jimsheatballframe[5] = 0;
+			}
+			else if (!jimsheatballalive[6]) {
+				jimsheatballalive[6] = 1;
+				jimsheatball_vel_y[6] = JIMSHEATBALL_JUMP_VEL;
+				jimsheatballx[6] = high_byte(old_x);
+				high_byte(jimsheatbally[6]) = high_byte(player_y[0]);
+				jimsheatballframe[6] = 0;
+			}
+			else if (!jimsheatballalive[7]) {
+				jimsheatballalive[7] = 1;
+				jimsheatball_vel_y[7] = JIMSHEATBALL_JUMP_VEL;
+				jimsheatballx[7] = high_byte(old_x);
+				high_byte(jimsheatbally[7]) = high_byte(player_y[0]);
+				jimsheatballframe[7] = 0;
+			}
 
 		}
 	}
@@ -203,7 +231,7 @@ void cube_movement(void){
 	player_vel_y[currplayer] = currplayer_vel_y;
 	player_gravity[currplayer] = currplayer_gravity;
 
-	for (tmp9 = 0; tmp9 < 4; tmp9++) {
+	for (tmp9 = 0; tmp9 < 8; tmp9++) {
 	
 		if (jimsheatballalive[tmp9]) {
 

@@ -38,7 +38,7 @@ void draw_sprites(void){
 		// else if (long_temp_x < 10) {}
 	}
 
-	for (tmp9 = 0; tmp9 < 4; tmp9++) {
+	for (tmp9 = 0; tmp9 < 8; tmp9++) {
 		if (jimsheatballalive[tmp9]) {
 			oam_meta_spr(jimsheatballx[tmp9], high_byte(jimsheatbally[tmp9]), Heat_Ball_Sprites[jimsheatballframe[tmp9]]);		
 			jimsheatballframe[tmp9] == 20 ? jimsheatballframe[tmp9] = 0 : jimsheatballframe[tmp9]++;

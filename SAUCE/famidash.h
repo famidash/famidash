@@ -346,13 +346,13 @@ uint8_t iconbank;
 uint8_t dblocked[2];
 uint8_t gravity_mod;
 
-uint8_t jimsheatballalive[4]; //jims heatball shit
-uint16_t jimsheatballx[4]; //jims heatball shit
-uint16_t jimsheatbally[4];
-int16_t jimsheatball_vel_x[4];
-int16_t jimsheatball_vel_y[4];
+uint8_t jimsheatballalive[8]; //jims heatball shit
+uint16_t jimsheatballx[8]; //jims heatball shit
+uint16_t jimsheatbally[8];
+int16_t jimsheatball_vel_x[8];
+int16_t jimsheatball_vel_y[8];
 
-uint8_t jimsheatballframe[4];
+uint8_t jimsheatballframe[8];
 
 uint8_t player_old_posy[9];
 uint8_t discorefreshrate;
