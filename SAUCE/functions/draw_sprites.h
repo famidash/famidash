@@ -22,6 +22,10 @@ void draw_sprites(void){
 			if (kandoframecnt & 0x01) { drawplayertwo(); drawplayerone(); }
 			else { drawplayerone(); drawplayertwo(); }
 		}
+		else if (bigboi) { drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; high_byte(player_y[0]) += 15; }
+		else if (longmode && !tallmode) { drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; }
+		else if (tallmode && !longmode) { drawplayerone(); high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_y[0]) += 15; }
+		else if (tallmode && longmode) { drawplayerone(); high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_y[0]) += 15; high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; }
 		else drawplayerone();
 	}
 	// the level sprites

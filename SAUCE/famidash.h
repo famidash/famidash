@@ -264,6 +264,7 @@ uint8_t coins;
 uint8_t currplayer;
 uint8_t kandotemp;
 uint8_t kandotemp2[2];
+uint8_t kandotemp3;
 uint8_t kandotemp5;
 uint8_t kandoframecnt;
 uint32_t attempts;
@@ -345,6 +346,9 @@ uint8_t lastbgcolortype;
 uint8_t iconbank;
 uint8_t dblocked[2];
 uint8_t gravity_mod;
+uint8_t longmode;
+uint8_t tallmode;
+uint8_t bigboi;
 
 #define MAX_FIREBALLS 20
 

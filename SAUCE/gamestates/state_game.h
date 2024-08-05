@@ -54,6 +54,8 @@ const uint8_t G_Table[]={
 #define test3  0x10
 #define test4  0X11
 
+void runthecolls();
+
 void x_movement_coll() {
 	if (slope_type && !slope_frames && gamemode != 6) {
 	// we we're on an slope and now we aren't, so push the player upwards a bit
@@ -296,22 +298,19 @@ void state_game(){
 	//       mmc3_set_1kb_chr_bank_2(parallax_scroll_x);
 	//     mmc3_set_1kb_chr_bank_3(saw_set[level]);
 		//}
+		
 		if (!retro_mode) {
-			if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
-			else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(22);
-			else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(iconbank);
-			else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(iconbank);
-			else mmc3_set_2kb_chr_bank_0(18);
+			tmp6 = 18; tmp7 = 22; tmp8 = iconbank;
 		}
 		else {
-			if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);			
-			else if (mini && gamemode != 0 || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(24);
-			else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(38);
-			else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(38);
-			else mmc3_set_2kb_chr_bank_0(20);
+			tmp6 = 20; tmp7 = 24; tmp8 = 38;
 		}
-	//	else mmc3_set_2kb_chr_bank_0(28);
-	//
+		
+		if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
+		else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(tmp7);
+		else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(tmp8);
+		else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(tmp8);
+		else mmc3_set_2kb_chr_bank_0(tmp6);
 
 
 
@@ -466,19 +465,65 @@ void state_game(){
 		
 		movement();
 
-		mmc3_set_prg_bank_1(GET_BANK(x_movement_coll));
-		x_movement_coll();
-		
-		mmc3_set_prg_bank_1(GET_BANK(x_movement));
-		x_movement();
-		
-		mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
-		sprite_collide();
+		kandotemp3 = 0;
 
-		if (!DEBUG_MODE && !invincible_counter) {
-			if ((dual && (kandoframecnt & 0x01)) || !dual)
-				bg_coll_death();
+		runthecolls();
+		
+		kandotemp3 = 1;
+		
+		if (bigboi) {
+				high_byte(player_x[0]) += 15;
+				high_byte(currplayer_x) += 15;
+
+				runthecolls();
+				
+				high_byte(player_x[0]) -= 15;
+				high_byte(currplayer_x) -= 15;
+
+				high_byte(player_y[0]) -= 15;
+				high_byte(currplayer_y) -= 15;
+
+			
+				runthecolls();
+
+				high_byte(player_x[0]) += 15;
+				high_byte(currplayer_x) += 15;
+
+				runthecolls();
+
+				high_byte(player_x[0]) -= 15;
+				high_byte(currplayer_x) -= 15;
+
+				high_byte(player_y[0]) += 15;
+				high_byte(currplayer_y) += 15;
+
+		}			
+			
+		else {
+			if (longmode) {
+
+				high_byte(player_x[0]) += 15;
+				high_byte(currplayer_x) += 15;
+
+				runthecolls();
+				
+				high_byte(player_x[0]) -= 15;
+				high_byte(currplayer_x) -= 15;
+
+			}
+			if (tallmode) {
+
+				high_byte(player_y[0]) -= 15;
+				high_byte(currplayer_y) -= 15;
+
+				runthecolls();
+
+				high_byte(player_y[0]) += 15;
+				high_byte(currplayer_y) += 15;
+
+			}
 		}
+
 		if (invincible_counter) invincible_counter--;
 
 		//if (DEBUG_MODE) color_emphasis(COL_EMP_RED);
@@ -520,18 +565,9 @@ void state_game(){
 			mmc3_set_prg_bank_1(GET_BANK(movement));
 			movement();
 
-			if (!DEBUG_MODE) {
-				if (!invincible_counter) bg_coll_death();
-			}
-
+			runthecolls();
 			mmc3_set_prg_bank_1(GET_BANK(do_the_scroll_thing2));
-			// x_movement();
-			x_movement_coll();
-
 			do_the_scroll_thing2();
-
-			mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
-			sprite_collide();
 	//		if(!DEBUG_MODE && cube_data[1] & 0x01) {
 	//			reset_level();
 	//		}
@@ -568,13 +604,31 @@ void state_game(){
  //       color_emphasis(0);
 
         if (DEBUG_MODE) gray_line();
-		if (!DEBUG_MODE) {
-			if (high_byte(player_x[0]) > 0x20) {
-				if (cube_data[0] & 1 || cube_data[1] & 1) reset_level();
-			} else cube_data[0] = cube_data[1] = 0;
-		}
+	if (!DEBUG_MODE) {
+		if (high_byte(player_x[0]) > 0x20) {
+			if (cube_data[0] & 1 || cube_data[1] & 1) reset_level();
+		} else cube_data[0] = cube_data[1] = 0;
+	}
         if (gameState != 0x02) return;
     }
     
 }
+
+void runthecolls() {
+	mmc3_set_prg_bank_1(GET_BANK(x_movement_coll));
+	x_movement_coll();
+
+	if (!kandotemp3) {
+		mmc3_set_prg_bank_1(GET_BANK(x_movement));
+		x_movement();
+	}	
+	mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
+	sprite_collide();
+
+		
+	if (!DEBUG_MODE && !invincible_counter) {
+		if ((dual && (kandoframecnt & 0x01)) || !dual)
+			bg_coll_death();
+	}
+}				
 
