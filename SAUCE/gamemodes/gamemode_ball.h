@@ -51,18 +51,15 @@ void ball_movement(void){
 	ball_eject();
 
 	if (bigboi) {
-			Generic.x = high_byte(currplayer_x);
-			Generic.y = high_byte(currplayer_y) - 15;
+			Generic.y -= 15;
 
 			ball_eject();
 		
-			Generic.x = high_byte(currplayer_x) + 15;
-			Generic.y = high_byte(currplayer_y);
-
+			Generic.x += 15;
+			
 			ball_eject();
 		
-			Generic.x = high_byte(currplayer_x) + 15;
-			Generic.y = high_byte(currplayer_y) - 15;
+			Generic.y += 15;
 
 			ball_eject();
 	}

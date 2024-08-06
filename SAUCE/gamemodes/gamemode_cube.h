@@ -45,22 +45,19 @@ void cube_movement(void){
 	
 
 	if (bigboi) {
-		Generic.x = high_byte(currplayer_x) + 15;
-		Generic.y = high_byte(currplayer_y);
+		Generic.x += 15;
 
 		cube_eject();
 
-		Generic.x = high_byte(currplayer_x);
-		Generic.y = high_byte(currplayer_y) - 15;
+		Generic.y -= 15;
 
 		cube_eject();
 		
-		Generic.x = high_byte(currplayer_x) + 15;
-		Generic.y = high_byte(currplayer_y) - 15;
+		Generic.x -= 15;
 		
 		cube_eject();
 	}
-		
+
 	else {
 		if (longmode) {
 
