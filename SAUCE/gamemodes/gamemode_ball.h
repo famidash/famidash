@@ -67,16 +67,14 @@ void ball_movement(void){
 	else {
 		if (tallmode) {
 			
-			Generic.x = high_byte(currplayer_x);
-
 			// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
-			Generic.y = high_byte(currplayer_y) - 15;
+			Generic.y -= 15;
 
 			ball_eject();
 		}	
 		if (longmode) {
 			
-			Generic.x = high_byte(currplayer_x) + 15;
+			Generic.x += 15;
 
 			// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
 			Generic.y = high_byte(currplayer_y);

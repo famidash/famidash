@@ -4,19 +4,15 @@
 
 void ufo_ship_eject();
 void ship_movement(void){
-// handle y
 
-// currplayer_gravity
-	// currplayer_vel_y is signed
-	//if(currplayer_vel_y < 0x400){
-		fallspeed_big = SHIP_MAX_FALLSPEED;
-		fallspeed_mini = MINI_SHIP_MAX_FALLSPEED;
-		gravity_big = SHIP_GRAVITY;
-		gravity_mini = MINI_SHIP_GRAVITY;
-		common_gravity_routine();
+	fallspeed_big = SHIP_MAX_FALLSPEED;
+	fallspeed_mini = MINI_SHIP_MAX_FALLSPEED;
+	gravity_big = SHIP_GRAVITY;
+	gravity_mini = MINI_SHIP_GRAVITY;
+	common_gravity_routine();
 
-		if(currplayer_vel_y > (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED);
-		if(currplayer_vel_y < (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED);
+	if(currplayer_vel_y > (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? SHIP_MAX_FALLSPEED : MINI_SHIP_MAX_FALLSPEED);
+	if(currplayer_vel_y < (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED)) currplayer_vel_y = (!mini ? -SHIP_MAX_FALLSPEED : -MINI_SHIP_MAX_FALLSPEED);
 
 
 	Generic.x = high_byte(currplayer_x);
@@ -36,12 +32,11 @@ void ship_movement(void){
 	}
 	else {
 		if (tallmode) {
-			Generic.x = high_byte(currplayer_x);
 			Generic.y = high_byte(currplayer_y) - 15;
 			ufo_ship_eject();
 		}	
 		if (longmode) {
-			Generic.x = high_byte(currplayer_x)+15;
+			Generic.x += 15;
 			Generic.y = high_byte(currplayer_y);
 			ufo_ship_eject();
 		}	

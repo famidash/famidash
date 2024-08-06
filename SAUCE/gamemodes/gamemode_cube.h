@@ -61,15 +61,14 @@ void cube_movement(void){
 	else {
 		if (longmode) {
 
-			Generic.x = high_byte(currplayer_x) + 15;
-			Generic.y = high_byte(currplayer_y);
+			Generic.x += 15;
 			
 			cube_eject();
 		}
 		
 		if (tallmode) {
 			Generic.x = high_byte(currplayer_x);
-			Generic.y = high_byte(currplayer_y) - 15;
+			Generic.y -= 15;
 			
 			cube_eject();
 		}		
@@ -286,7 +285,7 @@ void common_gravity_routine(void) {
 					case 4: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big*2 : gravity_big*2) : (currplayer_gravity ? -gravity_mini*2 : gravity_mini*2); break;
 				};
 		}
-	currplayer_y += currplayer_vel_y;
+		currplayer_y += currplayer_vel_y;
 	}
 	
 	

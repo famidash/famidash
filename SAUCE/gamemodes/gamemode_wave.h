@@ -38,7 +38,6 @@ void wave_movement(void){
 	wave_eject();
 	
 	if (bigboi) {
-		Generic.x = high_byte(currplayer_x);
 		Generic.y = high_byte(currplayer_y) - 15 + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
 		wave_eject();		
 		Generic.x = high_byte(currplayer_x) + 15;
@@ -51,13 +50,12 @@ void wave_movement(void){
 	
 	else {
 		if (longmode) {
-			Generic.x = high_byte(currplayer_x) + 15;
-			Generic.y = high_byte(currplayer_y) + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+			Generic.x += 15;
 			wave_eject();				
 		}
 		if (tallmode) {
 			Generic.x = high_byte(currplayer_x);
-			Generic.y = high_byte(currplayer_y) - 15 + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+			Generic.y -= 15;
 			wave_eject();				
 		}
 	}
