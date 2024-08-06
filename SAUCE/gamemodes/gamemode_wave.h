@@ -54,6 +54,7 @@ void wave_movement(void){
 		}
 	}
 
+	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
 
 	if (currplayer_vel_y != 0 && !slope_type){
