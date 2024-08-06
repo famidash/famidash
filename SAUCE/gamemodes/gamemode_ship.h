@@ -2,6 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
+void ship_eject();
 void ship_movement(void){
 // handle y
 
