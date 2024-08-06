@@ -2,6 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
+void ball_eject();
 void common_gravity_routine();
 void ball_movement(void){
 // handle y
@@ -47,47 +48,45 @@ void ball_movement(void){
 
 	if (pad_new[controllingplayer] & PAD_A) uint8_store(cube_data, currplayer, cube_data[currplayer] | 2);	
 
-	if(high_byte(currplayer_vel_y) & 0x80){
-		if(bg_coll_U()){ // check collision above
-			high_byte(currplayer_y) = high_byte(currplayer_y) - eject_U;
-			currplayer_vel_y = 0;
-			uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);			//fix for orb
-		}
-	}
-	else{
-		if(bg_coll_D()){ // check collision below
-		    high_byte(currplayer_y) = high_byte(currplayer_y) - eject_D;
-		    currplayer_vel_y = 0;
-			uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);		    //fix for orb
-		}
-	}
-	
-	if (tallmode) {
+	ball_eject();
+
+	if (bigboi) {
+			Generic.x = high_byte(currplayer_x);
+			Generic.y = high_byte(currplayer_y) - 15;
+
+			ball_eject();
 		
-		Generic.x = high_byte(currplayer_x);
+			Generic.x = high_byte(currplayer_x) + 15;
+			Generic.y = high_byte(currplayer_y);
 
-		// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
-		Generic.y = high_byte(currplayer_y) - 15;
+			ball_eject();
+		
+			Generic.x = high_byte(currplayer_x) + 15;
+			Generic.y = high_byte(currplayer_y) - 15;
 
-		if (pad_new[controllingplayer] & PAD_A) uint8_store(cube_data, currplayer, cube_data[currplayer] | 2);	
-
-		if(high_byte(currplayer_vel_y) & 0x80){
-			if(bg_coll_U()){ // check collision above
-				high_byte(currplayer_y) = high_byte(currplayer_y) - eject_U;
-				currplayer_vel_y = 0;
-				uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);			//fix for orb
-			}
-		}
-		else{
-			if(bg_coll_D()){ // check collision below
-			    high_byte(currplayer_y) = high_byte(currplayer_y) - eject_D;
-			    currplayer_vel_y = 0;
-				uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);		    //fix for orb
-			}
-		}		
-			
+			ball_eject();
 	}
 
+	else {
+		if (tallmode) {
+			
+			Generic.x = high_byte(currplayer_x);
+
+			// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
+			Generic.y = high_byte(currplayer_y) - 15;
+
+			ball_eject();
+		}	
+		if (longmode) {
+			
+			Generic.x = high_byte(currplayer_x) + 15;
+
+			// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
+			Generic.y = high_byte(currplayer_y);
+
+			ball_eject();
+		}
+	}
 	Generic.x = high_byte(currplayer_x);
 
 	// this literally offsets the collision down 1 pixel for the vel reset to happen every frame instead of each other frame
@@ -123,6 +122,24 @@ void ball_movement(void){
 
 }
 
+void ball_eject() {
+	
+		if(high_byte(currplayer_vel_y) & 0x80){
+			if(bg_coll_U()){ // check collision above
+				high_byte(currplayer_y) = high_byte(currplayer_y) - eject_U;
+				currplayer_vel_y = 0;
+				uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);			//fix for orb
+			}
+		}
+		else{
+			if(bg_coll_D()){ // check collision below
+			    high_byte(currplayer_y) = high_byte(currplayer_y) - eject_D;
+			    currplayer_vel_y = 0;
+				uint8_store(cube_data, currplayer, cube_data[currplayer] & 1);		    //fix for orb
+			}
+		}		
+
+}	
 
 #pragma code-name(pop)
 #pragma data-name(pop) 
