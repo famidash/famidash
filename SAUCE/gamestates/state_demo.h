@@ -61,7 +61,6 @@ const unsigned char palette_Credits[16]={ 0x11,0x0f,0x10,0x30,0x11,0x0f,0x2a,0x3
 void state_demo(){
     ppu_off();
 	pal_bright(0);
-
     
     pal_bg(palette_Credits);
 	

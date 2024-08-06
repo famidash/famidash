@@ -71,19 +71,10 @@ void main(){
 
 					kandowatchesyousleep = 1;
 
-					//	mmc3_set_prg_bank_1(GET_BANK(state_menu));
-
 					if (kandotemp == 0) music_play(song_menu_theme);
-
-					settingvalue = 0;
-
 					has_practice_point = 0;
-
 					#include "defines/mainmenu_charmap.h"
-					
-
 					oam_clear();	
-
 					levelselection();
 				}
 					break;

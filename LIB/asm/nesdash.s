@@ -1192,7 +1192,7 @@ found_bank:
 			LDA	music_data_locations_hi-FIRST_MUSIC_BANK, Y
 			TAY
 		.endif
-        LDA #$01
+        LDA NTSC_MODE
         JSR famistudio_init
     :
     PLA
@@ -2758,21 +2758,21 @@ SampleRate:
 	rts
 
 load_lo:
-	.byte	<__DATA_LOAD__,	<__SFX_LOAD__
+	.byte	<__DATA_LOAD__ ;,	<__SFX_LOAD__
 load_hi:
-	.byte	>__DATA_LOAD__,	>__SFX_LOAD__
+	.byte	>__DATA_LOAD__ ;,	>__SFX_LOAD__
 
 run_lo:
-	.byte	<__DATA_RUN__,	<__SFX_RUN__
+	.byte	<__DATA_RUN__ ;,	<__SFX_RUN__
 run_hi:
-	.byte	>__DATA_RUN__,	>__SFX_RUN__
+	.byte	>__DATA_RUN__ ;,	>__SFX_RUN__
 
 size_lo:
-	.byte	<__DATA_SIZE__,	<__SFX_SIZE__
+	.byte	<__DATA_SIZE__ ;,	<__SFX_SIZE__
 size_hi:
-	.byte	>__DATA_SIZE__,	>__SFX_SIZE__
+	.byte	>__DATA_SIZE__ ;,	>__SFX_SIZE__
 
 bank:
-	.byte	<__DATA_LOAD_BANK__,	<__SFX_LOAD_BANK__
+	.byte	<__DATA_LOAD_BANK__ ;,	<__SFX_LOAD_BANK__
 
 .endproc
