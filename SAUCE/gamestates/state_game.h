@@ -2,6 +2,8 @@
 	Calls the movement routine of the current gamemode
 	Implemented in asm
 */
+void set_player_banks();
+void set_tile_banks();
 void __fastcall__ movement(void);
 void __fastcall__ movement2(void);
 
@@ -115,19 +117,9 @@ void state_game(){
 //	lastgcolortype = 0xFF;
 	lastbgcolortype = 0xFF;
 
-	if (!no_parallax) {
-		mmc3_set_1kb_chr_bank_0(spike_set[level] + (parallax_scroll_x & 1));
-		mmc3_set_1kb_chr_bank_1(block_set[level] + (parallax_scroll_x & 1));	//tile graphics
-		mmc3_set_1kb_chr_bank_2(parallax_scroll_x + GET_BANK(PARALLAX_CHR));
-		mmc3_set_1kb_chr_bank_3(saw_set[level] + (parallax_scroll_x & 1));
-	}
-	else {
-		mmc3_set_1kb_chr_bank_0(spike_set[level]);
-		mmc3_set_1kb_chr_bank_1(block_set[level]);	//tile graphics
-		mmc3_set_1kb_chr_bank_2(SLOPESA);
-		mmc3_set_1kb_chr_bank_3(saw_set[level]);
-	}
-    ppu_off();
+	set_tile_banks();
+	
+	ppu_off();
 
 //	twoplayer = 1;
 
@@ -286,12 +278,7 @@ void state_game(){
 		if (slowmode && (kandoframecnt & 1)) { ppu_wait_nmi(); }
 		else {
 			ppu_wait_nmi();
-			if (!no_parallax) {
-			mmc3_set_1kb_chr_bank_0(spike_set[level] + (parallax_scroll_x & 1));
-			mmc3_set_1kb_chr_bank_1(block_set[level] + (parallax_scroll_x & 1));	//tile graphics
-			mmc3_set_1kb_chr_bank_2(parallax_scroll_x + GET_BANK(PARALLAX_CHR));
-			mmc3_set_1kb_chr_bank_3(saw_set[level] + (parallax_scroll_x & 1));
-		}
+			set_tile_banks();
 	//	else {
 	//     mmc3_set_1kb_chr_bank_0(spike_set[level]);
 		//    mmc3_set_1kb_chr_bank_1(block_set[level]);	//tile graphics
@@ -299,20 +286,7 @@ void state_game(){
 	//     mmc3_set_1kb_chr_bank_3(saw_set[level]);
 		//}
 		
-		if (!retro_mode) {
-			tmp6 = 18; tmp7 = 22; tmp8 = iconbank;
-		}
-		else {
-			tmp6 = 20; tmp7 = 24; tmp8 = 38;
-		}
-		
-		if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
-		else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(tmp7);
-		else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(tmp8);
-		else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(tmp8);
-		else mmc3_set_2kb_chr_bank_0(tmp6);
-
-
+		set_player_banks();
 
         
 
@@ -409,11 +383,7 @@ void state_game(){
 					gamemode == 8 ? gamemode = 0 : gamemode++;
 					ppu_off();
 					//one_vram_buffer(0xf5+gamemode, NTADR_A(18,15));	
-					if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
-					else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(22);
-					else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(iconbank);
-					else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(iconbank);
-					else mmc3_set_2kb_chr_bank_0(18);
+					set_player_banks();
 					oam_clear();
 					mmc3_set_prg_bank_1(GET_BANK(drawplayerone));	
 					drawplayerone();
@@ -636,3 +606,33 @@ void runthecolls() {
 	}
 }				
 
+void set_player_banks() {
+		if (!retro_mode) {
+			tmp6 = 18; tmp7 = 22; tmp8 = iconbank;
+		}
+		else {
+			tmp6 = 20; tmp7 = 24; tmp8 = 38;
+		}
+		
+		if (gamemode == 8) mmc3_set_2kb_chr_bank_0(NINJABANK);
+		else if ((mini && gamemode != 0) || (gamemode == 7)) mmc3_set_2kb_chr_bank_0(tmp7);
+		else if (mini && gamemode == 0) mmc3_set_2kb_chr_bank_0(tmp8);
+		else if (gamemode == 0 || gamemode == 1 || gamemode == 3) mmc3_set_2kb_chr_bank_0(tmp8);
+		else mmc3_set_2kb_chr_bank_0(tmp6);
+
+}	
+
+void set_tile_banks() {
+	if (!no_parallax) {
+		mmc3_set_1kb_chr_bank_0(spike_set[level] + (parallax_scroll_x & 1));
+		mmc3_set_1kb_chr_bank_1(block_set[level] + (parallax_scroll_x & 1));	//tile graphics
+		mmc3_set_1kb_chr_bank_2(parallax_scroll_x + GET_BANK(PARALLAX_CHR));
+		mmc3_set_1kb_chr_bank_3(saw_set[level] + (parallax_scroll_x & 1));
+	}
+	else {
+		mmc3_set_1kb_chr_bank_0(spike_set[level]);
+		mmc3_set_1kb_chr_bank_1(block_set[level]);	//tile graphics
+		mmc3_set_1kb_chr_bank_2(SLOPESA);
+		mmc3_set_1kb_chr_bank_3(saw_set[level]);
+	}
+}	
