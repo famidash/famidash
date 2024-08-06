@@ -268,46 +268,28 @@ void cube_movement(void){
 
 void common_gravity_routine(void) {
 	if (!dashing[currplayer]) {
-		if(!currplayer_gravity){
-			if(currplayer_vel_y > (!mini ? fallspeed_big : fallspeed_mini)) {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? -gravity_big : -gravity_mini; break;
-						case 1: currplayer_vel_y += !mini ? -gravity_big/3 : -gravity_mini/3; break;
-						case 2: currplayer_vel_y += !mini ? -gravity_big/2 : -gravity_mini/2; break;
-						case 3: currplayer_vel_y += !mini ? -gravity_big/3*2 : -gravity_mini/3*2; break;
-						case 4: currplayer_vel_y += !mini ? -gravity_big*2 : -gravity_mini*2; break;
-					};
-				} else {
-					switch (gravity_mod) {
-						case 0: currplayer_vel_y += !mini ? gravity_big : gravity_mini; break;
-						case 1: currplayer_vel_y += !mini ? gravity_big/3 : gravity_mini/3; break;
-						case 2: currplayer_vel_y += !mini ? gravity_big/2 : gravity_mini/2; break;
-						case 3: currplayer_vel_y += !mini ? gravity_big/3*2 : gravity_mini/3*2; break;
-						case 4: currplayer_vel_y += !mini ? gravity_big*2 : gravity_mini*2; break;
-					};
-				}
-		}
-		else{
-			if(currplayer_vel_y < (!mini ? -fallspeed_big : -fallspeed_mini)) {
+		if(!currplayer_gravity ? (currplayer_vel_y > (!mini ? fallspeed_big : fallspeed_mini)) : (currplayer_vel_y < (!mini ? -fallspeed_big : -fallspeed_mini))){
 				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? -gravity_big : -gravity_mini; break;
-					case 1: currplayer_vel_y -= !mini ? -gravity_big/3 : -gravity_mini/3; break;
-					case 2: currplayer_vel_y -= !mini ? -gravity_big/2 : -gravity_mini/2; break;
-					case 3: currplayer_vel_y -= !mini ? -gravity_big/3*2 : -gravity_mini/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? -gravity_big*2 : -gravity_mini*2; break;
+					case 0: currplayer_vel_y += !mini ? (!currplayer_gravity ? -gravity_big : gravity_big) : (!currplayer_gravity ? -gravity_mini : gravity_mini); break;
+					case 1: currplayer_vel_y += !mini ? (!currplayer_gravity ? -gravity_big/3 : gravity_big/3) : (!currplayer_gravity ? -gravity_mini/3 : gravity_mini/3); break;
+					case 2: currplayer_vel_y += !mini ? (!currplayer_gravity ? -gravity_big/2 : gravity_big/2) : (!currplayer_gravity ? -gravity_mini/2 : gravity_mini/2); break;
+					case 3: currplayer_vel_y += !mini ? (!currplayer_gravity ? -gravity_big/3*2 : gravity_big/3*2) : (!currplayer_gravity ? -gravity_mini/3*2 : gravity_mini/3*2); break;
+					case 4: currplayer_vel_y += !mini ? (!currplayer_gravity ? -gravity_big*2 : gravity_big*2) : (!currplayer_gravity ? -gravity_mini*2 : gravity_mini*2); break;
 				};
-			} else {
-				switch (gravity_mod) {
-					case 0: currplayer_vel_y -= !mini ? gravity_big : gravity_mini; break;
-					case 1: currplayer_vel_y -= !mini ? gravity_big/3 : gravity_mini/3; break;
-					case 2: currplayer_vel_y -= !mini ? gravity_big/2 : gravity_mini/2; break;
-					case 3: currplayer_vel_y -= !mini ? gravity_big/3*2 : gravity_mini/3*2; break;
-					case 4: currplayer_vel_y -= !mini ? gravity_big*2 : gravity_mini*2; break;
-				};
-			}
 		}
-		currplayer_y += currplayer_vel_y;
+		else {
+				switch (gravity_mod) {
+					case 0: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big : gravity_big) : (currplayer_gravity ? -gravity_mini : gravity_mini); break;
+					case 1: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big/3 : gravity_big/3) : (currplayer_gravity ? -gravity_mini/3 : gravity_mini/3); break;
+					case 2: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big/2 : gravity_big/2) : (currplayer_gravity ? -gravity_mini/2 : gravity_mini/2); break;
+					case 3: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big/3*2 : gravity_big/3*2) : (currplayer_gravity ? -gravity_mini/3*2 : gravity_mini/3*2); break;
+					case 4: currplayer_vel_y += !mini ? (currplayer_gravity ? -gravity_big*2 : gravity_big*2) : (currplayer_gravity ? -gravity_mini*2 : gravity_mini*2); break;
+				};
+		}
+	currplayer_y += currplayer_vel_y;
 	}
+	
+	
 	else if (dashing[currplayer] == 2) { currplayer_vel_y = -currplayer_vel_x; currplayer_y += currplayer_vel_y; }
 	else if (dashing[currplayer] == 3) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
 	else if (dashing[currplayer] == 4) { currplayer_vel_y = currplayer_vel_x; currplayer_y -= currplayer_vel_y; }	
