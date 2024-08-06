@@ -283,6 +283,14 @@ char sprite_height_lookup(){
 			forced_trails = 0;
 			activesprites_type[index] = 0xFF;
 			return 0x00;
+		case PLAYER_TRAILS_ON:
+			forced_trails = 2;
+			activesprites_type[index] = 0xFF;
+			return 0x00;
+		case PLAYER_TRAILS_OFF:
+			forced_trails = 0;
+			activesprites_type[index] = 0xFF;
+			return 0x00;
 		case GRAVITY_PAD_DOWN_INVISIBLE:
 		case GRAVITY_PAD_UP_INVISIBLE:
 			return 0x07;

@@ -196,7 +196,7 @@ void state_game(){
 
 		}		    
 
-		if (trails || forced_trails || gamemode == 6) {
+	//	if (trails || forced_trails || gamemode == 6) {
 			if (!(kandoframecnt & 0x01)) {
 				if (old_scroll_y >= scroll_y) {
 					tmp6 = sub_scroll_y_ext(scroll_y, old_scroll_y);
@@ -212,7 +212,7 @@ void state_game(){
 				player_old_posy[0] = high_byte(player_y[0]);
 				old_scroll_y = scroll_y;
 			}
-		}
+	//	}
 	    if (discomode && !(kandoframecnt & discorefreshrate)) {
 
 
