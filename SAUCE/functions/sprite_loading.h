@@ -110,7 +110,7 @@
 #define TELEPORT_PORTAL_DOWNWARDS_EXIT		0x67
 #define TELEPORT_PORTAL_DOWNWARDS_ENTER		0x68
 #define TELEPORT_PORTAL_UPWARDS_EXIT		0x69
-
+#define TALLBOI_MODE_ENTER			0x6A
 
 #define DEATH_CHANCE				0xDF
 
@@ -345,6 +345,7 @@ char sprite_height_lookup(){
 		case SPIDER_MODE:
 		case SINGLE_PORTAL:
 		case DUAL_PORTAL:
+		case TALLBOI_MODE_ENTER:
 		case GRAVITY_DOWN_PORTAL:
 		case GRAVITY_UP_PORTAL:
 		case MINI_PORTAL:
@@ -583,6 +584,7 @@ void sprite_collide_lookup() {
 	case J_BLOCK: jblocked[currplayer] = 1; return;
 	case D_BLOCK: dblocked[currplayer] = 1; return;
 	case F_BLOCK: fblocked[currplayer] = 1; return;
+	case TALLBOI_MODE_ENTER: tallmode = 1; return;
 	case GRAVITY_1X_PORTAL: gravity_mod = 0; return;
 	case GRAVITY_13_PORTAL: gravity_mod = 1; return;
 	case GRAVITY_12_PORTAL: gravity_mod = 2; return;
@@ -649,6 +651,7 @@ void sprite_collide_lookup() {
 	case SINGLE_PORTAL:
 		if (!twoplayer) dual = 0;
 		else { player_gravity[1] = player_gravity[0]; }
+		tallmode = 0;
 		return;
 
 	// collided with non game mode portals 

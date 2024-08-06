@@ -1544,6 +1544,21 @@ const unsigned char Portal_Single[]={
 	 16, 32,0x8F,0|OAM_FLIP_V,
 	0x80
 };
+const unsigned char Tallboy_Portal[]={
+
+	  0,  0,0x8B,3,
+	  8, 0,0x8D,3,
+	  16, 0,0x8F,3,
+	  0,  16,0x91,3,
+
+	  8, 16,0x93,3,
+	  16, 16,0x95,3,
+	  0,  32,0x8B,3|OAM_FLIP_V,
+	  8, 32,0x8D,3|OAM_FLIP_V,
+
+	 16, 32,0x8F,3|OAM_FLIP_V,
+	0x80
+};
 
 const unsigned char Teleport_Portal_Horizontal_Upwards_Enter[]={
 
@@ -2655,6 +2670,7 @@ const unsigned char * const Metasprites[]={
 	Teleport_Portal_Horizontal_Downwards_Exit,
 	Teleport_Portal_Horizontal_Downwards_Enter,
 	Teleport_Portal_Horizontal_Upwards_Exit,
+	Tallboy_Portal,
 	};
 
 
@@ -2770,6 +2786,8 @@ const void* const animation_frame_list[] = {
 	NULL,
 	NULL,
 	NULL,
+	NULL,
+	
 	
 };
 
@@ -2881,6 +2899,7 @@ const unsigned char animation_frame_length[] = {
 	0,
 	sizeof(RANDOM_GAMEMODE_PORTAL) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
 	sizeof(GREEN_PAD_SPRITES) / sizeof(struct SpriteFrame), // Red_Jump_Pad,
+	0,
 	0,
 	0,
 	0,
