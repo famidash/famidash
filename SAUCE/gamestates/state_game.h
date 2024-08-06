@@ -471,7 +471,7 @@ void state_game(){
 		
 		kandotemp3 = 1;
 		
-		if (bigboi) {
+		if (bigboi && !(kandoframecnt & 1) ) {
 				high_byte(player_x[0]) += 15;
 				high_byte(currplayer_x) += 15;
 
@@ -615,20 +615,19 @@ void state_game(){
 }
 
 void runthecolls() {
-	mmc3_set_prg_bank_1(GET_BANK(x_movement_coll));
-	x_movement_coll();
-
 	if (!kandotemp3) {
+		mmc3_set_prg_bank_1(GET_BANK(x_movement_coll));
+		x_movement_coll();
+
 		mmc3_set_prg_bank_1(GET_BANK(x_movement));
 		x_movement();
-	}	
-	mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
-	sprite_collide();
+		mmc3_set_prg_bank_1(GET_BANK(sprite_collide));
+		sprite_collide();
 
+	}	
 		
 	if (!DEBUG_MODE && !invincible_counter) {
-		if ((dual && (kandoframecnt & 0x01)) || !dual)
-			bg_coll_death();
+		bg_coll_death();
 	}
 }				
 

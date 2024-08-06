@@ -25,6 +25,7 @@ void cube_movement(void){
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
 	
+	
 	if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
 		if(bg_coll_D()){ // check collision below
 			high_byte(currplayer_y) -= eject_D;
@@ -40,7 +41,54 @@ void cube_movement(void){
 			if (fblocked[currplayer]) currplayer_gravity = 1;			
 		}
 	}
+	
+	if (longmode) {
+
+
+		Generic.x = high_byte(currplayer_x) + 15;
+		Generic.y = high_byte(currplayer_y);
+		
+		if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
+			if(bg_coll_D()){ // check collision below
+				high_byte(currplayer_y) -= eject_D;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 0;
+			}
+		} if (currplayer_gravity || (!currplayer_gravity && hblocked[currplayer]) || (!currplayer_gravity && fblocked[currplayer])) {
+			if(bg_coll_U()){ // check collision above
+				high_byte(currplayer_y) -= eject_U;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 1;			
+			}
+		}		
+		
+	}
+	
+	if (tallmode) {
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y) - 15;
+		
+		if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
+			if(bg_coll_D()){ // check collision below
+				high_byte(currplayer_y) -= eject_D;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 0;
+			}
+		} if (currplayer_gravity || (!currplayer_gravity && hblocked[currplayer]) || (!currplayer_gravity && fblocked[currplayer])) {
+			if(bg_coll_U()){ // check collision above
+				high_byte(currplayer_y) -= eject_U;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 1;			
+			}
+		}		
+	}		
+	
 	// check collision down a little lower than CUBE
+	Generic.x = high_byte(currplayer_x); // the rest should be the same
 	Generic.y = high_byte(currplayer_y); // the rest should be the same
 
 //	if (currplayer_vel_y != 0){

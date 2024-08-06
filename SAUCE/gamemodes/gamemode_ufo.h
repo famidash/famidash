@@ -36,7 +36,29 @@ void ufo_movement(void){
 		}
 	}
 
+	if (tallmode) {
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y) - 15;
+		if (mini) {
+			if (high_byte(currplayer_vel_y)) Generic.y -= 1;
+			else Generic.y += 1;
+		}
+		
+		if(high_byte(currplayer_vel_y) & 0x80){
+			if(bg_coll_U()){ // check collision above
+				high_byte(currplayer_y) -= eject_U + 1;
+				currplayer_vel_y = 0;
+			}
+		} else {
+			if(bg_coll_D()){ // check collision below
+				high_byte(currplayer_y) -= eject_D - 1;
+				currplayer_vel_y = 0;
+			}
+		}
+	}
 	
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y);
 
 	// check collision down a little lower than UFO
 	Generic.y = high_byte(currplayer_y); // the rest should be the same
