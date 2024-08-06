@@ -4,8 +4,8 @@
 
 
 void do_the_scroll_thing(){
-	if (currplayer_x > 0x5000){ // change x scroll
-		tmp1 = MSB(currplayer_x - 0x5000);
+	if (currplayer_x > curr_x_scroll_stop){ // change x scroll
+		tmp1 = MSB(currplayer_x - curr_x_scroll_stop);
 		scroll_x += tmp1;
 		parallax_scroll_x += tmp1 ? tmp1 - 1 : 0;
 		if (parallax_scroll_x >= 144) {
@@ -24,6 +24,12 @@ void do_the_scroll_thing(){
 		}
 		high_byte(currplayer_x) = high_byte(currplayer_x) + tmp1;
 	}
+	
+	
+	
+	
+	
+	
 //	if (gamemode != 5) {
 		if (!dual) {
 			if (currplayer_y < 0x4000 && (scroll_y > 0x08)){ // change y scroll (upward)

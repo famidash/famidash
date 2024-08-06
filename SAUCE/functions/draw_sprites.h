@@ -125,7 +125,7 @@ void draw_sprites(void){
 		}
 		
 	}
-	if (forced_trails == 1 || trails || gamemode == 6) {
+	if (forced_trails == 1 || trails == 1 || (gamemode == 6 && trails != 2)) {
 		tmp6 = currplayer_vel_x << 1;
 		tmp5 = player_x[0] - tmp6;
 
@@ -138,7 +138,7 @@ void draw_sprites(void){
 		} while (tmp1 > 0);
 
 	}
-	else if (forced_trails == 2 && !dual && !twoplayer) {
+	if ((forced_trails == 2 || trails == 2) && !dual && !twoplayer) {
 
 		tmpA = player_x[0];
 		tmpB = player_y[0];

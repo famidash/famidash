@@ -566,7 +566,7 @@ void settings() {
 				case 5:
 					decorations ^= 1; break;
 				case 6:
-					trails ^= 1; break;					
+					trails == 2 ? trails = 0 : trails++;
 				case 7:
 					if (pad[0] & PAD_A && pad_new[0] & PAD_START) {
 						setdefaultoptions();
