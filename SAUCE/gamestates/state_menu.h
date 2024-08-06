@@ -176,7 +176,6 @@ void state_menu();
 
 #include "defines/mainmenu_charmap.h"
 void levelselection() {
-	
   
 	pal_fade_to_withmusic(4,0);
 	ppu_off();
@@ -596,8 +595,7 @@ void settings() {
 
 #include "defines/mainmenu_charmap.h"
 
-const char palsystem[] = "FOR PAL SYSTEMS";
-#define NTSC_SYS PEEK(0x00)
+
 
 void state_menu() {
 	pal_fade_to_withmusic(4,0);
@@ -611,12 +609,15 @@ void state_menu() {
 
 	kandowatchesyousleep = 0;
 
-	if (!NTSC_SYS) multi_vram_buffer_horz(palsystem, sizeof(palsystem)-1, NTADR_A(9,7));
 //	mmc3_set_prg_bank_1(GET_BANK(state_menu));
 
-	if (kandotemp == 0) music_play(song_menu_theme);
+	switch (kandotemp){
+		case 0x00:	music_play(song_menu_theme); break;
+		case 0x01:	break;
+	}
 
 	settingvalue = 0;
+	
 	has_practice_point = 0;
 	
 	// Enable SRAM write
@@ -628,15 +629,8 @@ void state_menu() {
 
 	oam_clear();
 
-	POKE(0x200, 175);
-	POKE(0x201, 0x02); // Use the second tile in the BG side which is pure black
-	POKE(0x202, 0b00100000); // second palette
-	POKE(0x203, 0x00);
-	
 	// Expand the data for the menu nametable while the PPU is still off
     vram_adr(NAMETABLE_A);
-    vram_unrle(game_start_screen);
-	vram_adr(NAMETABLE_B);
     vram_unrle(game_start_screen);
 
 	
@@ -647,12 +641,12 @@ void state_menu() {
 	one_vram_buffer('a', tmp5);
 	one_vram_buffer('b', addloNOC(tmp5, 1));
 	pad_poll(0); // read the first controller
-	kandoframecnt = 0;
+		kandoframecnt = 0;
 	while (!(pad_new[0] & PAD_START)){
+		rand8();
 		ppu_wait_nmi();
 		music_update();
 		pad_poll(0); // read the first controller
-
 		
 		//if ((pad[0] & PAD_LEFT) && (pad[0] & PAD_DOWN) && (pad[0] & PAD_SELECT) && (pad_new[0] & PAD_B)) { color_emphasis(COL_EMP_GREY); color_emphasis(COL_EMP_GREEN); }
 		if (!(kandoframecnt & 127)) {
@@ -662,7 +656,6 @@ void state_menu() {
 			else if (tmp3 >= 0xF0) tmp3 -= 0x80;
 			tmp2 = (tmp3 & 0x3F);  		    
 				pal_col(0, tmp2);
-				pal_col(0x11, tmp2)
 				// pal_col(1, oneShadeDarker(tmp2)); 
 				// pal_col(9, oneShadeDarker(tmp2)); 
 		
@@ -705,29 +698,19 @@ void state_menu() {
 		if (pad_new[0] & PAD_SELECT) {
 				tmp2 = 0;
 				gameState = 0;
-				famistudio_music_stop();
-				music_update();
-				kandotemp = 0;
-				ppu_wait_nmi();
 				return;
 		}
-		tmp8 += CUBE_SPEED_X05>>8;
-		xy_split(tmp8,176);
-	}	
-	set_scroll_y(0);
-	set_scroll_x(0);
-	ppu_wait_nmi();
+	}		
+
 	tmp7 = rand8() & 255;
 	switch (menuselection) {
-		case 0x00: kandowatchesyousleep = 1; 
-			
-			if(!tmp7) crossPRGBankJump8(playPCM, 1); else crossPRGBankJump8(playPCM, 0);  levelselection(); return;
+		case 0x00: kandowatchesyousleep = 1; if(!tmp7) crossPRGBankJump8(playPCM, 1); else crossPRGBankJump8(playPCM, 0);  levelselection(); return;
 		case 0x01: funsettings(); return;
 		case 0x02: gameState = 4; return;
 		case 0x03: settings(); return;
 		case 0x04: customize_screen(); return;
 	};
-	
+  
 }
 
 

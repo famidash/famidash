@@ -243,9 +243,6 @@ detectNTSC:
 	LDA #<FIRST_MUSIC_BANK-1	; Impossible to get otherwise
 	STA current_song_bank		; Forces famistudio init on play
 
-    LDA #<.bank(sounds)
-    JSR mmc3_tmp_prg_bank_1
-    
 	ldx #<sounds
 	ldy #>sounds
 	jsr famistudio_sfx_init
@@ -322,7 +319,7 @@ GeometryDashPCMB:
 .segment "MUS_BANK_04"
 	.include "MUSIC/EXPORTS/music_5.s"
 
-.segment "SFX_BANK"
+.segment "SFX"
 	.include "MUSIC/EXPORTS/sfx.s"
 
 .segment "COLLMAP0"

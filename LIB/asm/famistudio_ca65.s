@@ -1,18 +1,3 @@
-
-;======================================================================================================================
-; THIS VERSION OF THE FAMISTUDIO DRIVER HAS BEEN MODIFIED TO INCLUDE SFX BANKSWITCHING AND ALTERED PAL SUPPORT.
-;
-; that is all, have a nice day
-; - usersniper
-;======================================================================================================================
-
-
-
-
-
-
-
-
 ;======================================================================================================================
 ; FAMISTUDIO SOUND ENGINE (4.1.0)
 ; Copyright (c) 2019-2023 Mathieu Gauthier
@@ -154,7 +139,7 @@
 ;======================================================================================================================
 
 ; One of these MUST be defined (PAL or NTSC playback). Note that only NTSC support is supported when using any of the audio expansions.
-FAMISTUDIO_CFG_PAL_SUPPORT   = 1
+; FAMISTUDIO_CFG_PAL_SUPPORT   = 1
 FAMISTUDIO_CFG_NTSC_SUPPORT  = 1
 
 ; Support for sound effects playback + number of SFX that can play at once.
@@ -1618,7 +1603,7 @@ famistudio_music_play:
 
 .if FAMISTUDIO_USE_FAMITRACKER_TEMPO
     lda famistudio_pal_adjust
-    ;beq @pal
+    beq @pal
     iny
     iny
 @pal:
@@ -4351,9 +4336,6 @@ famistudio_update:
 ;----------------------------------------------------------------------------------------------------------------------
 .if FAMISTUDIO_CFG_SFX_SUPPORT
 
-    LDA #<.bank(sounds)
-    JSR mmc3_tmp_prg_bank_1
-
     ; Process all sound effect streams
     .if FAMISTUDIO_CFG_SFX_STREAMS > 0
     ldx #FAMISTUDIO_SFX_CH0
@@ -6532,7 +6514,7 @@ famistudio_sfx_init:
     ldy #0
     
 .if FAMISTUDIO_DUAL_SUPPORT
-    lda NTSC_MODE ; Add 2 to the sound list pointer for PAL
+    lda famistudio_pal_adjust ; Add 2 to the sound list pointer for PAL
     bne @ntsc
     iny
     iny
@@ -6595,11 +6577,6 @@ famistudio_sfx_play:
     asl a
     tay
 
-    ; - CUSTOM CODE -
-    lda #<.bank(sounds)
-    jsr mmc3_tmp_prg_bank_1
-    ; ---------------
-
     jsr famistudio_sfx_clear_channel ; Stops the effect if it plays
 
     lda famistudio_sfx_addr_lo
@@ -6613,12 +6590,7 @@ famistudio_sfx_play:
     lda (@effect_data_ptr),y
     sta famistudio_sfx_ptr_hi,x ; This write enables the effect
 
-    ; - CUSTOM CODE -
-    jmp _mmc3_pop_prg_bank_1
-    ; ---------------
-    ; --- THE OLD ---
     rts
-    ; ---------------
 
 ;======================================================================================================================
 ; FAMISTUDIO_SFX_UPDATE (internal)
