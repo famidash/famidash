@@ -2,7 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
-
+void wave_eject();
 void wave_movement(void){
 
 	if (!dashing[currplayer]) {
@@ -35,6 +35,46 @@ void wave_movement(void){
 	
 	
 
+	wave_eject();
+	
+	if (bigboi) {
+		Generic.x = high_byte(currplayer_x);
+		Generic.y = high_byte(currplayer_y) - 15 + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+		wave_eject();		
+		Generic.x = high_byte(currplayer_x) + 15;
+		Generic.y = high_byte(currplayer_y) - 15 + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+		wave_eject();		
+		Generic.x = high_byte(currplayer_x) + 15;
+		Generic.y = high_byte(currplayer_y) + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+		wave_eject();		
+	}
+	
+	else {
+		if (longmode) {
+			Generic.x = high_byte(currplayer_x) + 15;
+			Generic.y = high_byte(currplayer_y) + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+			wave_eject();				
+		}
+		if (tallmode) {
+			Generic.x = high_byte(currplayer_x);
+			Generic.y = high_byte(currplayer_y) - 15 + ((high_byte(currplayer_vel_y) & 0x80) ? 2 : -2);
+			wave_eject();				
+		}
+	}
+
+	Generic.y = high_byte(currplayer_y);
+
+	if (currplayer_vel_y != 0 && !slope_type){
+		if(pad_new[controllingplayer] & PAD_A) {
+			uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
+		}
+	}
+	
+}	
+
+
+
+void wave_eject() {
 	if(high_byte(currplayer_vel_y) & 0x80){
 		if (bg_coll_U()) {
 			if(dblocked[currplayer]){ // check collision above
@@ -57,17 +97,7 @@ void wave_movement(void){
 			}
 		}
 	}
-
-	Generic.y = high_byte(currplayer_y);
-
-	if (currplayer_vel_y != 0 && !slope_type){
-		if(pad_new[controllingplayer] & PAD_A) {
-			uint8_store(cube_data, currplayer, cube_data[currplayer] | 0x02);
-		}
-	}
-	
 }	
-
 #pragma code-name(pop)
 #pragma data-name(pop) 
 #pragma rodata-name(pop)
