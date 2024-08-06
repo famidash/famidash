@@ -433,6 +433,23 @@ char bg_coll_slope() {
 					slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
 					was_on_slope_counter = (gamemode == 6 ? 6 : 2);
 				}
+				switch (slope_type) {
+					case SLOPE_45DEG_UP:
+						tmp8 = 4;
+						break;
+					case SLOPE_22DEG_UP:
+						tmp8 = 2;
+						break;
+					case SLOPE_66DEG_UP:
+						tmp8 = 8;
+						break;
+						
+					case SLOPE_45DEG_DOWN:
+					case SLOPE_22DEG_DOWN:
+					case SLOPE_66DEG_DOWN:
+						tmp8 = 0;
+						break;
+				}
 				return 1;
 			}
 			else return 0;
