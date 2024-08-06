@@ -2,7 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
-void ufo_eject();
+void ufo_ship_eject();
 void common_gravity_routine();
 void ufo_movement(void){
 // handle y
@@ -22,23 +22,23 @@ void ufo_movement(void){
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
 
-	ufo_eject();
+	ufo_ship_eject();
 
 	if (bigboi) {
 			Generic.x = high_byte(currplayer_x);
 			Generic.y = high_byte(currplayer_y) - 15;
 
-			ufo_eject();		
+			ufo_ship_eject();		
 		
 			Generic.x = high_byte(currplayer_x) + 15;
 			Generic.y = high_byte(currplayer_y);
 
-			ufo_eject();
+			ufo_ship_eject();
 
 			Generic.x = high_byte(currplayer_x) + 15;
 			Generic.y = high_byte(currplayer_y) - 15;
 
-			ufo_eject();			
+			ufo_ship_eject();			
 	}
 
 	else {
@@ -46,13 +46,13 @@ void ufo_movement(void){
 			Generic.x = high_byte(currplayer_x);
 			Generic.y = high_byte(currplayer_y) - 15;
 
-			ufo_eject();
+			ufo_ship_eject();
 		}
 		if (longmode) {
 			Generic.x = high_byte(currplayer_x) + 15;
 			Generic.y = high_byte(currplayer_y);
 
-			ufo_eject();
+			ufo_ship_eject();
 		}
 	}
 		Generic.x = high_byte(currplayer_x);
@@ -88,24 +88,7 @@ void ufo_movement(void){
 }	
 
 
-void ufo_eject() {
-		if (mini) {
-			if (high_byte(currplayer_vel_y)) Generic.y -= 1;
-			else Generic.y += 1;
-		}
-		
-		if(high_byte(currplayer_vel_y) & 0x80){
-			if(bg_coll_U()){ // check collision above
-				high_byte(currplayer_y) -= eject_U + 1;
-				currplayer_vel_y = 0;
-			}
-		} else {
-			if(bg_coll_D()){ // check collision below
-				high_byte(currplayer_y) -= eject_D - 1;
-				currplayer_vel_y = 0;
-			}
-		}
-}		
+	
 #pragma code-name(pop)
 #pragma data-name(pop) 
 #pragma rodata-name(pop)

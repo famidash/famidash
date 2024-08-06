@@ -2,7 +2,7 @@
 #pragma data-name(push, "XCD_BANK_01")
 #pragma rodata-name(push, "XCD_BANK_01")
 
-void ship_eject();
+void ufo_ship_eject();
 void ship_movement(void){
 // handle y
 
@@ -22,31 +22,31 @@ void ship_movement(void){
 	Generic.x = high_byte(currplayer_x);
 	Generic.y = high_byte(currplayer_y);
 	
-	ship_eject();
+	ufo_ship_eject();
 
 	if (bigboi) {
 			Generic.x = high_byte(currplayer_x);
 			Generic.y = high_byte(currplayer_y) - 15;
-			ship_eject();
+			ufo_ship_eject();
 		
 			Generic.x = high_byte(currplayer_x) + 15;
 			Generic.y = high_byte(currplayer_y);
-			ship_eject();
+			ufo_ship_eject();
 
 			Generic.x = high_byte(currplayer_x) + 15;
 			Generic.y = high_byte(currplayer_y) - 15;
-			ship_eject();
+			ufo_ship_eject();
 	}
 	else {
 		if (tallmode) {
 			Generic.x = high_byte(currplayer_x);
 			Generic.y = high_byte(currplayer_y) - 15;
-			ship_eject();
+			ufo_ship_eject();
 		}	
 		if (longmode) {
 			Generic.x = high_byte(currplayer_x)+15;
 			Generic.y = high_byte(currplayer_y);
-			ship_eject();
+			ufo_ship_eject();
 		}	
 	}		
 
@@ -73,7 +73,7 @@ void ship_movement(void){
 	}	
 }
 
-void ship_eject() {
+void ufo_ship_eject() {
 	if (mini) {
 		if (high_byte(currplayer_vel_y)) Generic.y -= 1;
 		else Generic.y += 1;
