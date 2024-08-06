@@ -3,6 +3,7 @@
 #pragma rodata-name(push, "XCD_BANK_01")
 void x_movement_coll();
 void common_gravity_routine();
+void cube_eject();
 void cube_movement(void){
 // handle y
 
@@ -42,51 +43,40 @@ void cube_movement(void){
 		}
 	}
 	
-	if (longmode) {
 
-
+	if (bigboi) {
 		Generic.x = high_byte(currplayer_x) + 15;
 		Generic.y = high_byte(currplayer_y);
-		
-		if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
-			if(bg_coll_D()){ // check collision below
-				high_byte(currplayer_y) -= eject_D;
-				low_byte(currplayer_y) = 0;
-				currplayer_vel_y = 0;
-				if (fblocked[currplayer]) currplayer_gravity = 0;
-			}
-		} if (currplayer_gravity || (!currplayer_gravity && hblocked[currplayer]) || (!currplayer_gravity && fblocked[currplayer])) {
-			if(bg_coll_U()){ // check collision above
-				high_byte(currplayer_y) -= eject_U;
-				low_byte(currplayer_y) = 0;
-				currplayer_vel_y = 0;
-				if (fblocked[currplayer]) currplayer_gravity = 1;			
-			}
-		}		
-		
-	}
-	
-	if (tallmode) {
+
+		cube_eject();
+
 		Generic.x = high_byte(currplayer_x);
 		Generic.y = high_byte(currplayer_y) - 15;
+
+		cube_eject();
 		
-		if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
-			if(bg_coll_D()){ // check collision below
-				high_byte(currplayer_y) -= eject_D;
-				low_byte(currplayer_y) = 0;
-				currplayer_vel_y = 0;
-				if (fblocked[currplayer]) currplayer_gravity = 0;
-			}
-		} if (currplayer_gravity || (!currplayer_gravity && hblocked[currplayer]) || (!currplayer_gravity && fblocked[currplayer])) {
-			if(bg_coll_U()){ // check collision above
-				high_byte(currplayer_y) -= eject_U;
-				low_byte(currplayer_y) = 0;
-				currplayer_vel_y = 0;
-				if (fblocked[currplayer]) currplayer_gravity = 1;			
-			}
+		Generic.x = high_byte(currplayer_x) + 15;
+		Generic.y = high_byte(currplayer_y) - 15;
+		
+		cube_eject();
+	}
+		
+	else {
+		if (longmode) {
+
+			Generic.x = high_byte(currplayer_x) + 15;
+			Generic.y = high_byte(currplayer_y);
+			
+			cube_eject();
+		}
+		
+		if (tallmode) {
+			Generic.x = high_byte(currplayer_x);
+			Generic.y = high_byte(currplayer_y) - 15;
+			
+			cube_eject();
 		}		
-	}		
-	
+	}	
 	// check collision down a little lower than CUBE
 	Generic.x = high_byte(currplayer_x); // the rest should be the same
 	Generic.y = high_byte(currplayer_y); // the rest should be the same
@@ -327,6 +317,25 @@ void common_gravity_routine(void) {
 	else if (dashing[currplayer] == 5) { currplayer_vel_y = currplayer_vel_x; currplayer_y += currplayer_vel_y; }	
 	else currplayer_vel_y = 1;
 }
+
+
+void cube_eject() {
+		if(!currplayer_gravity || (currplayer_gravity && hblocked[currplayer]) || (currplayer_gravity && fblocked[currplayer])){
+			if(bg_coll_D()){ // check collision below
+				high_byte(currplayer_y) -= eject_D;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 0;
+			}
+		} if (currplayer_gravity || (!currplayer_gravity && hblocked[currplayer]) || (!currplayer_gravity && fblocked[currplayer])) {
+			if(bg_coll_U()){ // check collision above
+				high_byte(currplayer_y) -= eject_U;
+				low_byte(currplayer_y) = 0;
+				currplayer_vel_y = 0;
+				if (fblocked[currplayer]) currplayer_gravity = 1;			
+			}
+		}	
+}		
 
 
 #pragma code-name(pop)
