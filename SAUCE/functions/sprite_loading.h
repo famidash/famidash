@@ -114,6 +114,7 @@
 #define LONGBOI_MODE_ENTER			0x6B
 #define BIGBOI_MODE_ENTER			0x6C
 
+#define X_SCROLL_SETTING			0xDE	//bottom floor is 0XB0, reset to standard at 0x50
 #define DEATH_CHANCE				0xDF
 
 #define TELEPORT_PORTAL_ENTER_EXTENSION		0xED
@@ -162,6 +163,21 @@ const unsigned char OUTLINES[]={
 		0x21,
 		0x17,
 		0x0F
+};
+
+const unsigned short SCROLL_TABLE[]={
+		0x0000,
+		0x1000,
+		0x2000,
+		0x3000,
+		0x4000,
+		0x5000,
+		0x6000,
+		0x7000,
+		0x8000,
+		0x9000,
+		0xA000,
+		0xB000
 };
 
 
@@ -231,8 +247,17 @@ char sprite_height_lookup(){
 		};
 
 		if (!(newrand() & 63)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; 
-	} else
-	if ((type >= 0xB0) && (type <= 0xBF)) {
+	} 
+	else if (type == X_SCROLL_SETTING) {
+		tmp8 = activesprites_realy[index] >> 4;
+		target_x_scroll_stop = SCROLL_TABLE[tmp8];
+		activesprites_type[index] = 0xFF;
+		return 0x00;		
+	}
+
+	
+	
+	else if ((type >= 0xB0) && (type <= 0xBF)) {
 					outline_color = uint8_load(OUTLINES, type & 0x0F);
 					activesprites_type[index] = 0xFF; 
 					return 0x00;
@@ -258,10 +283,11 @@ char sprite_height_lookup(){
 				return 0;
 	}
 	else if (type == MASK_SPRITES_ON) { disco_sprites = 1; activesprites_type[index] = 0xFF; return 0; }
-	
 	else if (type == MASK_SPRITES_OFF) { disco_sprites = 0; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_ON) { slowmode = 1; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == SLOWMODE_OFF) { slowmode = 0; activesprites_type[index] = 0xFF; return 0; }
+
+
 	else if (type >= COINGOTTEN1 && type <= COINGOTTEN3) return 0x17;	// Coin
 	else if (type >= SPEED_05_PORTAL && type <= SPEED_20_PORTAL) // Speed portals
 		return 0x1F;

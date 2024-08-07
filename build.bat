@@ -1,4 +1,4 @@
 bin\winmake.exe
-copy .\build\famidash.nes .\famidash.nes
-copy .\build\famidash.dbg .\famidash.dbg
+copy .\build\famidash.nes .\famidash-kando.nes
+copy .\build\famidash.dbg .\famidash-kando.dbg
 pause

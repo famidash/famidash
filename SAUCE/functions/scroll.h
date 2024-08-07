@@ -4,6 +4,10 @@
 
 
 void do_the_scroll_thing(){
+
+	if (curr_x_scroll_stop < target_x_scroll_stop) curr_x_scroll_stop += 0x80;
+	else if (curr_x_scroll_stop > target_x_scroll_stop) curr_x_scroll_stop -= 0x80;
+	
 	if (currplayer_x > curr_x_scroll_stop){ // change x scroll
 		tmp1 = MSB(currplayer_x - curr_x_scroll_stop);
 		scroll_x += tmp1;
@@ -25,7 +29,7 @@ void do_the_scroll_thing(){
 		high_byte(currplayer_x) = high_byte(currplayer_x) + tmp1;
 	}
 
-	
+
 	
 	
 	
