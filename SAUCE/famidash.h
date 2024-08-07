@@ -255,6 +255,7 @@ uint8_t spr_index;
 uint8_t long_temp_x;
 
 uint16_t curr_x_scroll_stop;
+uint16_t target_x_scroll_stop;
 uint8_t kandokidshack;
 uint8_t kandokidshack2;
 uint8_t kandokidshack3;

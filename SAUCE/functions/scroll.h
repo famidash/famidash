@@ -24,7 +24,7 @@ void do_the_scroll_thing(){
 		}
 		high_byte(currplayer_x) = high_byte(currplayer_x) + tmp1;
 	}
-	
+
 	
 	
 	

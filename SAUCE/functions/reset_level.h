@@ -97,6 +97,7 @@ void reset_level(void) {
     longmode = 0;
     bigboi = 0;
     curr_x_scroll_stop = 0x5000;
+    target_x_scroll_stop = 0x5000;
     discoframe = 0;
 	for (tmp2 = 0; tmp2 < 9; tmp2++) {
 		player_old_posy[tmp2] = 0;
