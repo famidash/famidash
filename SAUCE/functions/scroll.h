@@ -113,8 +113,8 @@ void do_the_scroll_thing(){
 void do_the_scroll_thing2(){
 
     
-	if (currplayer_x > 0x5000){ // change x scroll
-		tmp1 = MSB(currplayer_x - 0x5000);
+	if (currplayer_x > curr_x_scroll_stop){ // change x scroll
+		tmp1 = MSB(currplayer_x - curr_x_scroll_stop);
 		scroll_x += tmp1;
 		parallax_scroll_x += tmp1 ? tmp1 - 1 : 0;
 		if (parallax_scroll_x >= 144) {
