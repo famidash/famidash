@@ -24,9 +24,6 @@
 __fastcall__ char bg_collision_sub(void);
 void commonly_used_store();
 void commonly_stored_routine_2();
-void tmp20f();
-
-
 /*
 	Out:
 	A
@@ -59,14 +56,14 @@ void bg_coll_spikes() {
 	switch (collision) {
 		case COL_UP_LEFT_SPIKE:
 			if (!(temp_y & 0x08)) {
-				tmp20f();
+				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
 					break;
 			}
 			return;
 		case COL_UP_RIGHT_SPIKE:
 			if (!(temp_y & 0x08)) {
-				tmp20f();
+				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x0a && tmp2 < 0x0d)
 					break;
 			}
@@ -80,14 +77,14 @@ void bg_coll_spikes() {
 			return;
 		case COL_DOWN_LEFT_SPIKE:
 			if ((temp_y & 0x08)) {
-				tmp20f();
+				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
 					break;
 			}
 			return;
 		case COL_DOWN_RIGHT_SPIKE:
 			if ((temp_y & 0x08)) {
-				tmp20f();
+				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x0a && tmp2 < 0x0d)
 					break;
 			}
@@ -335,7 +332,7 @@ char bg_side_coll_common() {
 				cube_data[currplayer] |= 1;
 			} 
 		}	
-		dblocked[currplayer] = 0;
+		//dblocked[currplayer] = 0;
 		if (was_on_slope_counter) return 0;
 	}
 
@@ -848,6 +845,3 @@ void commonly_stored_routine_2() {
 			scroll_y
 		), temp_y, temp_room);
 }		
-void tmp20f() {
-	tmp2 = (uint8_t)(temp_x & 0x0f);	
-}
