@@ -61,7 +61,7 @@ void runthecolls();
 void x_movement_coll() {
 	if (slope_type && !slope_frames && gamemode != 6) {
 	// we we're on an slope and now we aren't, so push the player upwards a bit
-		switch (slope_type & 0x07) {
+		switch (slope_type) {
 			case SLOPE_22DEG_DOWN:
 			case SLOPE_22DEG_UP:
 				tmp5 = currplayer_vel_x >> 2;
