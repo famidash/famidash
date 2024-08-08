@@ -40,7 +40,6 @@
 #define MINI_WAVE_HEIGHT 0x01
 
 #define JUMP_VEL -0x590
-
 #define MINI_JUMP_VEL -0x4D0
 
 #define UFO_JUMP_VEL -0x3B0
@@ -70,13 +69,10 @@
 
 #define BALL_GRAVITY 0x53
 #define BALL_MAX_FALLSPEED 0x600
-
 #define SWING_GRAVITY 0x38
 #define SWING_MAX_FALLSPEED 0x4D0
-
 #define MINI_SWING_GRAVITY 0x38
 #define MINI_SWING_MAX_FALLSPEED 0x4D0
-
 #define MINI_BALL_GRAVITY 0x57
 #define MINI_BALL_MAX_FALLSPEED 0x600
 
@@ -85,10 +81,6 @@
 
 #define SHIP_GRAVITY 0x30
 #define MINI_SHIP_GRAVITY 0x2C
-
-#define JIMSHEATBALL_MAX_FALLSPEED 0x300
-#define JIMSHEATBALL_GRAVITY 0x34
-#define JIMSHEATBALL_JUMP_VEL -0x390
 
 #define COIN_1 0x01
 #define COIN_2 0x02
@@ -109,8 +101,8 @@ uint8_t tmp8;
 uint8_t tmp9;
 uint16_t tmpA;
 uint16_t tmpB;
-int16_t fallspeed_big;
-int16_t fallspeed_mini;
+int16_t max_fallspeed_big;
+int16_t max_fallspeed_mini;
 int16_t gravity_big;
 int16_t gravity_mini;
 uint8_t* tmpptr1;
@@ -146,7 +138,6 @@ uint8_t collision_D;
 
 uint16_t old_x;
 uint16_t old_y;
-
 
 uint8_t mini;
 uint8_t eject_L; // from the left
@@ -220,7 +211,6 @@ uint8_t retro_mode;
 uint8_t palette_cycle_mode;
 uint8_t gameboy_mode;
 uint8_t invisblocks;
-uint8_t cam_seesaw;
 
 #define LEVEL_COUNT 0x12
 uint8_t coin1_obtained[0x40];
@@ -252,11 +242,8 @@ uint8_t player_gravity[2];
 
 
 uint8_t rld_column;
-uint8_t spr_index;
 uint8_t long_temp_x;
 
-uint16_t curr_x_scroll_stop;
-uint16_t target_x_scroll_stop;
 uint8_t kandokidshack;
 uint8_t kandokidshack2;
 uint8_t kandokidshack3;
@@ -269,7 +256,6 @@ uint8_t coins;
 uint8_t currplayer;
 uint8_t kandotemp;
 uint8_t kandotemp2[2];
-uint8_t kandotemp3;
 uint8_t kandotemp5;
 uint8_t kandoframecnt;
 uint32_t attempts;
@@ -289,8 +275,6 @@ uint8_t level_data_bank;
 uint8_t sprite_data_bank;
 uint8_t menuselection; // = 0x00;
 uint8_t settingvalue;
-
-uint8_t disco_sprites;
 
 uint8_t gameState = 0x01;
 
@@ -350,19 +334,12 @@ uint8_t lastgcolortype;
 uint8_t lastbgcolortype;
 uint8_t iconbank;
 uint8_t dblocked[2];
-uint8_t gravity_mod;
-uint8_t longmode;
-uint8_t tallmode;
-uint8_t bigboi;
 
-#define MAX_FIREBALLS 20
-
-uint8_t jimsheatballalive[MAX_FIREBALLS]; //jims heatball shit
-uint16_t jimsheatballx[MAX_FIREBALLS]; //jims heatball shit
-uint16_t jimsheatbally[MAX_FIREBALLS];
-int16_t jimsheatball_vel_x[MAX_FIREBALLS];
-int16_t jimsheatball_vel_y[MAX_FIREBALLS];
-uint8_t jimsheatballframe[MAX_FIREBALLS];
+uint8_t jimsheatballalive[2]; //jims heatball shit
+uint8_t jimsheatballx[2]; //jims heatball shit
+uint8_t jimsheatbally[2];
+uint8_t jimsheatballframe[2];
+int16_t jimsheatballvel_y[2];
 
 uint8_t player_old_posy[9];
 uint8_t discorefreshrate;
@@ -370,7 +347,7 @@ uint8_t discoframe;
 uint8_t no_parallax;
 uint8_t outline_color;
 uint8_t forced_trails;
-/*
+
 uint8_t gnd_palette_transition_timer;
 uint8_t original_gnd_palette_idx_0;
 uint8_t original_gnd_palette_idx_1;
@@ -386,7 +363,7 @@ uint8_t original_bg_palette_color_1;
 uint8_t original_bg_palette_color_2;
 
 uint8_t current_transition_timer_length;
-*/
+
 
 uint8_t kandowatchesyousleep;	//variable to say whether to go back to main menu or level select
 
@@ -442,20 +419,20 @@ const uint8_t paletteDefaultSP[16]={
 
 const uint8_t paletteMenu[16] = { //SUBMENUS (minus settings)
 	0x17,0x0f,0x10,0x30,
-	0x17,0x0f,0x2a,0x28,
+	0x11,0x0f,0x2a,0x39,
 	0x17,0x0f,0x17,0x27,
 	0x17,0x0f,0x11,0x30
 };
 const uint8_t paletteSettings[16] = {
 	0x17,0x0f,0x10,0x30,
-	0x17,0x0f,0x2a,0x28,
+	0x11,0x0f,0x2a,0x39,
 	0x17,0x0F,0x16,0x26,
 	0x17,0x0f,0x11,0x30
 };
 
 const uint8_t splashMenu[16] = { //MAIN MENU
     0x11,0x0F,0x11,0x30,
-    0x11,0x0F,0x2A,0x28,
+    0x11,0x0f,0x2a,0x39,
     0x11,0x0F,0x27,0x30,
     0x11,0x0F,0x11,0x30
 };

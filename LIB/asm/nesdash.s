@@ -1192,7 +1192,7 @@ found_bank:
 			LDA	music_data_locations_hi-FIRST_MUSIC_BANK, Y
 			TAY
 		.endif
-        LDA #$01
+        LDA NTSC_MODE
         JSR famistudio_init
     :
     PLA
@@ -1252,7 +1252,7 @@ play:
 ; Because i JMPed, the routine is over
 
 
-; void load_next_sprite();
+; void load_next_sprite(uint8_t slot);
 .segment "CODE_2"
 
 .import _activesprites_x_lo, _activesprites_x_hi
@@ -1262,26 +1262,19 @@ play:
 
 .export _load_next_sprite := load_next_sprite
 .proc load_next_sprite
-.import _spr_index
-SpriteData = ptr1
-SpriteOffset = ptr2
 
-    lda mmc3PRG1Bank
-    pha
+	; Check that the pointer is valid
+	ldy _sprite_data+1
+	beq early_exit
 
-    lda _sprite_data_bank
-    jsr mmc3_set_prg_bank_1
-
-    ; And also keep the "max sprite id" number in x
-    ; This is premultiplied by two for the word sized x/y fields which come first
-    ldx _spr_index
+    ; Paste current free sprite slot into X
+   	tax
 
     ; Now read the data into the sprite
-    
     ldy #0
     lda (_sprite_data),y
     cmp #$ff
-    beq @Exit
+    beq exit
     iny
     
     ; X - 2 bytes
@@ -1310,28 +1303,20 @@ SpriteOffset = ptr2
 
     ; Increment to the next sprite index - 
     ; Add the 5 back to the pointer
-    LDA #$05
-    CLC
-    ADC _sprite_data
-    STA _sprite_data
-    BCC :+
-        INC _sprite_data+1
+    lda	#$05
+    clc
+    adc	_sprite_data
+    sta	_sprite_data
+	ldy _sprite_data+1
+    bcc	:+
+        iny
     :
 
-    ; Increment the _spr_index and and it with #$0F
-    INX
-	.if USE_ILLEGAL_OPCODES
-		LDA #$0F
-		SAX _spr_index
-	.else
-		TXA
-		AND #$0F
-		STA _spr_index
-	.endif
-
-@Exit:
-    pla
-    jmp mmc3_set_prg_bank_1
+exit:
+	;	Y is currently 0
+	sty _sprite_data+1	;__	invalidate the sprite pointer
+early_exit:
+	rts
 .endproc
 
 
@@ -1342,6 +1327,14 @@ SpriteOffset = ptr2
 
 .export _check_spr_objects := check_spr_objects
 .proc check_spr_objects
+	; save current bank
+    lda mmc3PRG1Bank
+    pha
+
+	; load sprite data bank
+    lda _sprite_data_bank
+    jsr mmc3_set_prg_bank_1
+
     ; for each sprite we want to check to see if its active
     ; if it is, update its realx/y position
     ; if its not, attempt to load another sprite
@@ -1349,18 +1342,20 @@ SpriteOffset = ptr2
 
 check_sprite_loop:
         ; X is the current sprite object
-        ; Load two byte X coord to see if we went offscreen
-        lda _activesprites_x_lo, x
-        sec
-        sbc _scroll_x
-        lda _activesprites_x_hi, x
-        sbc _scroll_x+1
+		lda _activesprites_type, x	;	If the sprite (e.g. color triggers)
+		cmp #$ff					;	has been marked as "complete",
+		beq sprite_dead				;__
+		
+        lda _activesprites_x_lo, x	;
+        sec							;	Or the sprite has
+        sbc _scroll_x				;	went offscreen,
+        lda _activesprites_x_hi, x	;
+        sbc _scroll_x+1				;__
         bpl sprite_alive
-            txa
-            pha
-                jsr load_next_sprite
-            pla
-            tax
+
+	sprite_dead:					;__	Load a new one in its place
+            txa						;	Takes the "slot" argument in A
+			jsr load_next_sprite	;__	But also preserves the X
             lda #0
             jmp write_active
     sprite_alive:
@@ -1383,13 +1378,15 @@ check_sprite_loop:
 
         lda #1
         bne write_active ; unconditional
-sprite_offscreen:
+	sprite_offscreen:
         lda #0
-write_active:
+	write_active:
         sta _activesprites_active, x
         dex
         bpl check_sprite_loop
-    rts
+end:
+	pla
+	jmp mmc3_set_prg_bank_1
 .endproc
 
 .segment "XCD_BANK_04"
@@ -1903,7 +1900,9 @@ drawplayer_center_offsets:
         .byte >_MINI_CUBE, >_MINI_SHIP, >_MINI_BALL, >_MINI_UFO, >_MINI_ROBOT, >_MINI_SPIDER, >_MINI_WAVE, >_MINI_SWING, >_MINI_CUBE
 
     rounding_slope_table:
-        .byte $03, $09, $09, $09, $0a, $00, $00, $00, $00, $09, $0a, $09
+		;     45^  45v  22^  22v  66^  66v  nothing
+        .byte $03, $09, $0a, $08, $08, $09, $00, $00
+		.byte $03, $09, $1a, $16, $17, $1a 		;upsidedown
 .endproc
 drawplayer_common := _drawplayerone::common
 
@@ -2758,21 +2757,21 @@ SampleRate:
 	rts
 
 load_lo:
-	.byte	<__DATA_LOAD__,	<__SFX_LOAD__
+	.byte	<__DATA_LOAD__ ;,	<__SFX_LOAD__
 load_hi:
-	.byte	>__DATA_LOAD__,	>__SFX_LOAD__
+	.byte	>__DATA_LOAD__ ;,	>__SFX_LOAD__
 
 run_lo:
-	.byte	<__DATA_RUN__,	<__SFX_RUN__
+	.byte	<__DATA_RUN__ ;,	<__SFX_RUN__
 run_hi:
-	.byte	>__DATA_RUN__,	>__SFX_RUN__
+	.byte	>__DATA_RUN__ ;,	>__SFX_RUN__
 
 size_lo:
-	.byte	<__DATA_SIZE__,	<__SFX_SIZE__
+	.byte	<__DATA_SIZE__ ;,	<__SFX_SIZE__
 size_hi:
-	.byte	>__DATA_SIZE__,	>__SFX_SIZE__
+	.byte	>__DATA_SIZE__ ;,	>__SFX_SIZE__
 
 bank:
-	.byte	<__DATA_LOAD_BANK__,	<__SFX_LOAD_BANK__
+	.byte	<__DATA_LOAD_BANK__ ;,	<__SFX_LOAD_BANK__
 
 .endproc

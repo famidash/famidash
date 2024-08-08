@@ -22,10 +22,6 @@ void draw_sprites(void){
 			if (kandoframecnt & 0x01) { drawplayertwo(); drawplayerone(); }
 			else { drawplayerone(); drawplayertwo(); }
 		}
-		else if (bigboi) { drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; high_byte(player_y[0]) += 15; }
-		else if (longmode && !tallmode) { drawplayerone(); high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; }
-		else if (tallmode && !longmode) { drawplayerone(); high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_y[0]) += 15; }
-		else if (tallmode && longmode) { drawplayerone(); high_byte(player_y[0]) -= 15; drawplayerone(); high_byte(player_y[0]) += 15; high_byte(player_x[0]) += 15; drawplayerone(); high_byte(player_x[0]) -= 15; }
 		else drawplayerone();
 	}
 	// the level sprites
@@ -42,12 +38,15 @@ void draw_sprites(void){
 		// else if (long_temp_x < 10) {}
 	}
 
-	for (tmp9 = 0; tmp9 < MAX_FIREBALLS; tmp9++) {
-		if (jimsheatballalive[tmp9]) {
-			oam_meta_spr(jimsheatballx[tmp9], high_byte(jimsheatbally[tmp9]), Heat_Ball_Sprites[jimsheatballframe[tmp9]]);		
-			jimsheatballframe[tmp9] == 20 ? jimsheatballframe[tmp9] = 0 : jimsheatballframe[tmp9]++;
-			jimsheatballx[tmp9] == 0xFF ? jimsheatballalive[tmp9] = 0 : jimsheatballx[tmp9]++;
-		}
+	if (jimsheatballalive[0]) {
+		oam_meta_spr(jimsheatballx[0], jimsheatbally[0], Heat_Ball_Sprites[jimsheatballframe[0]]);		
+		jimsheatballframe[0] == 20 ? jimsheatballframe[0] = 0 : jimsheatballframe[0]++;
+		jimsheatballx[0] == 0xFF ? jimsheatballalive[0] = 0 : jimsheatballx[0]++;
+	}
+	if (jimsheatballalive[1]) {
+		oam_meta_spr(jimsheatballx[1], jimsheatbally[1], Heat_Ball_Sprites[jimsheatballframe[1]]);		
+		jimsheatballframe[1] == 20 ? jimsheatballframe[1] = 0 : jimsheatballframe[1]++;
+		jimsheatballx[1] == 0xFF ? jimsheatballalive[1] = 0 : jimsheatballx[1]++;
 	}
 
 	
@@ -143,12 +142,12 @@ void draw_sprites(void){
 		tmpA = player_x[0];
 		tmpB = player_y[0];
 
-		high_byte(player_x[0]) -= 16;
+		high_byte(player_x[0]) -= 8;
 		high_byte(player_y[0]) = player_old_posy[3];
 
 		drawplayerone();
 		
-		high_byte(player_x[0]) -= 16;
+		high_byte(player_x[0]) -= 8;
 		high_byte(player_y[0]) = player_old_posy[6];
 
 		drawplayerone();
@@ -156,7 +155,6 @@ void draw_sprites(void){
 		player_x[0] = tmpA;
 		player_y[0] = tmpB;
 	}
-
 #undef spr_type
 #undef animation_ptr
 }
