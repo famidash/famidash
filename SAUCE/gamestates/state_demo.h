@@ -65,10 +65,10 @@ void state_demo(){
     
     pal_bg(palette_Credits);
 	
-	if (tmp2) {
-		gameState = 0x01;
-		return;
-	}
+//	if (tmp2) {
+//		gameState = 0x01;
+//		return;
+//	}
 
 
 	vram_adr(NAMETABLE_A);

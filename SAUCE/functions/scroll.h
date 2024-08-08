@@ -5,9 +5,15 @@
 
 void do_the_scroll_thing(){
 
-	if (curr_x_scroll_stop < target_x_scroll_stop) curr_x_scroll_stop += 0x80;
-	else if (curr_x_scroll_stop > target_x_scroll_stop) curr_x_scroll_stop -= 0x80;
+		
+	if (cam_seesaw == 1 && curr_x_scroll_stop < 0xE000) target_x_scroll_stop = 0xE000;
+	else if (cam_seesaw == 1 && curr_x_scroll_stop >= 0xE000) cam_seesaw = 2;
+	else if (cam_seesaw == 2 && curr_x_scroll_stop > 0x1000) target_x_scroll_stop = 0x1000;
+	else if (cam_seesaw == 2 && curr_x_scroll_stop <= 0x1000) cam_seesaw = 1;
 	
+	if (curr_x_scroll_stop < target_x_scroll_stop) curr_x_scroll_stop += 0x80;
+	else if (curr_x_scroll_stop > target_x_scroll_stop) curr_x_scroll_stop -= 0x80;		
+
 	if (currplayer_x > curr_x_scroll_stop){ // change x scroll
 		tmp1 = MSB(currplayer_x - curr_x_scroll_stop);
 		scroll_x += tmp1;

@@ -142,26 +142,19 @@ void setdefaultoptions() {
 	
 	// only non-zero values need to be set here
 
-	//twoplayer = 0;
-	//musicoff = 0;
-	//sfxoff = 0;
-	//jumpsound = 0;
-	//oneptwoplayer = 0;
-	//platformer = 0;
-	//options = 0; 
-
-
-	//invisible = 0;
+	twoplayer = 0;
+	options = 0; 
+	invisible = 0;
 	color1 = 0x2A;
 	color2 = 0X2C;		
 	color3 = 0x0F;
-	//discomode = 0;
-	//icon = 0;
-	//trails = 0;
-	//retro_mode = 0;
-	//palette_cycle_mode = 0;
-	//gameboy_mode = 0;
+	discomode = 0;
+	icon = 0;
+	trails = 0;
+	retro_mode = 0;
+	gameboy_mode = 0;
 	decorations = 1;
-	//invisblocks = 0;
+	invisblocks = 0;
+	cam_seesaw = 0;
 	return;
 }

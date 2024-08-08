@@ -220,6 +220,7 @@ uint8_t retro_mode;
 uint8_t palette_cycle_mode;
 uint8_t gameboy_mode;
 uint8_t invisblocks;
+uint8_t cam_seesaw;
 
 #define LEVEL_COUNT 0x12
 uint8_t coin1_obtained[0x40];

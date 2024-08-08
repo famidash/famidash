@@ -23,4 +23,4 @@
 
 
 // save file version. increment by 1 if the SRAM memory layout changes.
-#define FLAG_SAVE_VER 0x02
+#define FLAG_SAVE_VER 0x99

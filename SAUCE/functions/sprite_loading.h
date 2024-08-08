@@ -177,7 +177,11 @@ const unsigned short SCROLL_TABLE[]={
 		0x8000,
 		0x9000,
 		0xA000,
-		0xB000
+		0xB000,
+		0xC000,
+		0xD000,
+		0xE000,
+		0xF000,
 };
 
 
@@ -241,14 +245,9 @@ char sprite_height_lookup(){
 	}
 	*/
 	if (type == DEATH_CHANCE) { 
-		tmp7 = (newrand() & 15) + 1;
-		for (tmp2 = 0; tmp2 < tmp7; tmp2++) {
-			newrand();
-		};
-
-		if (!(newrand() & 63)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; 
+		if ((newrand() & 63) == (newrand() & 63)) { cube_data[currplayer] |= 1; } activesprites_type[index] = 0xFF; return 0; 
 	} 
-	else if (type == X_SCROLL_SETTING) {
+	else if (type == X_SCROLL_SETTING && !cam_seesaw) {
 		tmp8 = activesprites_realy[index] >> 4;
 		target_x_scroll_stop = SCROLL_TABLE[tmp8];
 		activesprites_type[index] = 0xFF;
@@ -258,29 +257,29 @@ char sprite_height_lookup(){
 	
 	
 	else if ((type >= 0xB0) && (type <= 0xBF)) {
-					outline_color = uint8_load(OUTLINES, type & 0x0F);
-					activesprites_type[index] = 0xFF; 
-					return 0x00;
+		outline_color = uint8_load(OUTLINES, type & 0x0F);
+		activesprites_type[index] = 0xFF; 
+		return 0x00;
 	}
 
 	else if ((type >= 0x80) && (type < 0xED)){                //COLOR TRIGGERS ON LOADING    was type & 0x30 and tmp2 = (type & 0x3f)-10 for spots 0x10-0x70
-				if (discomode) return 0;
-					
-				tmp2 = (type & 0x3F);                        
+		if (discomode) return 0;
+			
+		tmp2 = (type & 0x3F);                        
+		
 				
-						
-				if (type >= 0xC0){
-					pal_col(6, tmp2);
-					pal_col(5, oneShadeDarker(tmp2)); 
-					lastgcolortype = type;
-				} else {
-					pal_col(0, tmp2);
-					pal_col(1, oneShadeDarker(tmp2)); 
-					pal_col(9, oneShadeDarker(tmp2)); 
-					lastbgcolortype = type;
-				}
-				activesprites_type[index] = 0xFF; 
-				return 0;
+		if (type >= 0xC0){
+			pal_col(6, tmp2);
+			pal_col(5, oneShadeDarker(tmp2)); 
+			lastgcolortype = type;
+		} else {
+			pal_col(0, tmp2);
+			pal_col(1, oneShadeDarker(tmp2)); 
+			pal_col(9, oneShadeDarker(tmp2)); 
+			lastbgcolortype = type;
+		}
+		activesprites_type[index] = 0xFF; 
+		return 0;
 	}
 	else if (type == MASK_SPRITES_ON) { disco_sprites = 1; activesprites_type[index] = 0xFF; return 0; }
 	else if (type == MASK_SPRITES_OFF) { disco_sprites = 0; activesprites_type[index] = 0xFF; return 0; }
@@ -609,165 +608,165 @@ static void sprite_gamemode_controller_check() {
 void sprite_collide_lookup() {
 
 	if (!activesprites_activated[index] || dual) {
-	switch (collided) {
+		switch (collided) {
 
-	case TELEPORT_PORTAL_EXIT:
-	case TELEPORT_SQUARE_EXIT:
-	case NOSPRITE:
-		return;
-	
-	// Portal game mode switches
-	case S_BLOCK: dashing[currplayer] = 0; return;
-	case H_BLOCK: hblocked[currplayer] = 1; return;
-	case J_BLOCK: jblocked[currplayer] = 1; return;
-	case D_BLOCK: dblocked[currplayer] = 1; return;
-	case F_BLOCK: fblocked[currplayer] = 1; return;
-	case TALLBOI_MODE_ENTER: tallmode = 1; return;
-	case LONGBOI_MODE_ENTER: longmode = 1; return;
-	case BIGBOI_MODE_ENTER: bigboi = 1; return;
-	case GRAVITY_1X_PORTAL: gravity_mod = 0; return;
-	case GRAVITY_13_PORTAL: gravity_mod = 1; return;
-	case GRAVITY_12_PORTAL: gravity_mod = 2; return;
-	case GRAVITY_23_PORTAL: gravity_mod = 3; return;
-	case GRAVITY_2X_PORTAL: gravity_mod = 4; return;
-	case CUBE_MODE:
-		if (retro_mode) gamemode = 4;
-		else gamemode = 0;
-		return;    
+		case TELEPORT_PORTAL_EXIT:
+		case TELEPORT_SQUARE_EXIT:
+		case NOSPRITE:
+			return;
+		
+		// Portal game mode switches
+		case S_BLOCK: dashing[currplayer] = 0; return;
+		case H_BLOCK: hblocked[currplayer] = 1; return;
+		case J_BLOCK: jblocked[currplayer] = 1; return;
+		case D_BLOCK: dblocked[currplayer] = 1; return;
+		case F_BLOCK: fblocked[currplayer] = 1; return;
+		case TALLBOI_MODE_ENTER: tallmode = 1; return;
+		case LONGBOI_MODE_ENTER: longmode = 1; return;
+		case BIGBOI_MODE_ENTER: bigboi = 1; return;
+		case GRAVITY_1X_PORTAL: gravity_mod = 0; return;
+		case GRAVITY_13_PORTAL: gravity_mod = 1; return;
+		case GRAVITY_12_PORTAL: gravity_mod = 2; return;
+		case GRAVITY_23_PORTAL: gravity_mod = 3; return;
+		case GRAVITY_2X_PORTAL: gravity_mod = 4; return;
+		case CUBE_MODE:
+			if (retro_mode) gamemode = 4;
+			else gamemode = 0;
+			return;    
 
-	case SHIP_MODE:
-	case BALL_MODE:
-	case UFO_MODE:
-		target_scroll_y = uint16SepArrLoad(activesprites_y, index) - 0x10; //unused now
-//		target_scroll_y -= 0x10;
-	case ROBOT_MODE:
-		gamemode = collided;
-		//robotjumptime[currplayer] = 0;
-		return;
-	case TELEPORT_SQUARE_ENTER:
-		if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {
-			currplayer_vel_y = 0;
-			orbed[currplayer] = 1;
-			cube_data[currplayer] &= 1;
-	case TELEPORT_PORTAL_UPWARDS_ENTER:
-	case TELEPORT_PORTAL_DOWNWARDS_ENTER:
-	case TELEPORT_PORTAL_ENTER_EXTENSION:
-	case TELEPORT_PORTAL_ENTER:
-			high_byte(currplayer_y) = teleport_output;
-			//activesprites_activated[index]++;
-		}
-		return;
-	case SPIDER_MODE:
-		gamemode = 5;
-		return;
-	case WAVE_MODE:
-		gamemode = 6;
-		return;
-	case SWING_MODE:
-		gamemode = 7;
-		return;
-	case NINJA_MODE:
-		gamemode = 8;
-		return;
-	case RANDOM_MODE_PORTAL:
-		gamemode = rand8() & 7;
-		activesprites_activated[index]++;
-		return;
-	case MINI_PORTAL:
-		mini = 1;
-		return;
-	case GROWTH_PORTAL:
-		mini = 0;
-		return;
-	case GREEN_PAD:
-		currplayer_gravity ^= 1;
-		activesprites_activated[index]++;
-		return;
-	case DUAL_PORTAL:
-		dual = 1;
-		if (twoplayer) { player_gravity[1] = player_gravity[0] ^ 1; }
-		else { player_x[1] = player_x[0]; player_y[1] = player_y[0]; player_gravity[1] = player_gravity[0] ^ 1; }
-		return;
-	case SINGLE_PORTAL:
-		if (!twoplayer) dual = 0;
-		else { player_gravity[1] = player_gravity[0]; }
-		tallmode = 0;
-		longmode = 0;
-		bigboi = 0;
-		return;
+		case SHIP_MODE:
+		case BALL_MODE:
+		case UFO_MODE:
+			target_scroll_y = uint16SepArrLoad(activesprites_y, index) - 0x10; //unused now
+	//		target_scroll_y -= 0x10;
+		case ROBOT_MODE:
+			gamemode = collided;
+			//robotjumptime[currplayer] = 0;
+			return;
+		case TELEPORT_SQUARE_ENTER:
+			if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {
+				currplayer_vel_y = 0;
+				orbed[currplayer] = 1;
+				cube_data[currplayer] &= 1;
+		case TELEPORT_PORTAL_UPWARDS_ENTER:
+		case TELEPORT_PORTAL_DOWNWARDS_ENTER:
+		case TELEPORT_PORTAL_ENTER_EXTENSION:
+		case TELEPORT_PORTAL_ENTER:
+				high_byte(currplayer_y) = teleport_output;
+				//activesprites_activated[index]++;
+			}
+			return;
+		case SPIDER_MODE:
+			gamemode = 5;
+			return;
+		case WAVE_MODE:
+			gamemode = 6;
+			return;
+		case SWING_MODE:
+			gamemode = 7;
+			return;
+		case NINJA_MODE:
+			gamemode = 8;
+			return;
+		case RANDOM_MODE_PORTAL:
+			gamemode = rand8() & 7;
+			activesprites_activated[index]++;
+			return;
+		case MINI_PORTAL:
+			mini = 1;
+			return;
+		case GROWTH_PORTAL:
+			mini = 0;
+			return;
+		case GREEN_PAD:
+			currplayer_gravity ^= 1;
+			activesprites_activated[index]++;
+			return;
+		case DUAL_PORTAL:
+			dual = 1;
+			if (twoplayer) { player_gravity[1] = player_gravity[0] ^ 1; }
+			else { player_x[1] = player_x[0]; player_y[1] = player_y[0]; player_gravity[1] = player_gravity[0] ^ 1; }
+			return;
+		case SINGLE_PORTAL:
+			if (!twoplayer) dual = 0;
+			else { player_gravity[1] = player_gravity[0]; }
+			tallmode = 0;
+			longmode = 0;
+			bigboi = 0;
+			return;
 
-	// collided with non game mode portals 
+		// collided with non game mode portals 
 
-	case GRAVITY_DOWN_PORTAL:
-	case GRAVITY_DOWN_UPWARDS_PORTAL:
-	case GRAVITY_DOWN_DOWNWARDS_PORTAL:
-	case GRAVITY_DOWN_INVISIBLE_PORTAL:  
-		if (currplayer_gravity) {
-			currplayer_gravity = 0; 
-			if (currplayer_vel_y < -0x0290) currplayer_vel_y = -0x0290; 
-		}
-		activesprites_activated[index]++;
-		return;
-	case GRAVITY_UP_PORTAL:
-	case GRAVITY_UP_UPWARDS_PORTAL:
-	case GRAVITY_UP_DOWNWARDS_PORTAL:
-	case GRAVITY_UP_INVISIBLE_PORTAL:
-		if (!currplayer_gravity) {
-			currplayer_gravity = 1; 
-			//if (currplayer_vel_y < 0x0200) currplayer_vel_y = 0x0200; 
-	//	    else
-				if (currplayer_vel_y > 0x0290) currplayer_vel_y = 0x0290; 
-		}
-		activesprites_activated[index]++;		
-		return;
+		case GRAVITY_DOWN_PORTAL:
+		case GRAVITY_DOWN_UPWARDS_PORTAL:
+		case GRAVITY_DOWN_DOWNWARDS_PORTAL:
+		case GRAVITY_DOWN_INVISIBLE_PORTAL:  
+			if (currplayer_gravity) {
+				currplayer_gravity = 0; 
+				if (currplayer_vel_y < -0x0290) currplayer_vel_y = -0x0290; 
+			}
+			activesprites_activated[index]++;
+			return;
+		case GRAVITY_UP_PORTAL:
+		case GRAVITY_UP_UPWARDS_PORTAL:
+		case GRAVITY_UP_DOWNWARDS_PORTAL:
+		case GRAVITY_UP_INVISIBLE_PORTAL:
+			if (!currplayer_gravity) {
+				currplayer_gravity = 1; 
+				//if (currplayer_vel_y < 0x0200) currplayer_vel_y = 0x0200; 
+		//	    else
+					if (currplayer_vel_y > 0x0290) currplayer_vel_y = 0x0290; 
+			}
+			activesprites_activated[index]++;		
+			return;
 
-	// collided with coin
-	case COIN1:
-	case COINGOTTEN1:
-		if (!has_practice_point) {
-			coins |= COIN_1;
-	        sfx_play(sfx_coin, 0);
-			activesprites_type[index] = 0xFF;
-		}
-		return;
-	case COIN2:
-	case COINGOTTEN2:
-		if (!has_practice_point) {
-			coins |= COIN_2;
-	       sfx_play(sfx_coin, 0);
-			activesprites_type[index] = 0xFF;
-		}
-		return;
-	case COIN3:
-	case COINGOTTEN3:
-		if (!has_practice_point) {
-			coins |= COIN_3;
-	        sfx_play(sfx_coin, 0);
-			activesprites_type[index] = 0xFF;
-		}
-		return;
+		// collided with coin
+		case COIN1:
+		case COINGOTTEN1:
+			if (!has_practice_point) {
+				coins |= COIN_1;
+			sfx_play(sfx_coin, 0);
+				activesprites_type[index] = 0xFF;
+			}
+			return;
+		case COIN2:
+		case COINGOTTEN2:
+			if (!has_practice_point) {
+				coins |= COIN_2;
+		       sfx_play(sfx_coin, 0);
+				activesprites_type[index] = 0xFF;
+			}
+			return;
+		case COIN3:
+		case COINGOTTEN3:
+			if (!has_practice_point) {
+				coins |= COIN_3;
+			sfx_play(sfx_coin, 0);
+				activesprites_type[index] = 0xFF;
+			}
+			return;
 
-	// collided with speed trigger
-	case SPEED_05_PORTAL:
-		speed = 1;
-		return;
-	case SPEED_10_PORTAL:
-		speed = 0;
-		return;
-	case SPEED_20_PORTAL:
-		speed = 2;
-		return;
-	case SPEED_30_PORTAL:
-		speed = 3;
-		return;
-	case SPEED_40_PORTAL:
-		speed = 4;
-		return;
+		// collided with speed trigger
+		case SPEED_05_PORTAL:
+			speed = 1;
+			return;
+		case SPEED_10_PORTAL:
+			speed = 0;
+			return;
+		case SPEED_20_PORTAL:
+			speed = 2;
+			return;
+		case SPEED_30_PORTAL:
+			speed = 3;
+			return;
+		case SPEED_40_PORTAL:
+			speed = 4;
+			return;
 
-	case SPIDER_ORB_UP:
-		if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {
-			cube_data[currplayer] &= 1;
-	case SPIDER_PAD_UP:
+		case SPIDER_ORB_UP:
+			if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {
+				cube_data[currplayer] &= 1;
+		case SPIDER_PAD_UP:
 			high_byte(currplayer_y) -= eject_D;
 			currplayer_vel_y = 0;
 			currplayer_gravity = 1;
@@ -781,125 +780,125 @@ void sprite_collide_lookup() {
 				}
 				Generic.y = high_byte(currplayer_y); // the rest should be the same
 			} while (!bg_coll_U());
-			high_byte(currplayer_y) -= eject_U;
-			currplayer_vel_y = 0;	
-			orbed[currplayer] = 1;
-			activesprites_activated[index]++;
+				high_byte(currplayer_y) -= eject_U;
+				currplayer_vel_y = 0;	
+				orbed[currplayer] = 1;
+				activesprites_activated[index]++;
+			}
+			return;
+		case SPIDER_ORB_DOWN:
+			if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {	
+				cube_data[currplayer] &= 1;
+		case SPIDER_PAD_DOWN:
+				high_byte(currplayer_y) -= eject_U + 1;
+				currplayer_vel_y = 0;
+				currplayer_gravity = 0;
+				do {
+					high_byte(currplayer_y) += 0x08;
+					scroll_thing_again2();
+					set_scroll_y(scroll_y);
+					Generic.y = high_byte(currplayer_y); // the rest should be the same
+				} while (!bg_coll_D());
+
+				high_byte(currplayer_y) -= eject_D;
+				
+				currplayer_vel_y = 0;
+				orbed[currplayer] = 1;
+				activesprites_activated[index]++;
+			}
+			return;
+
+		// collided with a pad
+		case YELLOW_PAD_DOWN:
+		case YELLOW_PAD_UP:
+			table_offset = yellow_pad;
+			currplayer_vel_y = sprite_gamemode_y_adjust();
+			//activesprites_activated[index]++;		
+			return;
+		case PINK_PAD_DOWN:
+		case PINK_PAD_UP:
+			table_offset = pink_pad;
+			currplayer_vel_y = sprite_gamemode_y_adjust();
+			//activesprites_activated[index]++;		
+			return;
+		case RED_PAD_DOWN:
+		case RED_PAD_UP:
+			table_offset = red_pad;
+			currplayer_vel_y = sprite_gamemode_y_adjust();
+			//activesprites_activated[index]++;		
+			return;
+
+		case GRAVITY_PAD_DOWN:
+		case GRAVITY_PAD_DOWN_INVISIBLE:
+			if (!currplayer_gravity) { 
+				currplayer_gravity = 0x01;				//flip gravity
+				currplayer_vel_y = PAD_HEIGHT_BLUE;	
+			}
+			//activesprites_activated[index]++;		
+			return;
+		
+		case GRAVITY_PAD_UP:
+		case GRAVITY_PAD_UP_INVISIBLE:
+			if (currplayer_gravity) { 
+				currplayer_gravity = 0x00;				//flip gravity
+				currplayer_vel_y = PAD_HEIGHT_BLUE^0xFFFF;	
+			}
+			//activesprites_activated[index]++;		
+			return;
+
+		// collided with an orb
+
+
+
+		case YELLOW_ORB:
+			table_offset = 0;
+			//intentional leak
+		case DASH_ORB:
+		case DASH_GRAVITY_ORB:
+		case DASH_ORB_UPWARDS:
+		case DASH_GRAVITY_ORB_UPWARDS:
+		case DASH_ORB_DOWNWARDS:
+		case DASH_GRAVITY_ORB_DOWNWARDS:
+		case DASH_ORB_45DEG_UP:
+		case DASH_GRAVITY_ORB_45DEG_UP:
+		case DASH_ORB_45DEG_DOWN:
+		case DASH_GRAVITY_ORB_45DEG_DOWN:
+		case BLUE_ORB:
+			break;
+
+		case YELLOW_ORB_BIGGER:
+			table_offset = ylw_bigger;
+			break;
+		case YELLOW_ORB_SMALLER:
+			table_offset = ylw_smaller;
+			break;
+
+		case PINK_ORB:
+			table_offset = pink_orb;
+			break;
+
+		case BLACK_ORB:
+			table_offset = black_orb;
+			break;
+
+		case RED_ORB:
+			table_offset = red_orb;
+			break;
+		
+		case GREEN_ORB:
+			table_offset = red_orb;
+			break;
+		default:
+			return;
+		};
+		
+		if (gamemode == CUBE_MODE || gamemode == BALL_MODE || gamemode == ROBOT_MODE) {
+			sprite_gamemode_main();
+		} else {
+			sprite_gamemode_controller_check();
 		}
-		return;
-	case SPIDER_ORB_DOWN:
-		if (cube_data[currplayer] & 2 || pad_new[controllingplayer] & PAD_A) {	
-			cube_data[currplayer] &= 1;
-	case SPIDER_PAD_DOWN:
-			high_byte(currplayer_y) -= eject_U + 1;
-			currplayer_vel_y = 0;
-			currplayer_gravity = 0;
-			do {
-				high_byte(currplayer_y) += 0x08;
-				scroll_thing_again2();
-				set_scroll_y(scroll_y);
-				Generic.y = high_byte(currplayer_y); // the rest should be the same
-			} while (!bg_coll_D());
-
-			high_byte(currplayer_y) -= eject_D;
-			
-			currplayer_vel_y = 0;
-			orbed[currplayer] = 1;
-			activesprites_activated[index]++;
-		}
-		return;
-
-	// collided with a pad
-	case YELLOW_PAD_DOWN:
-	case YELLOW_PAD_UP:
-		table_offset = yellow_pad;
-		currplayer_vel_y = sprite_gamemode_y_adjust();
-		//activesprites_activated[index]++;		
-		return;
-	case PINK_PAD_DOWN:
-	case PINK_PAD_UP:
-		table_offset = pink_pad;
-		currplayer_vel_y = sprite_gamemode_y_adjust();
-		//activesprites_activated[index]++;		
-		return;
-	case RED_PAD_DOWN:
-	case RED_PAD_UP:
-		table_offset = red_pad;
-		currplayer_vel_y = sprite_gamemode_y_adjust();
-		//activesprites_activated[index]++;		
-		return;
-
-	case GRAVITY_PAD_DOWN:
-	case GRAVITY_PAD_DOWN_INVISIBLE:
-		if (!currplayer_gravity) { 
-			currplayer_gravity = 0x01;				//flip gravity
-			currplayer_vel_y = PAD_HEIGHT_BLUE;	
-		}
-		//activesprites_activated[index]++;		
-		return;
 	
-	case GRAVITY_PAD_UP:
-	case GRAVITY_PAD_UP_INVISIBLE:
-		if (currplayer_gravity) { 
-			currplayer_gravity = 0x00;				//flip gravity
-			currplayer_vel_y = PAD_HEIGHT_BLUE^0xFFFF;	
-		}
-		//activesprites_activated[index]++;		
 		return;
-
-	// collided with an orb
-
-
-
-	case YELLOW_ORB:
-		table_offset = 0;
-		//intentional leak
-	case DASH_ORB:
-	case DASH_GRAVITY_ORB:
-	case DASH_ORB_UPWARDS:
-	case DASH_GRAVITY_ORB_UPWARDS:
-	case DASH_ORB_DOWNWARDS:
-	case DASH_GRAVITY_ORB_DOWNWARDS:
-	case DASH_ORB_45DEG_UP:
-	case DASH_GRAVITY_ORB_45DEG_UP:
-	case DASH_ORB_45DEG_DOWN:
-	case DASH_GRAVITY_ORB_45DEG_DOWN:
-	case BLUE_ORB:
-		break;
-
-	case YELLOW_ORB_BIGGER:
-		table_offset = ylw_bigger;
-		break;
-	case YELLOW_ORB_SMALLER:
-		table_offset = ylw_smaller;
-		break;
-
-	case PINK_ORB:
-		table_offset = pink_orb;
-		break;
-
-	case BLACK_ORB:
-		table_offset = black_orb;
-		break;
-
-	case RED_ORB:
-		table_offset = red_orb;
-		break;
-	
-	case GREEN_ORB:
-		table_offset = red_orb;
-		break;
-	default:
-		return;
-	};
-	
-	if (gamemode == CUBE_MODE || gamemode == BALL_MODE || gamemode == ROBOT_MODE) {
-		sprite_gamemode_main();
-	} else {
-		sprite_gamemode_controller_check();
-	}
-	
-	return;
 	}
 }
 

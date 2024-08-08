@@ -32,7 +32,7 @@ void state_savefile_validate(){
 
 
     // if save file version is incorrect //
-    if ((SRAM_VALIDATE[2] != FLAG_SAVE_VER) && SRAM_VALIDATE[2] != 0x00) {
+    if ((SRAM_VALIDATE[2] != FLAG_SAVE_VER)) {
         savefile_display();
         multi_vram_buffer_horz(TEXT_isfora, sizeof(TEXT_isfora)-1, NTADR_A(17,4));
         multi_vram_buffer_horz("ER", 2, NTADR_A(5,5));
