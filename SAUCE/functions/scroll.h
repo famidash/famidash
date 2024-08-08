@@ -6,8 +6,8 @@
 void do_the_scroll_thing(){
 
 		
-	if (cam_seesaw == 1 && curr_x_scroll_stop < 0xE000) target_x_scroll_stop = 0xE000;
-	else if (cam_seesaw == 1 && curr_x_scroll_stop >= 0xE000) cam_seesaw = 2;
+	if (cam_seesaw == 1 && curr_x_scroll_stop < 0xD000) target_x_scroll_stop = 0xD000;
+	else if (cam_seesaw == 1 && curr_x_scroll_stop >= 0xD000) cam_seesaw = 2;
 	else if (cam_seesaw == 2 && curr_x_scroll_stop > 0x1000) target_x_scroll_stop = 0x1000;
 	else if (cam_seesaw == 2 && curr_x_scroll_stop <= 0x1000) cam_seesaw = 1;
 	
