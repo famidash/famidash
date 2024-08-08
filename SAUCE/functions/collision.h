@@ -1,8 +1,31 @@
+
+#define SLOPE_NONE			0b0000
+
+#define SLOPE_45DEG_UP 		0b0001
+#define SLOPE_45DEG_DOWN 	0b0010
+#define SLOPE_22DEG_UP 		0b0011
+#define SLOPE_22DEG_DOWN 	0b0100
+#define SLOPE_66DEG_UP 		0b0101
+#define SLOPE_66DEG_DOWN 	0b0110
+
+#define SLOPE_45DEG_UP_UD 	0b1001
+#define SLOPE_45DEG_DOWN_UD 0b1010
+#define SLOPE_22DEG_UP_UD 	0b1011
+#define SLOPE_22DEG_DOWN_UD 0b1100
+#define SLOPE_66DEG_UP_UD 	0b1101
+#define SLOPE_66DEG_DOWN_UD 0b1110
+
+
+
 /* 
 	Gets the collision of the current tile
 	Implemented in asm
 */
 __fastcall__ char bg_collision_sub(void);
+void commonly_used_store();
+void commonly_stored_routine_2();
+void tmp20f();
+
 
 /*
 	Out:
@@ -12,10 +35,10 @@ char bg_coll_sides() {
 	switch (collision) {
 		case COL_BOTTOM: 
 			if (temp_y & 0x08) return 1;		// If Y pos inside block ≥ 8px
-			break;	
+			
 		case COL_TOP: 
 			if (!(temp_y & 0x08)) return 1;		// If Y pos inside block < 8px
-			break;	
+			
 		case COL_ALL: 
 			return 1;		
 		case COL_UP_LEFT:
@@ -24,7 +47,7 @@ char bg_coll_sides() {
 			if (tmp2 < 0x08 && ((uint8_t)(temp_x & 0x0f) < 0x08)) {
 				return 1;
 			}
-			break;
+			
 	};
 	return 0;
 }
@@ -36,107 +59,109 @@ void bg_coll_spikes() {
 	switch (collision) {
 		case COL_UP_LEFT_SPIKE:
 			if (!(temp_y & 0x08)) {
-				tmp2 = (uint8_t)(temp_x & 0x0f);
+				tmp20f();
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_UP_RIGHT_SPIKE:
 			if (!(temp_y & 0x08)) {
-				tmp2 = (uint8_t)(temp_x & 0x0f);
+				tmp20f();
 				if (tmp2 >= 0x0a && tmp2 < 0x0d)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_UP_BOTH_SPIKES:
 			if (!(temp_y & 0x08)) {
 				tmp2 = (uint8_t)(temp_x & 0x07);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_DOWN_LEFT_SPIKE:
 			if ((temp_y & 0x08)) {
-				tmp2 = (uint8_t)(temp_x & 0x0f);
+				tmp20f();
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_DOWN_RIGHT_SPIKE:
 			if ((temp_y & 0x08)) {
-				tmp2 = (uint8_t)(temp_x & 0x0f);
+				tmp20f();
 				if (tmp2 >= 0x0a && tmp2 < 0x0d)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_DOWN_BOTH_SPIKES:
 			if ((temp_y & 0x08)) {
 				tmp2 = (uint8_t)(temp_x & 0x07);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_DEATH_LEFT:
 			if ((uint8_t)(temp_x & 0x0f) < 0x06) {
 				tmp2 = temp_y & 0x0f;
-				if (tmp2 >= 0x06 && tmp2 < 0x09) cube_data[currplayer] = 1;
+				if (tmp2 >= 0x06 && tmp2 < 0x09) break;
 			}
-			break;
+			return;
 		case COL_DEATH_RIGHT:
 			if ((uint8_t)(temp_x & 0x0f) >= 0x0a) {
 				tmp2 = temp_y & 0x0f;
-				if (tmp2 >= 0x06 && tmp2 < 0x09) cube_data[currplayer] = 1;
+				if (tmp2 >= 0x06 && tmp2 < 0x09) break;
 			}
-			break;
+			return;
 		case COL_DEATH_TOP:
 			if ((uint8_t)(temp_y & 0x0f) < 0x04) {			
 				tmp2 = (uint8_t)(temp_x & 0x0f);				// If Y pos inside block < 8px, die
 				if (tmp2 >= 0x04 && tmp2 < 0x09) {		// If X pos even insider, die even more
-					cube_data[currplayer] = 1;						
+					break;
 				}
 			}		
-			break;
+			return;
 		case COL_DEATH_BOTTOM:
 			if ((uint8_t)(temp_y & 0x0f) > 0x0c) {							// If Y pos inside block ≥ 8px, die
 				tmp2 = (uint8_t)(temp_x & 0x0f);				// If Y pos inside block < 8px, die
 				if (tmp2 >= 0x04 && tmp2 < 0x09) {		// If X pos even insider, die even more
-					cube_data[currplayer] = 1;						
+					break;
 				}
 			}								// else nothing
-			break;
+			return;
 		case COL_DEATH:	
 			tmp2 = (uint8_t)(temp_y & 0x0f);
 			if (tmp2 >= 0x04 && tmp2 < 0x0c) {
 				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x03 && tmp2 < 0x09) {
-					cube_data[currplayer] = 0x01;
+					break;
 				}
 			}
-			break;
+			return;
 		case COL_LEFT_SPIKE_BLOCK:
 		case COL_BOTTOM_LEFT_SPIKE:
 			if (!(temp_y & 0x08)) {
 				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
 		case COL_RIGHT_SPIKE_BLOCK:
 		case COL_BOTTOM_RIGHT_SPIKE:
 			if (!(temp_y & 0x08)) {
 				tmp2 = (uint8_t)(temp_x & 0x0f);
 				if (tmp2 >= 0x0a && tmp2 < 0x0d)
-					cube_data[currplayer] = 1;											
+					break;
 			}
-			break;
+			return;
 		case COL_BOTTOM_SPIKES:
 			if (!(temp_y & 0x08)) {
 				tmp2 = (uint8_t)(temp_x & 0x07);
 				if (tmp2 >= 0x02 && tmp2 < 0x06)
-					cube_data[currplayer] = 1;						
+					break;
 			}
-			break;
+			return;
+		default: return;
 	}
+	cube_data[currplayer] = 1;							
 }
 
 /*
@@ -146,21 +171,14 @@ void bg_coll_spikes() {
 void bg_coll_floor_spikes() { // used just for checking ground spikes on the floor
 	temp_x = Generic.x + low_word(scroll_x) + (Generic.width >> 1); // automatically only the low byte
 
-	storeWordSeparately(
-		add_scroll_y(
-			Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 3),
-			scroll_y
-		), temp_y, temp_room);
+		commonly_stored_routine_2();
 
 	for (tmp8 = 0; tmp8 < 2; tmp8++) {
 		bg_collision_sub();
 	
 		bg_coll_spikes();
 			
-		storeWordSeparately(
-			add_scroll_y(
-				Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 0) + Generic.height - 3, scroll_y
-			), temp_y, temp_room);
+		commonly_used_store();
 	}
 
 	// Check middle of cube
@@ -174,11 +192,7 @@ void bg_coll_floor_spikes() { // used just for checking ground spikes on the flo
 
 	bg_coll_spikes();
 
-	storeWordSeparately(
-		add_scroll_y(
-			Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 3),
-			scroll_y
-		), temp_y, temp_room);
+	commonly_stored_routine_2();
 
 	temp_x = Generic.x + low_word(scroll_x) + (Generic.width); // automatically only the low byte
 
@@ -187,28 +201,19 @@ void bg_coll_floor_spikes() { // used just for checking ground spikes on the flo
 
 		bg_coll_spikes();
 
-		storeWordSeparately(
-			add_scroll_y(
-				Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 0) + Generic.height - 3, scroll_y
-			), temp_y, temp_room);
+		commonly_used_store();
 	}
 
 	temp_x -= (Generic.width >> 1); // automatically only the low byte
 
-	storeWordSeparately(
-		add_scroll_y(
-			Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 3), scroll_y
-		), temp_y, temp_room);
+	commonly_stored_routine_2();
 
 	for (tmp8 = 0; tmp8 < 2; tmp8++) {
 		bg_collision_sub();
 	
 		bg_coll_spikes();
 			
-		storeWordSeparately(
-			add_scroll_y(
-				Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 0) + Generic.height - 3, scroll_y
-			), temp_y, temp_room);
+		commonly_used_store();
 	}
 }
 /*
@@ -316,8 +321,8 @@ char bg_side_coll_common() {
 		tmp1 += (currplayer ? 2 : -2);
 	}
 	
-	if (slope_frames > 0) { // if we are on a slope, make right_col a little more upwards so it doesn't hit blocks to the side of the slope
-		tmp1 -= (currplayer_gravity ? 4 : -4);
+	if (was_on_slope_counter | slope_frames) { // if we are on a slope, make right_col a little more upwards so it doesn't hit blocks to the side of the slope
+		tmp1 += (currplayer_gravity ? 16 : -16);
 	}
 
 	storeWordSeparately(add_scroll_y(tmp1, scroll_y), temp_y, temp_room);
@@ -369,7 +374,8 @@ char bg_coll_L() {
 char bg_coll_U_D_checks() {
 	switch (collision) {
 		case COL_ALL: 
-			return 1;
+			if (was_on_slope_counter) return 0;
+			else return 1;
 		case COL_DEATH_TOP:
 			tmp2 = temp_y & 0x0f;	
 			tmp8 = tmp2 & 0x07;	 
@@ -404,18 +410,24 @@ char bg_coll_U_D_checks() {
 
 	return 0;
 }
-#define SLOPE_NONE			0
-#define SLOPE_45DEG_UP 		1
-#define SLOPE_45DEG_DOWN 	2
-#define SLOPE_22DEG_UP 		3
-#define SLOPE_22DEG_DOWN 	4
-#define SLOPE_66DEG_UP 		5
-#define SLOPE_66DEG_DOWN 	6
 
 char xtable[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
 };
 
+void set_slope_stuff() {
+	slope_frames = (gamemode == 6 ? 3 : 2); //signal BG_COLL_R to not check stuff
+	was_on_slope_counter = (gamemode == 6 ? 6 : 4);
+}
+
+char slope_LX22_stuff() {
+	if ((uint8_t)tmp5 >= tmp4 + 2) {
+		set_slope_stuff();
+		slope_type = SLOPE_22DEG_DOWN_UD;
+		tmp8 = tmp5 - tmp4 - 5;
+		return 1;
+	} else return 0;
+}
 /*
 	Clobbers:
 	tmp4, tmp7
@@ -423,40 +435,37 @@ char xtable[] = {
 	A, tmp8
 */
 char bg_coll_slope() {	
+	tmp8 = (temp_y) & 0x0f;
 	switch (collision) {
-		case COL_SLOPE_SUPPORT:
-			if (slope_type) {
-				if (pad[controllingplayer] & PAD_A && gamemode != 6) {
-					slope_frames = 0;
-					slope_type = 0;
-				} else {
-					slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
-					was_on_slope_counter = (gamemode == 6 ? 6 : 2);
-				}
-				switch (slope_type) {
-					case SLOPE_45DEG_UP:
-						tmp8 = 4;
-						break;
-					case SLOPE_22DEG_UP:
-						tmp8 = 2;
-						break;
-					case SLOPE_66DEG_UP:
-						tmp8 = 8;
-						break;
-						
-					case SLOPE_45DEG_DOWN:
-					case SLOPE_22DEG_DOWN:
-					case SLOPE_66DEG_DOWN:
-						tmp8 = 0;
-						break;
-				}
-				return 1;
-			}
-			else return 0;
-		case COL_SLOPE_RU45:
+
+		// 45 degrees
+		
+		case COL_SLOPE_LU45:
 			tmp7 = (temp_x & 0x0f);	// = 0x0F - (temp_x & 0x0F)
-			tmp4 = temp_y & 0x0f;
-			slope_type = SLOPE_45DEG_UP;
+			tmp4 = (temp_y & 0x0f) ^ 0x0f;
+
+			if ((uint8_t)tmp4 >= tmp7 - 3) {
+				set_slope_stuff();
+				slope_type = SLOPE_45DEG_DOWN_UD;
+				tmp8 = tmp4 - tmp7 - 3;
+				return 1;
+			} else return 0;
+			break;
+		case COL_SLOPE_LD45:
+			if (gamemode == 6) return 0;
+			tmp7 = (temp_x & 0x0f);	// = 0x0f - (0x10 - (temp_x & 0x0f))
+			tmp4 = (temp_y & 0x0f);
+			
+			if ((uint8_t)tmp4 >= tmp7) {
+				set_slope_stuff();
+				slope_type = SLOPE_45DEG_DOWN;
+				tmp8 = tmp4 - tmp7 - 3;
+				return 1;
+			} else return 0;
+		case COL_SLOPE_RU45:
+			tmp7 = (temp_x & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = (temp_y & 0x0f) ^ 0x0f;
+			slope_type = SLOPE_45DEG_UP_UD;
 
 			break;
 		case COL_SLOPE_RD45:
@@ -465,103 +474,137 @@ char bg_coll_slope() {
 			slope_type = SLOPE_45DEG_UP;
 
 			break;
-		case COL_SLOPE_RD22_TOP:
+		
+		// 22 degrees
+
+		case COL_SLOPE_RU22_RIGHT:
+			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = (((temp_y) & 0x0e) | 0x1) ^ 0x0f;
+
+			slope_type = SLOPE_22DEG_UP_UD;
+			break;
+		case COL_SLOPE_RU22_LEFT:
+			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f) ^ 0x0f;
+		
+			slope_type = SLOPE_22DEG_UP_UD;
+			break;
+		
+		case COL_SLOPE_RD22_LEFT:
 			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = ((temp_y) & 0x0e) | 0x1;
 
 			slope_type = SLOPE_22DEG_UP;
 			break;	
-			
-		case COL_SLOPE_RD22_BOT:
+		case COL_SLOPE_RD22_RIGHT:
 			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = (temp_y) & 0x0f;
 		
 			slope_type = SLOPE_22DEG_UP;
 			break;
-		case COL_SLOPE_LD22_TOP:
-			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
-			tmp4 = ((temp_y) & 0x0e) >> 1;
-
-			slope_type = SLOPE_22DEG_DOWN;
-			break;	
 	
-		case COL_SLOPE_LD22_BOT:
-			tmp7 = ((temp_x >> 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
-			tmp4 = (temp_y) & 0x0f >> 1;
+		case COL_SLOPE_LU22_RIGHT:
+			tmp7 = (temp_x & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp5 = (temp_y & 0x0f) ^ 0x0f;
+			tmp4 = xtable[(tmp7 >> 1) | 8];
+			
+			return slope_LX22_stuff();
+	
+		case COL_SLOPE_LU22_LEFT:
+			tmp7 = (temp_x & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp5 = (temp_y & 0x0f) ^ 0x0f;
+			tmp4 = xtable[tmp7 >> 1];
 		
-			slope_type = SLOPE_22DEG_DOWN;
-			break;
+			return slope_LX22_stuff();
+
+		case COL_SLOPE_LD22_RIGHT:
+			tmp7 = (temp_x & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp5 = (temp_y & 0x0f);
+			tmp4 = xtable[(tmp7 >> 1) | 8];
+			
+			return slope_LX22_stuff();
+	
+		case COL_SLOPE_LD22_LEFT:
+			tmp7 = (temp_x & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp5 = (temp_y & 0x0f);
+			tmp4 = xtable[tmp7 >> 1];
+		
+			return slope_LX22_stuff();
+		
+		// 66 degrees
+
 		case COL_SLOPE_RD66_TOP:
-			if ((temp_x & 0x0f) < 0x08) return 0;
+			if ((uint8_t)(temp_x & 0x0f) < 0x08) return 0;
 			tmp7 = (((temp_x & 0x07) << 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = ((temp_y) & 0x0f);
 			slope_type = SLOPE_66DEG_UP;
 
 			break;	
 		case COL_SLOPE_RD66_BOT:
-			if ((temp_x & 0x0f) >= 0x08) return 1;
+			if ((uint8_t)(temp_x & 0x0f) >= 0x08) return 1;
 			tmp7 = (((temp_x & 0x0f) << 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
 			tmp4 = ((temp_y) & 0x0f);
 
 			slope_type = SLOPE_66DEG_UP;
 			break;	
-		case COL_SLOPE_LD66_BOT:
-			if ((temp_x & 0x0f) >= 0x08) return 1;
-			tmp7 = (((temp_x & 0x07) << 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
-			tmp4 = -((temp_y) & 0x0f);
+		case COL_SLOPE_LD66_TOP:
+			if ((uint8_t)(temp_x & 0x0f) >= 0x08) return 0;
+			tmp7 = (((temp_x & 0x07) << 1) & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f);
+
 			slope_type = SLOPE_66DEG_DOWN;
+			break;		
+		case COL_SLOPE_LD66_BOT:
+			if ((uint8_t)(temp_x & 0x0f) < 0x08) return 1;
+			tmp7 = (((temp_x & 0x0f) << 1) & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f);
+			slope_type = SLOPE_66DEG_DOWN;
+			break;	
+
+		case COL_SLOPE_RU66_TOP:
+			if ((uint8_t)(temp_x & 0x0f) < 0x08) return 0;
+			tmp7 = (((temp_x & 0x07) << 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f) ^ 0x0f;
+			slope_type = SLOPE_66DEG_UP_UD;
 
 			break;	
-		case COL_SLOPE_LD66_TOP:
-			if ((temp_x & 0x0f) < 0x08) return 0;
+		case COL_SLOPE_RU66_BOT:
+			if ((uint8_t)(temp_x & 0x0f) >= 0x08) return 1;
 			tmp7 = (((temp_x & 0x0f) << 1) & 0x0f) ^ 0x0f;	// = 0x0F - (temp_x & 0x0F)
-			tmp4 = -((temp_y) & 0x0f);
+			tmp4 = ((temp_y) & 0x0f) ^ 0x0f;
 
-			slope_type = SLOPE_66DEG_DOWN;
-			break;			
-		case COL_SLOPE_LD45:
-			if (gamemode == 6) return 0;
-			tmp7 = (temp_x & 0x0f);	// = 0x0f - (0x10 - (temp_x & 0x0f))
-			tmp4 = (temp_y & 0x0f);
+			slope_type = SLOPE_66DEG_UP_UD;
+			break;	
+		case COL_SLOPE_LU66_TOP:
+			if ((uint8_t)(temp_x & 0x0f) >= 0x08) return 0;
+			tmp7 = (((temp_x & 0x07) << 1) & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f) ^ 0x0f;
+
+			slope_type = SLOPE_66DEG_DOWN_UD;
+			break;		
+		case COL_SLOPE_LU66_BOT:
+			if ((uint8_t)(temp_x & 0x0f) < 0x08) return 1;
+			tmp7 = (((temp_x & 0x0f) << 1) & 0x0f);	// = 0x0F - (temp_x & 0x0F)
+			tmp4 = ((temp_y) & 0x0f) ^ 0x0f;
+			slope_type = SLOPE_66DEG_DOWN_UD;
+			break;	
 			
-			if (tmp4 >= tmp7) {
-				slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
-				was_on_slope_counter = (gamemode == 6 ? 6 : 2);
-				slope_type = SLOPE_45DEG_DOWN;
-				tmp8 = tmp4 - tmp7 - 3;
-				return 1;
-			} else return 0;
 		default:
 			return 0;
 	}
-	if (currplayer_gravity) {
-		if ((uint8_t)(tmp4) < tmp7) {
-				tmp8 = tmp7 - tmp4 + (mini ? 2 : ((slope_type == SLOPE_66DEG_UP) ? 1 : 0));
-				if (pad[controllingplayer] & PAD_A && gamemode != 6) {
-					slope_frames = 0;
-					slope_type = 0;
-				} else {
-					slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
-					was_on_slope_counter = (gamemode == 6 ? 6 : 2);
-				}
-				return 1;
-			} else if (!was_on_slope_counter) {
+	if ((uint8_t)(tmp4) >= tmp7) {
+			tmp8 = tmp4 - tmp7 + (mini ? 2 : ((slope_type == SLOPE_66DEG_UP) ? 1 : 0));
+			
+			if (pad[controllingplayer] & PAD_A && gamemode != 6) {
+				slope_frames = 0;
 				slope_type = 0;
-		}
-	} else {
-		if ((uint8_t)(tmp4) >= tmp7) {
-				tmp8 = tmp4 - tmp7 + (mini ? 2 : ((slope_type == SLOPE_66DEG_UP) ? 1 : 0));
-				if (pad[controllingplayer] & PAD_A && gamemode != 6) {
-					slope_frames = 0;
-					slope_type = 0;
-				} else {
-					slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
-					was_on_slope_counter = (gamemode == 6 ? 6 : 2);
-				}
-				return 1;
-			} else if (!was_on_slope_counter) {
-				slope_type = 0;
-		}
+			} else {
+				slope_frames = (gamemode == 6 ? 3 : 1); //signal BG_COLL_R to not check stuff
+				was_on_slope_counter = (gamemode == 6 ? 6 : 2);
+			}
+			return 1;
+	} else if (!was_on_slope_counter) {
+			slope_type = 0;
 	}
 	
 	
@@ -654,7 +697,7 @@ char bg_coll_U() {
 	if (high_byte(currplayer_x) >= 0x10) {
 		storeWordSeparately(
 			add_scroll_y(
-				Generic.y + 2 + (mini ? byte(0x10 - Generic.height) >> 1 : 0),
+				Generic.y + (byte(0x10 - Generic.height) >> 1) + (mini ? 1 : 2),
 				scroll_y
 			), temp_y, temp_room);
 		temp_x = Generic.x + low_word(scroll_x); // middle of the cube
@@ -772,7 +815,7 @@ void bg_coll_death() {
 		if (bg_coll_mini_blocks()) cube_data[currplayer] = 0x01; 
 	}
 	else {
-		if (collision == COL_ALL && gamemode != 0x06) {  // wave
+		if ((collision == COL_ALL || collision == COL_FLOOR_CEIL) && gamemode != 0x06 && !was_on_slope_counter) {  // wave
 			if (currplayer_gravity) {
 				if (currplayer_vel_y > 0) {
 					cube_data[currplayer] = 0x01; 
@@ -792,3 +835,19 @@ void bg_coll_death() {
 //	}
 }
 
+void commonly_used_store() {
+		storeWordSeparately(
+			add_scroll_y(
+				Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 0) + Generic.height - 3, scroll_y
+			), temp_y, temp_room);
+}			
+void commonly_stored_routine_2() {
+	storeWordSeparately(
+		add_scroll_y(
+			Generic.y + (mini ? (byte(0x10 - Generic.height) >> 1) : 3),
+			scroll_y
+		), temp_y, temp_room);
+}		
+void tmp20f() {
+	tmp2 = (uint8_t)(temp_x & 0x0f);	
+}
