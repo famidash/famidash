@@ -39,7 +39,6 @@ void __fastcall__ load_ground(uint8_t id);
 */
 void __fastcall__ dummy_unrle_columns(uint16_t columns);
 
-#pragma code-name(push, "CODE_2")
 void increase_parallax_scroll_column() {
 	// The parallax is a 6 x 9 tile background, and when it repeats
 	// horizontally, we offset the start of the next column by 3
@@ -54,6 +53,7 @@ void increase_parallax_scroll_column() {
 	}
 }
 
+#pragma code-name(push, "CODE_2")
 extern unsigned char scroll_count;
 void unrle_first_screen(void){ // run-length decode the first screen of a level
 	// register unsigned char i;
