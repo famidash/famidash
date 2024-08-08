@@ -435,16 +435,19 @@ void funsettings() {
 		
 		if (invisblocks) 	one_vram_buffer('g', NTADR_A(26, 15));	// believe it or not, 
 		else 	one_vram_buffer('f', NTADR_A(26, 15));	// this is auto optimized by cc65
+		
+		if (cam_seesaw) 	one_vram_buffer('g', NTADR_A(26, 17));	// believe it or not, 
+		else 	one_vram_buffer('f', NTADR_A(26, 17));	// this is auto optimized by cc65
 
 		tmp1 = settingvalue;
 
 		if (pad_new[0] & (PAD_RIGHT | PAD_DOWN)) {
-			if (settingvalue == 4) { settingvalue = 0; }
+			if (settingvalue == 5) { settingvalue = 0; }
 			else { settingvalue++;  }
 		}
 
 		if (pad_new[0] & (PAD_LEFT | PAD_UP)) {
-			if (settingvalue == 0) { settingvalue = 4; }
+			if (settingvalue == 0) { settingvalue = 5; }
 			else { settingvalue--;  }
 		}
 
@@ -477,6 +480,7 @@ void funsettings() {
 					
 					break;
 				case 0x04: invisblocks ^= 1; break;
+				case 0x05: cam_seesaw = (cam_seesaw > 0 ? 0 : 1); break;
 			};
 		}
 			
