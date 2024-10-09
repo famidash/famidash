@@ -190,7 +190,7 @@ uint8_t SRAM_VALIDATE[4];
 #ifdef FLAG_ENABLE_TEST_LEVELS
 	#define LEVEL_COUNT2 256
 #else
-	#define LEVEL_COUNT2 20
+	#define LEVEL_COUNT2 16
 #endif
 
 
@@ -388,7 +388,7 @@ uint8_t activesprites_active[max_loaded_sprites];
 uint8_t activesprites_activated[max_loaded_sprites];
 
 
-
+uint8_t code_count;
 uint8_t DEBUG_MODE; // = 0;
 uint8_t lastgcolortype;
 uint8_t lastbgcolortype;

@@ -897,15 +897,29 @@ void code_checker() {
 	tmp3 = 1;
 
 	// bgm 9 & sfx 2
-	if (song == 0x9 && sfx == 0x2) {
-		gameState = 0xF0; // fun settings gamestate
+	if (song == 0x9 && sfx == 0x2 && code_count == 0) {
+		code_count++;
 		tmp3--;
 	}
+	
+	else if (song == 1 && sfx == 7 && code_count == 1) {
+		code_count++;
+		tmp3--;
+	}
+	
+	else if (song == 5 && sfx == 0xA && code_count == 2) {
+		gameState = 0xF0; // fun settings gamestate
+		tmp3--;
+	}		
+	else code_count = 0;
+	
+/*   debug code disabled
 	if (song == 0xB && sfx == 0x7) {
 		multi_vram_buffer_horz(TEXT_debug_mode, sizeof(TEXT_debug_mode)-1, NTADR_A(7,26));
 		options |= debugtoggle;
 		tmp3--;
 	}
+*/
 
 	// this is quite literally the greatest hack ever
 	// since sfx doesn't update until the next frame i can just
