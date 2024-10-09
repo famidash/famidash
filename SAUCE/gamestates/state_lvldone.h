@@ -781,7 +781,7 @@ void funsettings() {
 				else if (mouse.y >= 0x94 && mouse.y <= 0x9C) {
 					settingvalue = 6; set_fun_settings();
 				}
-				else if (mouse.y >= 0xA4 && mouse.y <= 0x9C) {
+				else if (mouse.y >= 0xA4 && mouse.y <= 0xAC) {
 					settingvalue = 7; set_fun_settings();
 				}
 
