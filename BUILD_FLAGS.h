@@ -41,7 +41,7 @@
 //
 // Beta Build
 // uncomment if compiling a demo or beta build.
-#define FLAG_BETA_BUILD
+//#define FLAG_BETA_BUILD
 //
 // Major Version Number 
 // set if releasing a demo/beta.
