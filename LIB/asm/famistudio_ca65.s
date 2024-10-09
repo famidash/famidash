@@ -4815,6 +4815,7 @@ famistudio_set_instrument:
 		sta @instrument_ptr
 		jsr _newrand
 		eor @instrument_ptr
+		and #$1F
 		; Y is 0
 		cmp #$11	;	Ensure shit stays in range
 		bcs @randomization_loop				;__
