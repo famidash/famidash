@@ -903,11 +903,6 @@ void code_checker() {
 	}
 	
 	else if (song == 1 && sfx == 7 && code_count == 1) {
-		code_count++;
-		tmp3--;
-	}
-	
-	else if (song == 5 && sfx == 0xA && code_count == 2) {
 		gameState = 0xF0; // fun settings gamestate
 		tmp3--;
 	}		
