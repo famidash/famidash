@@ -47,6 +47,9 @@ void state_lvldone() {
 	#define delay_spr_0 tmp4
 	#define delay_timer tmpptr1
 	#define top_scroll scroll_x
+
+	pal_bright(0);
+	ppu_wait_nmi();
 	ppu_off();
 	delay_spr_0 = 0x20;
 	gamemode = 0;
@@ -57,10 +60,10 @@ void state_lvldone() {
 
 	current_state = 0;
 
-	// Set palettes back to natural colors since we aren't fading back in
-	pal_bright(4);
-
-
+	pal_bg(paletteMenu);
+	pal_col(0x0A,0x2A);
+	pal_col(0x0B,0x21);
+	pal_set_update();
     //pal_spr(paletteMenu);
 	pal_spr(paletteDefaultSP);
 	mmc3_set_8kb_chr(LEVELCOMPLETEBANK);
@@ -150,6 +153,8 @@ void state_lvldone() {
     set_scroll_y(top_scroll);
 
 	//	one_vram_buffer(0xD0+coins, NTADR_A(12,9));
+	// Set palettes back to natural colors since we aren't fading back in
+	pal_bright(4);
 
     ppu_on_all();
 
@@ -158,17 +163,12 @@ void state_lvldone() {
 	sfx_play(sfx_level_complete, 0);
 	menuselection = 1;
 	lvl_done_update();
-        //ppu_wait_nmi();
 	while (1) {
-	pal_bg(paletteMenu);
-	pal_col(0x0A,0x2A);
-	pal_col(0x0B,0x21);
-	pal_set_update();		
 		// Rather hacky, but when doing sprite zero at the bottom of the screen we DON'T 
 		// want to skip a frame, so we re-enable NMI and then if NMI happens during the frame
 		// we don't have a lag frame by skipping it.
 		if (VRAM_UPDATE == 1) {
-		ppu_wait_nmi();
+        	ppu_wait_nmi();
 		}
 		// force re-enable NMI every frame.
 		VRAM_UPDATE = 1;

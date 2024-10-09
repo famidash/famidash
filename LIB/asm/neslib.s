@@ -171,7 +171,7 @@ pal_copy:
     lda (PAL_PTR),y
     sta PAL_BUF,x
     dex
-    bne @loop
+    bpl @loop
 
 	inc <PAL_UPDATE
 
