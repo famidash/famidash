@@ -13,6 +13,11 @@ RIFFChunkStart "plst"
 .byte song_time_machine, song_cycles, song_xstep, song_clutterfunk
 .byte song_theory_of_everything, song_electroman_adventures, song_custom_endgame, song_practice
 
+.repeat sfx_max+2, n
+.byte song_max+n
+.endrepeat
+
+
 RIFFChunkStart "psfx"
 .repeat sfx_max+2, n
 .byte song_max+n
@@ -76,6 +81,27 @@ AutMeta "Dj-Nate", "leejh20, UserSniper, Vikrinox, Zenith302"
 .asciiz "VA: MDK"
 .asciiz "VA: Joe"
 
-; TODO: figure out wtf to do with the time
+; TODO: PAL Timings, by flag
+RIFFChunkStart "time"
+.dword 96369+500, 96702+500, 78862+500, (239817*2)
+.dword (29954*2), 90877+500, 86584+500, 88115+500
+.dword 85852+500, 82707+500, 84986+500, 85585+500
+.dword 81409+500, 80710+500, 82041+500, 88697+500
+
+.dword 1000, 1000, 4000, 1000
+.dword 1000, 1000, 1000, 1000
+.dword 1000, 1000, 1000
+
+.dword 2000, 2000
+
+RIFFChunkStart "fade"
+.dword 0, 0, 0, $FFFFFFFF
+.dword $FFFFFFFF, 0, 0, 0
+.dword 0, 0, 0, 0
+.dword 0, 0, 0, 0
+
+.repeat sfx_max+2
+.dword 0
+.endrepeat
 
 EndNSFERIFFList

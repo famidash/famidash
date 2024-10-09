@@ -4805,6 +4805,7 @@ famistudio_set_instrument:
 	
 ;!!! FAMISTUDIO DRIVER MODIFICATION BEGIN
 ;*  MODIFIED
+	.ifdef CURSED_MUSIC_ENABLE
 	; Randomize the instrument if the music is cursed
     bit _cursedmusic
 	bvc @no_randomization
@@ -4819,6 +4820,7 @@ famistudio_set_instrument:
 		bcs @randomization_loop				;__
 	
 	@no_randomization:
+	.endif
 ;!!! FAMISTUDIO DRIVER MODIFICATION END
 
 
@@ -5583,20 +5585,26 @@ famistudio_advance_channel:
     sta famistudio_chn_note,x ; Store note code
 ;!!! FAMISTUDIO DRIVER MODIFICATION BEGIN
 ;*  MODIFIED
+	.ifdef CURSED_MUSIC_ENABLE
 	; Randomize the instrument if the music is cursed
     bit _cursedmusic
 	bpl @no_randomization
 	eor famistudio_tempo_acc_lo
+	sty @temp_ptr_y
+	sta famistudio_chn_note,x
+	lda #0
+	sta famistudio_slide_step, x
 	
 	@randomization_loop:
-		sta famistudio_chn_note,x
 		jsr _newrand
 		eor famistudio_chn_note,x
 		cmp #96	;	Ensure shit stays in range
 		bcs @randomization_loop				;__
 	
 	sta famistudio_chn_note,x
+	ldy @temp_ptr_y
 	@no_randomization:
+	.endif
 ;!!! FAMISTUDIO DRIVER MODIFICATION END
 	
 

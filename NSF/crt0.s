@@ -22,7 +22,6 @@ PLAYBACK_MODE:		.res 1 ; Bit 7 for PCM, bit 6 for finished PCM
 current_song_bank:	.res 1
 sampleID:			.res 1
 
-
 ;
 ; NSF2 header
 ;
