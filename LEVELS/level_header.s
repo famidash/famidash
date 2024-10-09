@@ -75,8 +75,8 @@ theoryofeverything_grnd_color  = $04
 decode_song_number = song_custom_endgame
 decode_game_mode   = $00
 decode_speed       = $00
-decode_bg_color    = $12
-decode_grnd_color  = $02
+decode_bg_color    = $16
+decode_grnd_color  = $06
 
 nightmare_song_number = song_polargeist
 nightmare_game_mode   = $00
