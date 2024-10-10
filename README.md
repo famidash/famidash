@@ -31,7 +31,7 @@ The general principle is: fork it, change it, push it, open a PR, get it merged 
 |[kandowontu](https://github.com/kandowontu)|director, secondary lead developer, maintainer|
 |[AleFunky](https://github.com/PinguLinux)|core code, levels, testing, bugfixes|
 |[Ficus mcHousePlant](https://github.com/FicusmcHousePlant)|levels, guidance, testing, bugfixes, graphics|
-|[alexmush](https://github.com/ADM228)|code, code optimization|
+|[alexmush](https://github.com/ADM228)|code, code optimization, music|
 |[jroweboy](https://github.com/jroweboy)|graphics, code optimisation, parallax, menu, etc|
 |[Zenith](https://github.com/ZenithNeko)|music, graphics|
 

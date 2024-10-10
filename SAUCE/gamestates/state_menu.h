@@ -285,7 +285,12 @@ void customize_screen() {
 
 	ppu_on_all();
 	pal_fade_to_withmusic(0,4);
-	prev_icon = icon;
+	tmp1 = iconTable[icon] + 'a';
+	one_vram_buffer(tmp1, NTADR_A(15, 8));
+	one_vram_buffer(++tmp1, NTADR_A(16, 8));
+	one_vram_buffer((tmp1 += ('c'-'b')), NTADR_A(15, 9));
+	one_vram_buffer(++tmp1, NTADR_A(16, 9));
+	prev_icon = icon;	
 	while (1) {
 		tmp3 = 0;
 
