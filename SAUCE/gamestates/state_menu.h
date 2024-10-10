@@ -396,10 +396,12 @@ void customize_screen() {
 			if (joypad1.press_up || (joypad1.up && hold_timer >= 15)) {
 				icon++;
 				if (icon > (MAX_ICONS - 1)) icon = 0;
+				hold_timer = 0;
 			}
 			if (joypad1.press_down || (joypad1.down && hold_timer >= 15)) {
 				if (icon == 0) icon = MAX_ICONS - 1;
 				else icon--;
+				hold_timer = 0;				
 			}
 		} else if (settingvalue != 3) updateColors();
 
