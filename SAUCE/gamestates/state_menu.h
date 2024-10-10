@@ -1240,6 +1240,7 @@ void roll_new_mode() {
 		titlemode = (newrand() & 7) + 8;
 	}
 	if (retro_mode && titlemode == 0) titlemode = tmp7;
+	if (retro_mode && titlemode == 2) titlemode = tmp7;
 //	titlemode = 11; //to test
 	if (titlemode == 1 || titlemode == 3 || titlemode == 6 || titlemode == 9 || titlemode == 11 || titlemode == 12) {
 		while (tmp1 > 0xA0 && tmp1 <= 0x20) {
